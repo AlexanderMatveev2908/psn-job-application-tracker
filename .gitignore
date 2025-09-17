@@ -1,17 +1,102 @@
+# ? python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.Python
+env/
+.venv/
+venv/
+pip-wheel-metadata/
+
+# ? java
+*.class
+*.log
+*.jar
+*.war
+*.ear
+out/
+bin/
+.gradle
+
+# ? useless
+.editorconfig
+
+# ? keep .vscode because it have useful settings for python formatting
+
+# ? keep cheat_sheet because can be useful as reminder for some concepts 
+
+# ? pytest
+htmlcov/
+.cache/
+.tox/
+.coverage
+.coverage.*
+.pytest_cache/
+nosetests.xml
+test-results.xml
+.pytest_cache/
+
+# ? mypy / ruff / linting
+.mypy_cache/
+.dmypy.json
+ruff_cache/
+*.lint
+*.typecheck
+
+# ? yarn
 .yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/sdks/
+!.yarn/versions/
+!.yarnrc.yml
 
-# Whether you use PnP or not, the node_modules folder is often used to store
-# build artifacts that should be gitignored
-node_modules
+# ? node
+node_modules/
 
-# Swap the comments on the following lines if you wish to use zero-installs
-# In that case, don't forget to run `yarn config set enableGlobalCache false`!
-# Documentation here: https://yarnpkg.com/features/caching#zero-installs
+# ? ts build
+*.tsbuildinfo
 
-#!.yarn/cache
-.pnp.*
+# ? turbo
+turbo/
+.turbo/
+
+# ? build apps
+dist/
+build/
+
+# ? loggers
+logger/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ? client
+apps/*/.next/
+apps/*/out/
+
+# ? secrets
+*.pem
+*.key
+*.crt
+.env
+.env.*
+certs/
+kind-secrets.yml
+
+# ? assets
+uploads/
+assets/
+
+# ? tests
+playwright-report/
+test-results/
+

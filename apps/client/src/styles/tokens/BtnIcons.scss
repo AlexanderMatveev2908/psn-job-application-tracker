@@ -1,0 +1,56 @@
+.btn_icons {
+}
+
+@for $i from 0 through 5 {
+  .btn_icons__svg_#{$i} {
+    position: absolute;
+    pointer-events: none;
+    transition: 0.3s;
+    z-index: 100;
+    transform: scale(0);
+    opacity: 0.5;
+
+    @if ($i % 2 ==1) {
+      width: 30px;
+      height: 30px;
+    } @else {
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  .btn_icons:enabled:hover .btn_icons__svg_#{$i} {
+    opacity: 1;
+    @if ($i % 2 ==0) {
+      transition-delay: 0.05s;
+      transform: scale(1.1) translateY(-50%) rotate(25deg);
+    } @else {
+      transform: scale(1.1) translateY(-25%) rotate(-25deg);
+    }
+  }
+
+  .btn_icons:enabled:active .btn_icons__svg_#{$i} {
+    transition: 0.1s;
+    opacity: 0.5;
+    transform: scale(0);
+  }
+}
+
+.btn_icons__svg_0 {
+  @apply -top-[50%] -left-[10%];
+}
+.btn_icons__svg_1 {
+  @apply -top-[50%] -right-[10%];
+}
+.btn_icons__svg_2 {
+  @apply -bottom-[150%] left-[25%];
+}
+.btn_icons__svg_3 {
+  @apply -bottom-[50%] -left-[10%];
+}
+.btn_icons__svg_4 {
+  @apply -bottom-[75%] right-0;
+}
+.btn_icons__svg_5 {
+  @apply top-[0] right-[25%];
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "tasks": {
+    "install_pkg": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["^install_pkg"],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^dev"],
+      "outputs": []
+    },
+    "check": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": [],
+      "outputs": []
+    },
+    "test": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": [],
+      "outputs": []
+    },
+    "start": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^start"],
+      "outputs": []
+    },
+    "build": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["^build"],
+      "outputs": ["apps/client/.next/**", "apps/server/dist/**"]
+    }
+  }
+}

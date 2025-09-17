@@ -1,0 +1,63 @@
+@keyframes spin {
+  0% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+.__wrap {
+  min-height: 20vh;
+}
+
+.__dot {
+  position: absolute;
+  content: "";
+  background: var(--spin__clr);
+  box-shadow: 0 0 10px var(--spin__clr), 0 0 20px var(--spin__clr),
+    0 0 30px var(--spin__clr), 0 0 40px var(--spin__clr),
+    0 0 50px var(--spin__clr);
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+
+  animation: spin 1s linear infinite;
+  animation-delay: var(--delay_page);
+}
+
+@media screen and (min-width: 350px) {
+  .__wrap {
+    min-height: 30vh;
+  }
+
+  .__dot {
+    width: 30px;
+    height: 30px;
+  }
+}
+@media screen and (min-width: 600px) {
+  .__wrap {
+    min-height: 40vh;
+  }
+
+  .__dot {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .__wrap {
+    min-height: 50vh;
+  }
+
+  .__dot {
+    width: 50px;
+    height: 50px;
+  }
+}

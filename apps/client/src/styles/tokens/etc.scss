@@ -1,0 +1,50 @@
+.tb {
+  @apply border-[3px] border-[whitesmoke];
+}
+.tc {
+  @apply text-[whitesmoke] text-2xl;
+}
+
+.bd__sm {
+  @apply border-2 border-neutral-300 rounded-xl;
+}
+
+.bd__md {
+  @apply border-3 border-neutral-300 rounded-xl;
+}
+
+.grad__txt {
+  background: linear-gradient(to right, var(--white__0), var(--neutral__500));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.clamp__txt {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.scroll__app::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll__app::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll__app::-webkit-scrollbar-thumb {
+  background: var(--white__0);
+  border-radius: 10px;
+  box-shadow: 0 0 2.5px var(--white__0), 0 0 5px var(--white__0);
+}
+
+.scroll__app {
+  scrollbar-width: auto;
+  scrollbar-color: var(--white__0) transparent;
+}

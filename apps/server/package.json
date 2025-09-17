@@ -1,0 +1,11 @@
+{
+  "name": "server",
+  "scripts": {
+    "dev": "find app/src/main/java app/src/main/resources -type f | entr -r ./gradlew bootRun",
+    "build": "./gradlew bootJar",
+    "start": "java -jar app/build/libs/server-1.0.0.jar",
+    "test": "./gradlew test",
+    "clean": "./gradlew clean",
+    "install_pkg": "./gradlew clean build --refresh-dependencies"
+  }
+}

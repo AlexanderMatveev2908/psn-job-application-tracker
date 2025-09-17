@@ -1,0 +1,66 @@
+@use "./t.css";
+
+@use "./tokens/etc.scss";
+@use "./tokens/hover.scss";
+@use "./tokens/z.scss";
+@use "./tokens/txt.scss";
+@use "./tokens//SVGs.scss";
+@use "./tokens/inputs.scss";
+@use "./tokens/shapes.scss";
+@use "./tokens/animations.scss";
+@use "./tokens/BtnIcons.scss";
+
+:root {
+  --white__0: #f5f5f5;
+
+  --gray__300: #d1d5dc;
+
+  --green__600: #16a34a;
+  --blue__300: #93c5fd;
+  --blue__600: #2563eb;
+  --red__600: #dc2626;
+  --orange__600: #ea580c;
+  --yellow__600: #ca8a04;
+
+  --neutral__50: #fafafa;
+  --neutral__100: #f5f5f5;
+  --neutral__200: #e5e5e5;
+  --neutral__300: #d4d4d4;
+  --neutral__400: #a3a3a3;
+  --neutral__500: #737373;
+  --neutral__600: #525252;
+  --neutral__700: #404040;
+  --neutral__800: #262626;
+  --neutral__900: #171717;
+  --neutral__950: #0a0a0a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button {
+  appearance: none;
+}
+input {
+  appearance: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

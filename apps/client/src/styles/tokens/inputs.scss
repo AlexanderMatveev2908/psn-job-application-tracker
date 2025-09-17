@@ -1,0 +1,13 @@
+.input__base,
+.input__txt {
+  @apply transition-all duration-300 outline-0 border-2 border-neutral-300 rounded-xl;
+}
+.input__txt {
+  @apply w-full py-2 px-4;
+}
+
+.input__base:focus,
+.input__txt:focus {
+  box-shadow: 0 0 2.5px var(--white__0), 0 0 5px var(--white__0),
+    0 0 10px var(--white__0), 0 0 15px var(--white__0), 0 0 20px var(--white__0);
+}

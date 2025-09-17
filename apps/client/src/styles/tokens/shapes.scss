@@ -1,0 +1,35 @@
+.page__shape {
+  @apply w-full flex flex-col justify-center gap-10;
+}
+
+.cont__grid__sm,
+.cont__grid__md,
+.cont__grid__lg {
+  @apply w-full grid grid-cols-1;
+}
+
+.cont__grid__sm {
+  @apply gap-4;
+}
+.cont__grid__md {
+  @apply gap-6;
+}
+.cont__grid__lg {
+  @apply gap-8;
+}
+
+.form__shape__sm {
+  @apply w-full mx-auto max-w-[800px] h-fit rounded-xl border-3 border-neutral-300 py-5 overflow-hidden;
+}
+
+.form__body__sm {
+  @apply grid grid-cols-1 gap-6 w-full h-fit max-h-fit items-start p-5;
+}
+
+.search_bar__btn {
+  @apply w-[80px] md:w-[250px];
+}
+
+.search_bar__wrap_btns {
+  @apply w-full grid grid-cols-2 gap-10 justify-items-center;
+}

@@ -1,0 +1,46 @@
+.link__app,
+.link__curr {
+  position: relative;
+  max-width: fit-content;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -3.5px;
+    width: 100%;
+    left: 0;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: 0.3s ease-in-out;
+    background-color: var(--white__0);
+  }
+}
+
+.link__app:hover,
+.link__curr {
+  &::after {
+    transform: scaleX(1);
+    box-shadow: 0 0 5px var(--white__0), 0 0 10px var(--white__0);
+  }
+}
+
+.btn__app:enabled,
+.el__app {
+  cursor: pointer;
+  transition: 0.3s;
+
+  &:hover {
+    transform: scale(var(--scale__up));
+  }
+}
+
+.btn__app:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.btn__app:enabled:active,
+.el__app:active {
+  transition: 0.15s;
+  transform: scale(0.8);
+}

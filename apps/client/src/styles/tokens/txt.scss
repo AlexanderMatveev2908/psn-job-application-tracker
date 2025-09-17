@@ -1,0 +1,35 @@
+.txt__xxs {
+  @apply font-thin text-xs lg:text-sm;
+}
+
+.txt__xs {
+  @apply font-normal text-xs sm:text-sm lg:text-base;
+}
+
+.txt__sm {
+  @apply font-normal text-sm sm:text-base lg:text-lg;
+}
+
+.txt__md {
+  @apply font-medium text-base sm:text-lg lg:text-xl;
+}
+
+.txt__lg {
+  @apply font-bold text-lg sm:text-xl lg:text-2xl;
+}
+
+.txt__xl {
+  @apply font-bold text-xl sm:text-2xl lg:text-3xl;
+}
+
+.txt__2xl {
+  @apply font-bold text-2xl sm:text-3xl lg:text-4xl;
+}
+
+.txt__3xl {
+  @apply font-extrabold text-3xl sm:text-4xl lg:text-5xl;
+}
+
+.txt__clr {
+  @apply text-neutral-300;
+}

@@ -1,0 +1,40 @@
+app:
+  env-vars:
+    appName: ${APP_NAME}
+    nextPblEnv: ${NEXT_PUBLIC_ENV}
+    nextPblBackUrl: ${NEXT_PUBLIC_BACK_URL}
+    nextPblBackUrlDev: ${NEXT_PUBLIC_BACK_URL_DEV}
+    nextPblBackUrlTest: ${NEXT_PUBLIC_BACK_URL_TEST}
+    nextPblFrontUrl: ${NEXT_PUBLIC_FRONT_URL}
+    nextPblFrontUrlDev: ${NEXT_PUBLIC_FRONT_URL_DEV}
+    nextPblFrontUrlTest: ${NEXT_PUBLIC_FRONT_URL_TEST}
+    nextPblSmptFrom: ${NEXT_PUBLIC_SMPT_FROM}
+
+server:
+  port: 3000
+
+spring:
+  datasource:
+    url: ${DB_URL}?sslmode=verify-full&sslrootcert=${DB_CERT}
+    username: ${DB_US}
+    password: ${DB_PWD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+logging:
+  level:
+    root: WARN
+    org.hibernate: WARN
+    org.flywaydb: WARN
