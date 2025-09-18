@@ -12,6 +12,8 @@ app:
 
 server:
   port: 3000
+  tomcat:
+    relaxed-query-chars: "[,]"
 
 spring:
   datasource:

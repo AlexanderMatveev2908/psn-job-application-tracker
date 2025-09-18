@@ -10,9 +10,9 @@ import server.middleware.dev.ReqAPI;
 public class PostCtrl {
     public Map<String, Object> wakeUp(ReqAPI req) {
 
-        var bd = req.grabBody();
+        // var bd = req.grabBody();
 
-        System.out.println(bd);
+        // System.out.println(bd);
 
         return Map.of(
                 "status", 200,

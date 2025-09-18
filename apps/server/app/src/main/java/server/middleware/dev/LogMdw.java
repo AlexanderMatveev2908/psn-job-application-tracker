@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,21 +19,23 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-@SuppressWarnings("UseSpecificCatch")
+@SuppressWarnings({ "UseSpecificCatch", "unchecked" })
 @Component
+@Order(1)
 public class LogMdw implements Filter {
 
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
-    private static final ObjectMapper jack = new ObjectMapper();
+    private static final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, jakarta.servlet.ServletException {
+            throws IOException, ServletException {
 
         HttpServletRequest http = (HttpServletRequest) req;
         ReqAPI cpyReq = new ReqAPI(http);
@@ -56,6 +59,9 @@ public class LogMdw implements Filter {
 
         Map<String, String[]> params = http.getParameterMap();
         arg.put("params", params.isEmpty() ? null : params);
+
+        Map<String, Object> parsedQuery = (Map<String, Object>) http.getAttribute("parsedQuery");
+        arg.put("parsedQuery", parsedQuery == null || parsedQuery.isEmpty() ? null : parsedQuery);
 
         String accessToken = http.getHeader("authorization");
         arg.put("accessToken", accessToken);
@@ -89,7 +95,6 @@ public class LogMdw implements Filter {
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING)) {
 
-                jack.enable(SerializationFeature.INDENT_OUTPUT);
                 String json = jack.writeValueAsString(arg);
 
                 bw.write(json);
