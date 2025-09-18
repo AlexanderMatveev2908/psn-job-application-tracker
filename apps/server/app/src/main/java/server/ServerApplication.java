@@ -29,7 +29,7 @@ public class ServerApplication {
     ApplicationListener<WebServerInitializedEvent> lifeSpawn() {
         return e -> {
 
-            log.log(String.format("🚀 server running on %d...", e.getWebServer().getPort()),
+            log.logTtl(String.format("🚀 server running on %d...", e.getWebServer().getPort()),
                     String.format("⬜ whitelist => %s", env.getFrontUrl()));
         };
     }

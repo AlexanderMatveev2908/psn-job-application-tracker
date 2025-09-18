@@ -16,7 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import server.middleware.dev.ReqAPI;
+import server.decorators.ReqAPI;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component

@@ -11,7 +11,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import server.middleware.dev.ReqAPI;
+import server.decorators.ReqAPI;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component

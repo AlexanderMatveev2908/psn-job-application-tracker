@@ -5,9 +5,10 @@ import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import server.decorators.ErrAPI;
+import server.decorators.ReqAPI;
 import server.features.wake_up.controllers.GetCtrl;
 import server.features.wake_up.controllers.PostCtrl;
-import server.middleware.dev.ReqAPI;
 import server.router.RootApi;
 
 @RootApi
@@ -27,7 +28,7 @@ public class WakeUpRouter {
     }
 
     @PostMapping("/wake-up")
-    public Map<String, Object> wakeUpPost(ReqAPI req) {
+    public Map<String, Object> wakeUpPost(ReqAPI req) throws ErrAPI, Exception {
         return postCtrl.wakeUp(req);
     }
 }

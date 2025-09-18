@@ -1,4 +1,4 @@
-package server.middleware.dev;
+package server.decorators;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
