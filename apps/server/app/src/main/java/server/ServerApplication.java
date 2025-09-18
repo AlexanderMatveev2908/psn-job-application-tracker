@@ -26,9 +26,9 @@ public class ServerApplication {
     ApplicationListener<WebServerInitializedEvent> lifeSpawn() {
         return e -> {
 
-            System.out.println("🚀 Server running on " + e.getWebServer().getPort());
-
-            System.out.println("🌍 Env: " + env.getEnvVars());
+            System.out.println(String.format("🚀 server running on %d...", e.getWebServer().getPort()));
+            System.out.println();
+            System.out.println("⬜ whitelist => " + env.getFrontUrl());
         };
     }
 }
