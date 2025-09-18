@@ -35,7 +35,7 @@ public class LogMdw implements Filter {
             throws IOException, jakarta.servlet.ServletException {
 
         HttpServletRequest http = (HttpServletRequest) req;
-        CpyReq cpyReq = new CpyReq(http);
+        ReqAPI cpyReq = new ReqAPI(http);
 
         Path appDir = Path.of(System.getProperty("user.dir"));
         Path serverDir = appDir.resolve("../").normalize();

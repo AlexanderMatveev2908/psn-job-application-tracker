@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +15,12 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 
-public class CpyReq extends HttpServletRequestWrapper {
+@SuppressWarnings("UseSpecificCatch")
+public class ReqAPI extends HttpServletRequestWrapper {
     private final byte[] cachedBody;
+    private static final ObjectMapper jack = new ObjectMapper();
 
-    public CpyReq(HttpServletRequest req) throws IOException {
+    public ReqAPI(HttpServletRequest req) throws IOException {
         super(req);
         InputStream bodyStream = req.getInputStream();
         this.cachedBody = bodyStream.readAllBytes();
@@ -49,6 +50,7 @@ public class CpyReq extends HttpServletRequestWrapper {
             public void setReadListener(ReadListener readListener) {
                 throw new UnsupportedOperationException("❌ async read not supported");
             }
+
         };
     }
 
@@ -58,10 +60,18 @@ public class CpyReq extends HttpServletRequestWrapper {
                 new InputStreamReader(new ByteArrayInputStream(this.cachedBody), StandardCharsets.UTF_8));
     }
 
-    public Map<String, Object> grabBody() throws IOException {
-        ObjectMapper jack = new ObjectMapper();
+    public <T> T grabBody() {
 
-        return jack.readValue(cachedBody, new TypeReference<Map<String, Object>>() {
-        });
+        try {
+            if (cachedBody.length == 0)
+                return null;
+
+            return jack.readValue(cachedBody, new TypeReference<T>() {
+            });
+
+        } catch (Exception err) {
+            return null;
+        }
     }
+
 }
