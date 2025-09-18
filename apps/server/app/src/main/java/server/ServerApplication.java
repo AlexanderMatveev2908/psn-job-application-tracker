@@ -7,14 +7,17 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
 import server.conf.env.EnvKeeper;
+import server.lib.dev.MyLog;
 
 @SpringBootApplication
 public class ServerApplication {
 
     private final EnvKeeper env;
+    private final MyLog log;
 
-    public ServerApplication(EnvKeeper env) {
+    public ServerApplication(EnvKeeper env, MyLog log) {
         this.env = env;
+        this.log = log;
     }
 
     public static void main(String[] args) {
@@ -26,9 +29,8 @@ public class ServerApplication {
     ApplicationListener<WebServerInitializedEvent> lifeSpawn() {
         return e -> {
 
-            System.out.println(String.format("🚀 server running on %d...", e.getWebServer().getPort()));
-            System.out.println();
-            System.out.println("⬜ whitelist => " + env.getFrontUrl());
+            log.log(String.format("🚀 server running on %d...", e.getWebServer().getPort()),
+                    String.format("⬜ whitelist => %s", env.getFrontUrl()));
         };
     }
 }
