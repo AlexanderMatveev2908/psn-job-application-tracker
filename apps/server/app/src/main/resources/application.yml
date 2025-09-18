@@ -15,9 +15,6 @@ server:
 
 spring:
   datasource:
-    url: ${DB_URL}?sslmode=verify-full&sslrootcert=${DB_CERT}
-    username: ${DB_US}
-    password: ${DB_PWD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
