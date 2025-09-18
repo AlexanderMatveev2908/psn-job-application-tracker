@@ -23,11 +23,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 
 @SuppressWarnings({ "UseSpecificCatch", "unchecked" })
 @Component
-@Order(1)
+@Order(10)
 public class LogMdw implements Filter {
 
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
@@ -37,8 +36,7 @@ public class LogMdw implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest http = (HttpServletRequest) req;
-        ReqAPI cpyReq = new ReqAPI(http);
+        ReqAPI reqAPI = (ReqAPI) req;
 
         Path appDir = Path.of(System.getProperty("user.dir"));
         Path serverDir = appDir.resolve("../").normalize();
@@ -51,22 +49,25 @@ public class LogMdw implements Filter {
 
         Map<String, Object> arg = new LinkedHashMap<>();
 
-        arg.put("url", http.getRequestURI());
-        arg.put("method", http.getMethod());
+        arg.put("url", reqAPI.getRequestURI());
+        arg.put("method", reqAPI.getMethod());
 
-        String query = http.getQueryString();
+        String query = reqAPI.getQueryString();
         arg.put("query", (query == null || query.isBlank()) ? null : query);
 
-        Map<String, String[]> params = http.getParameterMap();
+        Map<String, String[]> params = reqAPI.getParameterMap();
         arg.put("params", params.isEmpty() ? null : params);
 
-        Map<String, Object> parsedQuery = (Map<String, Object>) http.getAttribute("parsedQuery");
+        Map<String, Object> parsedQuery = (Map<String, Object>) reqAPI.getAttribute("parsedQuery");
         arg.put("parsedQuery", parsedQuery == null || parsedQuery.isEmpty() ? null : parsedQuery);
 
-        String accessToken = http.getHeader("authorization");
+        Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
+        arg.put("parsedForm", parsedForm == null || parsedForm.isEmpty() ? null : parsedForm);
+
+        String accessToken = reqAPI.getHeader("authorization");
         arg.put("accessToken", accessToken);
 
-        Cookie[] cookies = http.getCookies(); // may be null if no cookies
+        Cookie[] cookies = reqAPI.getCookies(); // may be null if no cookies
         String refreshToken = null;
 
         if (cookies != null) {
@@ -79,11 +80,13 @@ public class LogMdw implements Filter {
         }
         arg.put("refreshToken", refreshToken);
 
+        String contentType = reqAPI.getContentType();
         Map<String, Object> body = null;
-
-        try {
-            body = cpyReq.grabBody();
-        } catch (Exception err) {
+        if (!contentType.startsWith("multipart/form-data")) {
+            try {
+                body = reqAPI.grabBody();
+            } catch (Exception err) {
+            }
         }
 
         arg.put("body", body);
@@ -104,6 +107,6 @@ public class LogMdw implements Filter {
             }
         });
 
-        chain.doFilter(cpyReq, res);
+        chain.doFilter(reqAPI, res);
     }
 }

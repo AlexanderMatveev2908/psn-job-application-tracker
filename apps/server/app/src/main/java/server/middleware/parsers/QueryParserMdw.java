@@ -11,23 +11,23 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import server.middleware.dev.ReqAPI;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component
-@Order(0)
+@Order(5)
 public class QueryParserMdw implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest reqHttp = (HttpServletRequest) req;
+        ReqAPI reqAPI = (ReqAPI) req;
 
-        Map<String, Object> parsedQuery = ParserManager.nestDict(reqHttp.getQueryString());
+        Map<String, Object> parsedQuery = ParserManager.nestDict(reqAPI.getQueryString());
 
-        reqHttp.setAttribute("parsedQuery", parsedQuery);
+        reqAPI.setAttribute("parsedQuery", parsedQuery);
 
-        chain.doFilter(req, res);
+        chain.doFilter(reqAPI, res);
     }
 }

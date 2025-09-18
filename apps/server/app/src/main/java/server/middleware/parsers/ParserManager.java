@@ -18,7 +18,11 @@ public class ParserManager {
 
         for (String pair : query.split("&")) {
             String[] kv = pair.split("=", 2);
-            String rawKey = kv[0];
+
+            if (kv.length < 2)
+                continue;
+
+            String rawKey = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
             String rawVal = kv.length > 1 ? URLDecoder.decode(kv[1], StandardCharsets.UTF_8) : "";
 
             nestKeyVal(dict, rawKey, rawVal);
@@ -27,7 +31,7 @@ public class ParserManager {
         return dict;
     }
 
-    public static void nestKeyVal(Map<String, Object> dict, String key, Object val) {
+    private static void nestKeyVal(Map<String, Object> dict, String key, Object val) {
         String[] parts = key.replace("]", "").split("\\[");
 
         Map<String, Object> curr = dict;

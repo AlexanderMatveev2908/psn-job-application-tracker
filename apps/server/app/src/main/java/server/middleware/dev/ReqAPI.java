@@ -74,4 +74,8 @@ public class ReqAPI extends HttpServletRequestWrapper {
         }
     }
 
+    public byte[] getRawBody() {
+        return cachedBody;
+    }
+
 }
