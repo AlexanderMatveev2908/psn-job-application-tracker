@@ -33,4 +33,5 @@ public class ServerApplication {
                     String.format("⬜ whitelist => %s", env.getFrontUrl()));
         };
     }
+
 }

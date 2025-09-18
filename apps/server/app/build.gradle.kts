@@ -9,20 +9,28 @@ repositories {
 }
 
 dependencies {
+    // ? side stuff
     implementation(libs.guava)
+    implementation(libs.dotenv)
 
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.platform.launcher)
-
+    // ? Spring Boot
     implementation(libs.spring.boot.starter)
-    implementation(libs.spring.boot.starter.web) 
-    implementation(libs.spring.boot.starter.data.jpa) 
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.data.jpa)
+
+    // ? DB stuff
     runtimeOnly(libs.postgresql)
     implementation(libs.flyway.core)
     implementation(libs.flyway.postgres)
-    implementation(libs.dotenv)
+
+    // ? dev only
     developmentOnly(libs.spring.boot.devtools)
+
+    // ? tests
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
+
 
 
 java {
