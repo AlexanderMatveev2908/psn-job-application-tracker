@@ -65,8 +65,8 @@ public class ResAPI<T> {
         return genRes(403, msg, null);
     }
 
-    public static ResponseEntity<ResAPI<Void>> err404(String item) {
-        return genRes(404, item + " not found", null);
+    public static ResponseEntity<ResAPI<Void>> err404(String msg) {
+        return genRes(404, msg, null);
     }
 
     public static ResponseEntity<ResAPI<Void>> err409(String msg) {

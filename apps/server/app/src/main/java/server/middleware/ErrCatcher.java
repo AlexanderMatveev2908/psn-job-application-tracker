@@ -3,6 +3,7 @@ package server.middleware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import server.decorators.ErrAPI;
 import server.decorators.flow.ResAPI;
@@ -13,6 +14,11 @@ import server.lib.dev.MyLog;
 
 @RestControllerAdvice
 public class ErrCatcher {
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ResAPI<Void>> handleNotFound(NoHandlerFoundException err) {
+        return ResAPI.err404(String.format("%s not supported", err.getRequestURL()));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResAPI<Object>> handleGeneric(Exception err) {
@@ -25,4 +31,5 @@ public class ErrCatcher {
 
         return ResponseEntity.status(status).body(new ResAPI<>(ResAPI.prependEmj(msg, ActT.ERR), status, data));
     }
+
 }
