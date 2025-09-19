@@ -52,6 +52,10 @@ public class ResAPI<T> {
         return ok201(null, data);
     }
 
+    public static <T> ResponseEntity<Void> ok204() {
+        return ResponseEntity.status(204).build();
+    }
+
     // ? err
     public static ResponseEntity<ResAPI<Void>> err400(String msg) {
         return genRes(400, msg, null);
