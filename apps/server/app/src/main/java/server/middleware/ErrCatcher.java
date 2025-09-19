@@ -31,7 +31,7 @@ public class ErrCatcher {
         log.logErr(err);
 
         return ResponseEntity
-                .status(500)
+                .status((int) body.get("status"))
                 .body(body);
     }
 }

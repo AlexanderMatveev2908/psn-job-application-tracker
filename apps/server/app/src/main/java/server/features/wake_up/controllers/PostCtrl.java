@@ -1,21 +1,23 @@
 package server.features.wake_up.controllers;
 
-import java.util.Map;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import server.decorators.ErrAPI;
 import server.decorators.ReqAPI;
+import server.decorators.ResAPI;
 
 @Component
 public class PostCtrl {
-    public Map<String, Object> wakeUp(ReqAPI req) throws ErrAPI, Exception {
+    public ResponseEntity<ResAPI<Object>> wakeUp(ReqAPI req) throws ErrAPI, Exception {
 
         // var bd = req.grabBody();
 
         // System.out.println(bd);
 
-        throw new ErrAPI("something", 500);
+        // throw new ErrAPI("something", 500);
+
+        return ResAPI.ok201(null);
 
         // return Map.of(
         // "status", 200,
