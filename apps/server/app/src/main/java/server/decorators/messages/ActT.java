@@ -1,4 +1,4 @@
-package server.decorators;
+package server.decorators.messages;
 
 public enum ActT {
     OK("✅"),

@@ -13,11 +13,9 @@ import server.lib.dev.MyLog;
 public class ServerApplication {
 
     private final EnvKeeper env;
-    private final MyLog log;
 
-    public ServerApplication(EnvKeeper env, MyLog log) {
+    public ServerApplication(EnvKeeper env) {
         this.env = env;
-        this.log = log;
     }
 
     public static void main(String[] args) {
@@ -29,7 +27,7 @@ public class ServerApplication {
     ApplicationListener<WebServerInitializedEvent> lifeSpawn() {
         return e -> {
 
-            log.logTtl(String.format("🚀 server running on %d...", e.getWebServer().getPort()),
+            MyLog.logTtl(String.format("🚀 server running on %d...", e.getWebServer().getPort()),
                     String.format("⬜ whitelist => %s", env.getFrontUrl()));
         };
     }

@@ -1,7 +1,10 @@
-package server.decorators;
+package server.decorators.flow;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import server.decorators.messages.ActT;
+import server.decorators.messages.MapperMsg;
 
 public class ResAPI<T> {
     public final String msg;

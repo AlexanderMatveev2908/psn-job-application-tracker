@@ -29,7 +29,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import server.decorators.AppFile;
-import server.decorators.ReqAPI;
+import server.decorators.flow.ReqAPI;
 import server.lib.etc.Hiker;
 
 @SuppressWarnings({ "UseSpecificCatch", "unchecked" })

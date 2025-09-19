@@ -1,4 +1,4 @@
-package server.decorators;
+package server.decorators.flow;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

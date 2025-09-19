@@ -4,8 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import server.decorators.ErrAPI;
-import server.decorators.ReqAPI;
-import server.decorators.ResAPI;
+import server.decorators.flow.ReqAPI;
+import server.decorators.flow.ResAPI;
 
 @Component
 public class PostCtrl {

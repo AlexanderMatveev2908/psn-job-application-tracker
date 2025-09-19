@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import server.decorators.ErrAPI;
-import server.decorators.ReqAPI;
-import server.decorators.ResAPI;
+import server.decorators.flow.ReqAPI;
+import server.decorators.flow.ResAPI;
 import server.features.wake_up.controllers.GetCtrl;
 import server.features.wake_up.controllers.PostCtrl;
 import server.router.RootApi;

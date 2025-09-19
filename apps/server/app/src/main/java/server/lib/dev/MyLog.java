@@ -4,16 +4,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
-import org.springframework.stereotype.Service;
-
 import server.decorators.ErrAPI;
 
-@Service
 public class MyLog {
 
     private static final String APP_PKG = "server";
 
-    public void logTtl(String title, Object... arg) {
+    public static void logTtl(String title, Object... arg) {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
         StackTraceElement caller = Arrays.stream(Thread.currentThread().getStackTrace())
@@ -36,11 +33,11 @@ public class MyLog {
             System.out.println(v);
     }
 
-    public void log(Object... arg) {
-        this.logTtl(null, arg);
+    public static void log(Object... arg) {
+        logTtl(null, arg);
     }
 
-    public void logErr(Exception err) {
+    public static void logErr(Exception err) {
 
         if (err == null) {
             logTtl("⚠️ null error passed to logErr ⚠️");
