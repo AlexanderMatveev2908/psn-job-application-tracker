@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -93,29 +95,35 @@ public class LogMdw implements Filter {
                             LinkedHashMap::new));
 
             List<AppFile> images = (List<AppFile>) (cpyForm).get("images");
+            List<AppFile> videos = (List<AppFile>) (cpyForm).get("videos");
 
-            if (images != null) {
+            List<AppFile> assets = Stream.of(images, videos)
+                    .filter(Objects::nonNull)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
 
-                List<Map<String, Object>> safeImages = new ArrayList<>();
+            if (assets != null) {
+                List<Map<String, Object>> cpyImages = new ArrayList<>();
+                List<Map<String, Object>> cpyVideos = new ArrayList<>();
 
-                for (AppFile img : images) {
-                    safeImages.add(img.getFancyShape());
-                }
+                for (AppFile img : images)
+                    cpyImages.add(img.getFancyShape());
+                for (AppFile vid : videos)
+                    cpyVideos.add(vid.getFancyShape());
 
-                cpyForm.put("images", safeImages);
+                cpyForm.put("images", cpyImages);
+                cpyForm.put("videos", cpyVideos);
                 arg.put("parsedForm", cpyForm);
-
             }
         }
 
         String contentType = reqAPI.getContentType();
         Map<String, Object> body = null;
-        if (!contentType.startsWith("multipart/form-data")) {
+        if (!contentType.startsWith("multipart/form-data"))
             try {
                 body = reqAPI.grabBody();
             } catch (Exception err) {
             }
-        }
 
         arg.put("body", body);
 

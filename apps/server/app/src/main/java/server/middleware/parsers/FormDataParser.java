@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -34,7 +35,9 @@ import server.lib.etc.Hiker;
 public class FormDataParser implements Filter {
 
     private static final ExecutorService fileExecutor = Executors.newFixedThreadPool(2);
-    private final Path imagesDir = Hiker.grabDir().resolve("assets/images").normalize();
+    private final Path serverDir = Hiker.grabDir();
+    private final Path imagesDir = serverDir.resolve("assets/images").normalize();
+    private final Path videosDir = serverDir.resolve("assets/videos").normalize();
 
     public static String[] splitParts(ReqAPI reqAPI) {
 
@@ -58,7 +61,7 @@ public class FormDataParser implements Filter {
                 : m.group(1);
     }
 
-    public static AppFile handleImg(String body, String headers) {
+    public static AppFile handleAsset(String body, String headers, String field) {
         String filename = findPattern("filename", headers);
 
         if (filename == null)
@@ -71,7 +74,7 @@ public class FormDataParser implements Filter {
 
         byte[] rawFile = body.getBytes(StandardCharsets.ISO_8859_1);
 
-        return new AppFile("images", filename, contentTypePart, rawFile);
+        return new AppFile(field, filename, contentTypePart, rawFile);
     }
 
     @Override
@@ -88,6 +91,9 @@ public class FormDataParser implements Filter {
 
         StringBuilder sb = new StringBuilder();
         List<AppFile> images = new ArrayList<>();
+        List<AppFile> videos = new ArrayList<>();
+        Files.createDirectories(imagesDir);
+        Files.createDirectories(videosDir);
 
         for (String prt : parts) {
             String[] headerAndBody = prt.split("\r\n\r\n", 2);
@@ -102,28 +108,36 @@ public class FormDataParser implements Filter {
                 continue;
 
             if (headers.contains("filename=")) {
-                AppFile img;
-                if ((img = handleImg(body, headers)) != null) {
 
-                    Files.createDirectories(imagesDir);
-                    Files.createDirectories(imagesDir.resolve("../_").normalize());
+                if (!Set.of("images", "videos").contains(name))
+                    continue;
 
-                    Path imgPath = imagesDir.resolve(img.getFilename());
+                boolean isImage = name.equals("images");
+
+                AppFile asset;
+                if ((asset = handleAsset(body, headers, name)) != null) {
+
+                    String generatedFilename = asset.getFilename();
+                    Path assetPath = isImage ? imagesDir.resolve(generatedFilename)
+                            : videosDir.resolve(generatedFilename);
 
                     fileExecutor.submit(() -> {
-                        try (OutputStream os = Files.newOutputStream(imgPath,
+                        try (OutputStream os = Files.newOutputStream(assetPath,
                                 StandardOpenOption.CREATE,
                                 StandardOpenOption.TRUNCATE_EXISTING)) {
 
-                            os.write(img.getBts());
+                            os.write(asset.getBts());
 
-                            img.setFilePath(imgPath.toString());
+                            asset.setFilePath(assetPath.toString());
 
                         } catch (Exception err) {
                         }
                     });
 
-                    images.add(img);
+                    if (isImage)
+                        images.add(asset);
+                    else
+                        videos.add(asset);
                 }
             } else {
                 String val = new String(body.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).trim();
@@ -141,6 +155,7 @@ public class FormDataParser implements Filter {
 
         Map<String, Object> parsedForm = ParserManager.nestDict(sb.toString());
         parsedForm.put("images", images);
+        parsedForm.put("videos", videos);
         reqAPI.setAttribute("parsedForm", parsedForm);
 
         chain.doFilter(reqAPI, res);
