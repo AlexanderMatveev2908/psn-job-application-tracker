@@ -53,18 +53,6 @@ public class LogMdw implements Filter {
         arg.put("url", reqAPI.getRequestURI());
         arg.put("method", reqAPI.getMethod());
 
-        String query = reqAPI.getQueryString();
-        arg.put("query", (query == null || query.isBlank()) ? null : query);
-
-        Map<String, String[]> params = reqAPI.getParameterMap();
-        arg.put("params", params.isEmpty() ? null : params);
-
-        Map<String, Object> parsedQuery = (Map<String, Object>) reqAPI.getAttribute("parsedQuery");
-        arg.put("parsedQuery", parsedQuery == null || parsedQuery.isEmpty() ? null : parsedQuery);
-
-        Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
-        arg.put("parsedForm", parsedForm == null || parsedForm.isEmpty() ? null : parsedForm);
-
         String accessToken = reqAPI.getHeader("authorization");
         arg.put("accessToken", accessToken);
 
@@ -80,6 +68,18 @@ public class LogMdw implements Filter {
             }
         }
         arg.put("refreshToken", refreshToken);
+
+        String query = reqAPI.getQueryString();
+        arg.put("query", (query == null || query.isBlank()) ? null : query);
+
+        Map<String, String[]> params = reqAPI.getParameterMap();
+        arg.put("params", params.isEmpty() ? null : params);
+
+        Map<String, Object> parsedQuery = (Map<String, Object>) reqAPI.getAttribute("parsedQuery");
+        arg.put("parsedQuery", parsedQuery == null || parsedQuery.isEmpty() ? null : parsedQuery);
+
+        Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
+        arg.put("parsedForm", parsedForm == null || parsedForm.isEmpty() ? null : parsedForm);
 
         String contentType = reqAPI.getContentType();
         Map<String, Object> body = null;
