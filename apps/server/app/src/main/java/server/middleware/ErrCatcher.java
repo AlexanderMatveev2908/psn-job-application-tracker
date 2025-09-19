@@ -1,13 +1,12 @@
 package server.middleware;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import server.decorators.ActT;
 import server.decorators.ErrAPI;
+import server.decorators.ResAPI;
 import server.lib.dev.MyLog;
 
 @SuppressWarnings("UseSpecificCatch")
@@ -22,16 +21,14 @@ public class ErrCatcher {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(Exception err) {
-        Map<String, Object> body = new LinkedHashMap<>();
+    public ResponseEntity<ResAPI<Object>> handleGeneric(Exception err) {
 
-        body.put("msg", err.getMessage());
-        body.put("status", err instanceof ErrAPI ? ((ErrAPI) err).status : 500);
+        String msg = err.getMessage();
+        int status = err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500;
+        Object data = err instanceof ErrAPI ? ((ErrAPI) err).getData() : null;
 
         log.logErr(err);
 
-        return ResponseEntity
-                .status((int) body.get("status"))
-                .body(body);
+        return ResponseEntity.status(status).body(new ResAPI<>(ResAPI.prependEmj(msg, ActT.ERR), status, data));
     }
 }
