@@ -9,6 +9,6 @@ public class GetCtrl {
     public Map<String, Object> wakeUp() {
         return Map.of(
                 "status", 200,
-                "msg", "I am awake");
+                "msg", "Ops I did not listen the alarm ⏰");
     }
 }

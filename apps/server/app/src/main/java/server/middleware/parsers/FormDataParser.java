@@ -31,7 +31,7 @@ import server.lib.etc.Hiker;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component
-@Order(0)
+@Order(10)
 public class FormDataParser implements Filter {
 
     private static final ExecutorService fileExecutor = Executors.newFixedThreadPool(2);

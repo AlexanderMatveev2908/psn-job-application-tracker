@@ -15,7 +15,7 @@ import server.decorators.flow.ReqAPI;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component
-@Order(5)
+@Order(20)
 public class QueryParserMdw implements Filter {
 
     @Override

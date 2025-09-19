@@ -34,7 +34,7 @@ import server.lib.etc.Hiker;
 
 @SuppressWarnings({ "UseSpecificCatch", "unchecked" })
 @Component
-@Order(10)
+@Order(30)
 public class LogMdw implements Filter {
 
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
@@ -86,6 +86,7 @@ public class LogMdw implements Filter {
 
         Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
         arg.put("parsedForm", null);
+
         if (parsedForm != null && !parsedForm.isEmpty()) {
             Map<String, Object> cpyForm = parsedForm.entrySet().stream()
                     .collect(Collectors.toMap(
@@ -119,7 +120,7 @@ public class LogMdw implements Filter {
 
         String contentType = reqAPI.getContentType();
         Map<String, Object> body = null;
-        if (!contentType.startsWith("multipart/form-data"))
+        if (contentType != null && !contentType.startsWith("multipart/form-data"))
             try {
                 body = reqAPI.grabBody();
             } catch (Exception err) {
