@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -82,23 +83,28 @@ public class LogMdw implements Filter {
         arg.put("parsedQuery", parsedQuery == null || parsedQuery.isEmpty() ? null : parsedQuery);
 
         Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
-        arg.put("parsedForm", parsedForm == null || parsedForm.isEmpty() ? null : parsedForm);
-        if (arg.get("parsedForm") != null) {
-            List<AppFile> images = (List<AppFile>) ((Map<String, Object>) arg.get("parsedForm")).get("images");
+        arg.put("parsedForm", null);
+        if (parsedForm != null && !parsedForm.isEmpty()) {
+            Map<String, Object> cpyForm = parsedForm.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (oldVal, newVal) -> newVal,
+                            LinkedHashMap::new));
+
+            List<AppFile> images = (List<AppFile>) (cpyForm).get("images");
 
             if (images != null) {
 
                 List<Map<String, Object>> safeImages = new ArrayList<>();
 
                 for (AppFile img : images) {
-                    safeImages.add(Map.of(
-                            "field", img.getField(),
-                            "filename", img.getFilename(),
-                            "contentType", img.getContentType(),
-                            "bytes", "💾 long binary code..."));
+                    safeImages.add(img.getFancyShape());
                 }
 
-                ((Map<String, Object>) arg.get("parsedForm")).put("images", safeImages);
+                cpyForm.put("images", safeImages);
+                arg.put("parsedForm", cpyForm);
+
             }
         }
 

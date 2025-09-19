@@ -1,11 +1,17 @@
 package server.middleware.parsers;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,11 +26,15 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import server.decorators.AppFile;
 import server.decorators.ReqAPI;
+import server.lib.etc.Hiker;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component
 @Order(0)
 public class FormDataParser implements Filter {
+
+    private static final ExecutorService fileExecutor = Executors.newFixedThreadPool(2);
+    private final Path imagesDir = Hiker.grabDir().resolve("assets/images").normalize();
 
     public static String[] splitParts(ReqAPI reqAPI) {
 
@@ -93,8 +103,28 @@ public class FormDataParser implements Filter {
 
             if (headers.contains("filename=")) {
                 AppFile img;
-                if ((img = handleImg(body, headers)) != null)
+                if ((img = handleImg(body, headers)) != null) {
+
+                    Files.createDirectories(imagesDir);
+                    Files.createDirectories(imagesDir.resolve("../_").normalize());
+
+                    Path imgPath = imagesDir.resolve(img.getFilename());
+
+                    fileExecutor.submit(() -> {
+                        try (OutputStream os = Files.newOutputStream(imgPath,
+                                StandardOpenOption.CREATE,
+                                StandardOpenOption.TRUNCATE_EXISTING)) {
+
+                            os.write(img.getBts());
+
+                            img.setFilePath(imgPath.toString());
+
+                        } catch (Exception err) {
+                        }
+                    });
+
                     images.add(img);
+                }
             } else {
                 String val = new String(body.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).trim();
 
