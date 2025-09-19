@@ -3,6 +3,8 @@ package server.middleware.parsers;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,6 +18,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import server.decorators.AppFile;
 import server.decorators.ReqAPI;
 
 @SuppressWarnings("UseSpecificCatch")
@@ -23,44 +26,83 @@ import server.decorators.ReqAPI;
 @Order(0)
 public class FormDataParser implements Filter {
 
+    public static String[] splitParts(ReqAPI reqAPI) {
+
+        String contentType = reqAPI.getContentType();
+
+        if (contentType == null || !contentType.startsWith("multipart/form-data")) {
+            return null;
+        }
+
+        String boundary = "--" + contentType.split("boundary=")[1];
+        byte[] rawBody = reqAPI.getRawBody();
+        String txtBody = new String(rawBody, StandardCharsets.ISO_8859_1);
+        String[] parts = txtBody.split(Pattern.quote(boundary));
+
+        return parts;
+    }
+
+    public static String findPattern(String key, String headers) {
+        Matcher m = Pattern.compile(String.format("%s=\"([^\"]+)\"", Pattern.quote(key))).matcher(headers);
+        return !m.find() ? null
+                : m.group(1);
+    }
+
+    public static AppFile handleImg(String body, String headers) {
+        String filename = findPattern("filename", headers);
+
+        if (filename == null)
+            return null;
+
+        String contentTypePart = null;
+        Matcher cm = Pattern.compile("Content-Type: (.+)").matcher(headers);
+        if (cm.find())
+            contentTypePart = cm.group(1).trim();
+
+        byte[] rawFile = body.getBytes(StandardCharsets.ISO_8859_1);
+
+        return new AppFile("images", filename, contentTypePart, rawFile);
+    }
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
         ReqAPI reqAPI = new ReqAPI((HttpServletRequest) req);
-        String contentType = reqAPI.getContentType();
+        String[] parts = splitParts(reqAPI);
 
-        if (contentType == null || !contentType.startsWith("multipart/form-data")) {
+        if (parts == null) {
             chain.doFilter(reqAPI, res);
             return;
         }
 
-        String boundary = "--" + contentType.split("boundary=")[1];
-        byte[] rawBody = reqAPI.getRawBody();
-        String txtBody = new String(rawBody, StandardCharsets.UTF_8);
-        String[] parts = txtBody.split(Pattern.quote(boundary));
         StringBuilder sb = new StringBuilder();
+        List<AppFile> images = new ArrayList<>();
 
-        for (String part : parts) {
-            String[] headerAndBody = part.split("\r\n\r\n", 2);
-
+        for (String prt : parts) {
+            String[] headerAndBody = prt.split("\r\n\r\n", 2);
             if (headerAndBody.length < 2)
                 continue;
 
             String headers = headerAndBody[0];
-            String value = headerAndBody[1].trim();
+            String body = headerAndBody[1];
 
-            String name;
-            Matcher m = Pattern.compile("name=\"([^\"]+)\"").matcher(headers);
-            if (!m.find())
+            String name = findPattern("name", headers);
+            if (name == null)
                 continue;
 
-            name = m.group(1);
+            if (headers.contains("filename=")) {
+                AppFile img;
+                if ((img = handleImg(body, headers)) != null)
+                    images.add(img);
+            } else {
+                String val = new String(body.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).trim();
 
-            sb.append(URLEncoder.encode(name, StandardCharsets.UTF_8));
-            sb.append("=");
-            sb.append(URLEncoder.encode(value, StandardCharsets.UTF_8));
-            sb.append("&");
+                sb.append(URLEncoder.encode(name, StandardCharsets.UTF_8));
+                sb.append("=");
+                sb.append(URLEncoder.encode(val, StandardCharsets.UTF_8));
+                sb.append("&");
+            }
 
         }
 
@@ -68,6 +110,7 @@ public class FormDataParser implements Filter {
             sb.setLength(sb.length() - 1);
 
         Map<String, Object> parsedForm = ParserManager.nestDict(sb.toString());
+        parsedForm.put("images", images);
         reqAPI.setAttribute("parsedForm", parsedForm);
 
         chain.doFilter(reqAPI, res);

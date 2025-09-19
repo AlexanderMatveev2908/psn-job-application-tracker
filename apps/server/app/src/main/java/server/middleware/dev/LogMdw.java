@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,7 +25,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
+import server.decorators.AppFile;
 import server.decorators.ReqAPI;
+import server.lib.etc.Hiker;
 
 @SuppressWarnings({ "UseSpecificCatch", "unchecked" })
 @Component
@@ -39,8 +43,7 @@ public class LogMdw implements Filter {
 
         ReqAPI reqAPI = (ReqAPI) req;
 
-        Path appDir = Path.of(System.getProperty("user.dir"));
-        Path serverDir = appDir.resolve("../").normalize();
+        Path serverDir = Hiker.grabDir();
         Path loggerDir = serverDir.resolve("logger").normalize();
         Path loggerFile = loggerDir.resolve("log.json").normalize();
 
@@ -80,6 +83,24 @@ public class LogMdw implements Filter {
 
         Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
         arg.put("parsedForm", parsedForm == null || parsedForm.isEmpty() ? null : parsedForm);
+        if (arg.get("parsedForm") != null) {
+            List<AppFile> images = (List<AppFile>) ((Map<String, Object>) arg.get("parsedForm")).get("images");
+
+            if (images != null) {
+
+                List<Map<String, Object>> safeImages = new ArrayList<>();
+
+                for (AppFile img : images) {
+                    safeImages.add(Map.of(
+                            "field", img.getField(),
+                            "filename", img.getFilename(),
+                            "contentType", img.getContentType(),
+                            "bytes", "💾 long binary code..."));
+                }
+
+                ((Map<String, Object>) arg.get("parsedForm")).put("images", safeImages);
+            }
+        }
 
         String contentType = reqAPI.getContentType();
         Map<String, Object> body = null;
