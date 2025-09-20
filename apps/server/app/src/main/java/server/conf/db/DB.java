@@ -1,6 +1,7 @@
 package server.conf.db;
 
 import java.sql.Connection;
+import java.util.concurrent.CompletableFuture;
 
 import javax.sql.DataSource;
 
@@ -41,6 +42,10 @@ public class DB implements CommandLineRunner {
     @FunctionalInterface
     public interface TrxCb<T> {
         T trxCallable(Connection conn) throws Exception;
+    }
+
+    public <T> CompletableFuture<T> trxRunnerAsync(TrxCb<T> cb) {
+        return CompletableFuture.supplyAsync(() -> trxRunner(cb));
     }
 
     public <T> T trxRunner(TrxCb<T> cb) {

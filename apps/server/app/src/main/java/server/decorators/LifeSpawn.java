@@ -26,58 +26,57 @@ public class LifeSpawn {
 
     @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
     public void lifeCheck(WebServerInitializedEvent e) {
-        Map<String, Object> result;
-        try {
-            result = db.trxRunner(conn -> {
-                int count = 0;
-                try (PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT COUNT(*) FROM information_schema.tables " +
-                                "WHERE table_schema = 'public' " +
-                                "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
-                        ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next())
-                        count = rs.getInt(1);
 
-                }
+        db.trxRunnerAsync(cnt -> {
+            int count = 0;
+            try (PreparedStatement stmt = cnt.prepareStatement(
+                    "SELECT COUNT(*) FROM information_schema.tables " +
+                            "WHERE table_schema = 'public' " +
+                            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
+                    ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    count = rs.getInt(1);
 
-                List<String> tableNames = new ArrayList<>();
-                try (PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT table_name FROM information_schema.tables " +
-                                "WHERE table_schema = 'public' " +
-                                "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
+            }
 
-                        ResultSet rs = stmt.executeQuery()) {
+            List<String> tableNames = new ArrayList<>();
+            try (PreparedStatement stmt = cnt.prepareStatement(
+                    "SELECT table_name FROM information_schema.tables " +
+                            "WHERE table_schema = 'public' " +
+                            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
 
-                    while (rs.next())
-                        tableNames.add(rs.getString("table_name"));
+                    ResultSet rs = stmt.executeQuery()) {
 
-                }
+                while (rs.next())
+                    tableNames.add(rs.getString("table_name"));
 
-                Map<String, Object> data = new HashMap<>();
-                data.put("count", count);
-                data.put("tables", tableNames);
+            }
 
-                return data;
-            });
+            Map<String, Object> data = new HashMap<>();
+            data.put("count", count);
+            data.put("tables", tableNames);
 
-        } catch (Exception err) {
-            throw new ErrAPI(err.getMessage(), err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
-        }
+            return data;
+        }).thenAccept(res -> {
+            MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
+                    String.format("⬜ whitelist => %s", env.getFrontUrl()));
 
-        MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
-                String.format("⬜ whitelist => %s", env.getFrontUrl()));
+            List<String> tables = (List<String>) res.get("tables");
+            StringBuilder sb = new StringBuilder(
+                    String.format("🔥 db tables count => %d%n", (Integer) res.get("count")));
+            for (int i = 0; i < tables.size(); i++) {
+                sb.append(String.format("%-20s|", tables.get(i)));
+                if ((i + 1) % 3 == 0)
+                    sb.append("\n");
+            }
 
-        List<String> tables = (List<String>) result.get("tables");
-        StringBuilder sb = new StringBuilder(String.format("🔥 db tables count => %d%n", result.get("count")));
-        for (int i = 0; i < tables.size(); i++) {
-            sb.append(String.format("%-25s", tables.get(i)));
-            if ((i + 1) % 3 == 0)
+            if (tables.size() % 3 != 0)
                 sb.append("\n");
-        }
 
-        if (tables.size() % 3 != 0)
-            sb.append("\n");
+            System.out.println(sb.toString());
+        }).exceptionally(err -> {
+            throw new ErrAPI(err.getMessage(), err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
+        });
 
-        System.out.println(sb.toString());
     }
 }
