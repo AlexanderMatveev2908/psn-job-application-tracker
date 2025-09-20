@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: psn-job-application-tracker-client
+  name: psn-job-application-tracker-server
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: psn-job-application-tracker-client
+      app: psn-job-application-tracker-server
   template:
     metadata:
       labels:
-        app: psn-job-application-tracker-client
+        app: psn-job-application-tracker-server
     spec:
       topologySpreadConstraints:
         - maxSkew: 1
@@ -18,12 +18,12 @@ spec:
           whenUnsatisfiable: ScheduleAnyway
           labelSelector:
             matchLabels:
-              app: psn-job-application-tracker-client
+              app: psn-job-application-tracker-server
       containers:
-        - name: client
-          image: alexandermatveev2908/psn-job-application-tracker-client:latest
+        - name: server
+          image: alexandermatveev2908/psn-job-application-tracker-server:latest
           ports:
-            - containerPort: 3001
+            - containerPort: 3000
           envFrom:
             - secretRef:
                 name: psn-job-application-tracker
