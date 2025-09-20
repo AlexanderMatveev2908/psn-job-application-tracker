@@ -16,16 +16,19 @@ dependencies {
     // ? Spring Boot
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
-    implementation(libs.spring.boot.starter.data.jpa)
 
-    // ? DB driver for app runtime
+    // ? spring DB
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.data.r2dbc)
+    
+    // ? DB driver
     runtimeOnly(libs.postgresql)
+    
+    // ? async DB
+    implementation(libs.r2dbc.postgres)
 
     // ? migrations
     implementation(libs.liquibase.core)
-
-    // ? dev only
-    developmentOnly(libs.spring.boot.devtools)
 
     // ? tests
     testImplementation(libs.junit.jupiter)

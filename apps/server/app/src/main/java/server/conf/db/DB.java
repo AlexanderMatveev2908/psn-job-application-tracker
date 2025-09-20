@@ -1,66 +1,47 @@
 package server.conf.db;
 
-import java.sql.Connection;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
-import javax.sql.DataSource;
-
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
 
+import io.r2dbc.spi.ConnectionFactory;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import server.decorators.ErrAPI;
 
 @Component
-public class DB implements CommandLineRunner {
-    private final DataSource db;
-    private final PlatformTransactionManager trx;
+public class DB {
 
-    public DB(DataSource db, PlatformTransactionManager trx) {
-        this.db = db;
-        this.trx = trx;
+    private final R2dbcEntityTemplate db;
+    private final TransactionalOperator trx;
+    private final DatabaseClient dbRaw;
+
+    public DB(ConnectionFactory cnt) {
+        this.db = new R2dbcEntityTemplate(cnt);
+        ReactiveTransactionManager trxMng = new R2dbcTransactionManager(cnt);
+        this.trx = TransactionalOperator.create(trxMng);
+        this.dbRaw = db.getDatabaseClient();
     }
 
-    public DataSource getDataSource() {
+    public R2dbcEntityTemplate getDb() {
         return db;
     }
 
-    public void check() throws Exception {
-        // try (Connection cnt = db.getConnection()) {
-        // System.out.println("🔥 db => " + cnt.getMetaData().getDatabaseProductName());
-        // }
+    public <T> Mono<T> trxRunnerMono(Function<DatabaseClient, Mono<T>> cb) {
+        return cb.apply(dbRaw)
+                .as(trx::transactional)
+                .onErrorResume(err -> Mono.error(new ErrAPI("❌ trx failed => " + err.getMessage(), 500)));
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        check();
+    public <T> Flux<T> trxRunnerFlux(Function<DatabaseClient, Flux<T>> cb) {
+        return cb.apply(dbRaw)
+                .as(trx::transactional)
+                .onErrorResume(err -> Flux.error(new ErrAPI("❌ trx failed => " + err.getMessage(), 500)));
     }
 
-    @FunctionalInterface
-    public interface TrxCb<T> {
-        T trxCallable(Connection conn) throws Exception;
-    }
-
-    public <T> T trxRunner(TrxCb<T> cb) {
-        TransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = trx.getTransaction(def);
-
-        try (Connection jdbc = db.getConnection()) {
-
-            T result = cb.trxCallable(jdbc);
-            trx.commit(status);
-            return result;
-        } catch (Exception err) {
-            trx.rollback(status);
-
-            throw new ErrAPI(err.getMessage(), err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
-        }
-    }
-
-    public <T> CompletableFuture<T> trxRunnerAsync(TrxCb<T> cb) {
-        return CompletableFuture.supplyAsync(() -> trxRunner(cb));
-    }
 }
