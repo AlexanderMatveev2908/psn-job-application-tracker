@@ -21,6 +21,7 @@ dependencies {
     // ? DB driver for app runtime
     runtimeOnly(libs.postgresql)
 
+    // ? migrations
     implementation(libs.liquibase.core)
 
     // ? dev only
