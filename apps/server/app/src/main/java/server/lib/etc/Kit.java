@@ -1,26 +1,26 @@
 package server.lib.etc;
 
-import java.nio.file.Path;
-
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import server.conf.env.EnvKeeper;
+import server.lib.paths.Hiker;
 
 @Service
 public class Kit {
-    private final Path serverDir = Hiker.grabDir();
+    private final Hiker hiker;
     private final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private final EnvKeeper envKeeper;
 
-    public Kit(EnvKeeper envKeeper) {
+    public Kit(Hiker hiker, EnvKeeper envKeeper) {
+        this.hiker = hiker;
         this.envKeeper = envKeeper;
     }
 
-    public Path getServerDir() {
-        return serverDir;
+    public Hiker getHiker() {
+        return hiker;
     }
 
     public ObjectMapper getJack() {

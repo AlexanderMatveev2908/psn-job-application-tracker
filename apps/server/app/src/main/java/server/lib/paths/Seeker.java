@@ -1,4 +1,4 @@
-package server.lib.etc;
+package server.lib.paths;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -6,13 +6,13 @@ import java.nio.file.Paths;
 
 import server.decorators.ErrAPI;
 
-public class Hiker {
+public class Seeker {
     @SuppressWarnings("UseSpecificCatch")
     public static Path grabDir() {
 
         try {
             Path appDir = Paths.get(
-                    Hiker.class.getProtectionDomain()
+                    Seeker.class.getProtectionDomain()
                             .getCodeSource()
                             .getLocation()
                             .toURI());

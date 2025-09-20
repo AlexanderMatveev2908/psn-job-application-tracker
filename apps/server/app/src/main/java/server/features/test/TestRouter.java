@@ -24,4 +24,9 @@ public class TestRouter {
         return postCtrl.postMsg(req);
     }
 
+    @PostMapping("/test-form-data")
+    public ResponseEntity<ResAPI<Object>> postFormData(ReqAPI req) {
+        return postCtrl.postFormData(req);
+    }
+
 }

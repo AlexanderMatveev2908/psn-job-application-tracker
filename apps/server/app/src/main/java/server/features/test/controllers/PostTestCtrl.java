@@ -24,4 +24,8 @@ public class PostTestCtrl {
         return ResAPI.ok200("msg received", Map.of("clientMsg", msg));
 
     }
+
+    public ResponseEntity<ResAPI<Object>> postFormData(ReqAPI req) {
+        return ResAPI.ok200("form data received • parsed • processed • sent back", req.getAttribute("parsedForm"));
+    }
 }

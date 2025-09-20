@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import server.decorators.AppFile;
 import server.decorators.flow.ReqAPI;
 import server.lib.etc.Kit;
+import server.lib.paths.Hiker;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component
@@ -35,13 +36,10 @@ import server.lib.etc.Kit;
 public class FormDataParser implements Filter {
 
     private static final ExecutorService fileExecutor = Executors.newFixedThreadPool(2);
-    private final Path imagesDir;
-    private final Path videosDir;
+    private final Kit kit;
 
     public FormDataParser(Kit kit) {
-        Path serverDir = kit.getServerDir();
-        this.imagesDir = serverDir.resolve("assets/images").normalize();
-        this.videosDir = serverDir.resolve("assets/videos").normalize();
+        this.kit = kit;
     }
 
     public static String[] splitParts(ReqAPI reqAPI) {
@@ -97,8 +95,9 @@ public class FormDataParser implements Filter {
         StringBuilder sb = new StringBuilder();
         List<AppFile> images = new ArrayList<>();
         List<AppFile> videos = new ArrayList<>();
-        Files.createDirectories(imagesDir);
-        Files.createDirectories(videosDir);
+        Hiker hiker = kit.getHiker();
+        Path imagesDir = hiker.getImagesDir();
+        Path videosDir = hiker.getVideosDir();
 
         for (String prt : parts) {
             String[] headerAndBody = prt.split("\r\n\r\n", 2);

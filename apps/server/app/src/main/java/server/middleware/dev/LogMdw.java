@@ -27,7 +27,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import server.decorators.AppFile;
 import server.decorators.flow.ReqAPI;
-import server.lib.etc.Hiker;
 import server.lib.etc.Kit;
 
 @SuppressWarnings({ "UseSpecificCatch", "unchecked" })
@@ -48,13 +47,7 @@ public class LogMdw implements Filter {
 
         ReqAPI reqAPI = (ReqAPI) req;
 
-        Path serverDir = Hiker.grabDir();
-        Path loggerDir = serverDir.resolve("logger").normalize();
-        Path loggerFile = loggerDir.resolve("log.json").normalize();
-
-        Files.createDirectories(loggerDir);
-        if (Files.notExists(loggerFile))
-            Files.createFile(loggerFile);
+        Path loggerFile = kit.getHiker().getLogFile();
 
         Map<String, Object> arg = new LinkedHashMap<>();
 
