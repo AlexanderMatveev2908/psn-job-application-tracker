@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class Hiker {
     private final Path serverDir = Seeker.grabDir();
+    private final Path certsDir;
     private final Path imagesDir;
     private final Path videosDir;
     private final Path logDir;
@@ -17,6 +18,7 @@ public class Hiker {
     public Hiker() {
         this.imagesDir = serverDir.resolve("assets/images").normalize();
         this.videosDir = serverDir.resolve("assets/videos").normalize();
+        this.certsDir = serverDir.resolve("certs").normalize();
         this.logDir = serverDir.resolve("logger").normalize();
         this.logFile = logDir.resolve("log.json");
 
@@ -25,6 +27,7 @@ public class Hiker {
 
     private void ensureDirs() {
         try {
+            Files.createDirectories(certsDir);
             Files.createDirectories(imagesDir);
             Files.createDirectories(videosDir);
             Files.createDirectories(logDir);
@@ -55,6 +58,10 @@ public class Hiker {
 
     public Path getLogFile() {
         return logFile;
+    }
+
+    public Path getCertsDir() {
+        return certsDir;
     }
 
 }

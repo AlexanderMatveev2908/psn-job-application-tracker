@@ -1,35 +1,34 @@
 package server.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "users")
+@Table("users")
 public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(nullable = false)
+    @Column("first_name")
     private String firstName;
-    @Column(nullable = false)
+
+    @Column("last_name")
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column("email")
     private String email;
-    @Column(nullable = true)
+
+    @Column("tmp_email")
     private String tmpEmail;
 
-    @Column(nullable = false)
+    @Column("password")
     private String password;
 
-    @Column(nullable = true)
+    @Column("totp_secret")
     private String totpSecret;
 
+    // --- getters + setters ---
     public String getId() {
         return id;
     }
@@ -85,5 +84,4 @@ public class User {
     public void setTotpSecret(String totpSecret) {
         this.totpSecret = totpSecret;
     }
-
 }

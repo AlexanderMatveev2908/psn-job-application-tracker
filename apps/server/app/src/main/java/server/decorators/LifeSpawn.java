@@ -1,15 +1,14 @@
 package server.decorators;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Mono;
 import server.conf.db.DB;
 import server.lib.dev.MyLog;
 import server.lib.etc.Kit;
@@ -24,60 +23,54 @@ public class LifeSpawn {
         this.db = db;
     }
 
-    @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
+    @SuppressWarnings("unchecked")
     public void lifeCheck(WebServerInitializedEvent e) {
+        DatabaseClient client = db.getDb();
 
-        db.trxRunnerAsync(jdbc -> {
-            int count = 0;
-            try (PreparedStatement stmt = jdbc.prepareStatement(
-                    "SELECT COUNT(*) FROM information_schema.tables " +
-                            "WHERE table_schema = 'public' " +
-                            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
-                    ResultSet rs = stmt.executeQuery()) {
-                if (rs.next())
-                    count = rs.getInt(1);
+        Mono<Map<String, Object>> result = client.sql(
+                "SELECT COUNT(*) as count " +
+                        "FROM information_schema.tables " +
+                        "WHERE table_schema = 'public' " +
+                        "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')")
+                .map(row -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("count", row.get("count", Integer.class));
+                    return map;
+                })
+                .first()
+                .flatMap(countMap -> client.sql(
+                        "SELECT table_name " +
+                                "FROM information_schema.tables " +
+                                "WHERE table_schema = 'public' " +
+                                "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')")
+                        .map(row -> row.get("table_name", String.class))
+                        .all()
+                        .collectList()
+                        .map(tables -> {
+                            countMap.put("tables", tables);
+                            return countMap;
+                        }));
 
-            }
-
-            List<String> tableNames = new ArrayList<>();
-            try (PreparedStatement stmt = jdbc.prepareStatement(
-                    "SELECT table_name FROM information_schema.tables " +
-                            "WHERE table_schema = 'public' " +
-                            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
-
-                    ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next())
-                    tableNames.add(rs.getString("table_name"));
-
-            }
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("count", count);
-            data.put("tables", tableNames);
-
-            return data;
-        }).thenAccept(res -> {
+        result.subscribe(res -> {
             MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
                     String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()));
 
             List<String> tables = (List<String>) res.get("tables");
             StringBuilder sb = new StringBuilder(
-                    String.format("🔥 db tables count => %d%n", (Integer) res.get("count")));
+                    String.format("🔥 db tables count => %d%n", res.get("count")));
 
             for (int i = 0; i < tables.size(); i++) {
                 sb.append(String.format("%-20s|", tables.get(i)));
                 if ((i + 1) % 3 == 0)
                     sb.append("\n");
             }
-
             if (tables.size() % 3 != 0)
                 sb.append("\n");
 
             System.out.println(sb.toString());
-        }).exceptionally(err -> {
-            throw new ErrAPI(err.getMessage(), err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
+        }, err -> {
+            throw new ErrAPI(err.getMessage(),
+                    err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
         });
-
     }
 }
