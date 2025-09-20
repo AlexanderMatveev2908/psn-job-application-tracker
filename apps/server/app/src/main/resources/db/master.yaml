@@ -8,5 +8,5 @@ databaseChangeLog:
             relativeToChangelogFile: true
       rollback:
         - sqlFile:
-            path: sql/rollback/001_init_schema_down.sql
+            path: sql/rollbacks/001_init_schema.sql
             relativeToChangelogFile: true
