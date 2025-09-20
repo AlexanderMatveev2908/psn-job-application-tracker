@@ -17,14 +17,14 @@ dependencies {
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
 
-    // ? sync DB
+    // ? spring DB
     implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.data.r2dbc)
     
-    // ? DB driver for app runtime
+    // ? DB driver
     runtimeOnly(libs.postgresql)
     
     // ? async DB
-    implementation(libs.spring.boot.starter.data.r2dbc)
     implementation(libs.r2dbc.postgres)
 
     // ? migrations

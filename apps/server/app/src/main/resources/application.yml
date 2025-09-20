@@ -18,8 +18,14 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
+    url: set_with_ctm_env_loader_cls
+    username: set_with_ctm_env_loader_cls
+    password: set_with_ctm_env_loader_cls
 
   r2dbc:
+    url: set_with_ctm_env_loader_cls
+    username: set_with_ctm_env_loader_cls
+    password: set_with_ctm_env_loader_cls
 
   main:
     banner-mode: off

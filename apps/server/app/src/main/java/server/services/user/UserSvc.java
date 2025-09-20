@@ -1,11 +1,10 @@
-package server.services;
+package server.services.user;
 
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.User;
-import server.services.user.UserRepo;
 
 @Service
 public class UserSvc {

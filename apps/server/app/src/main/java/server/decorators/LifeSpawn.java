@@ -17,39 +17,38 @@ import server.lib.etc.Kit;
 public class LifeSpawn {
     private final Kit kit;
     private final DB db;
+    private final String cond = "WHERE table_schema = 'public' " +
+            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')";
 
     public LifeSpawn(Kit kit, DB db) {
         this.kit = kit;
         this.db = db;
     }
 
+    private Mono<Map<String, Object>> grabTableCount(DatabaseClient dbRaw) {
+        return dbRaw.sql("SELECT COUNT(*) as count FROM information_schema.tables " + cond)
+                .map(row -> {
+                    Map<String, Object> res = new HashMap<>();
+                    res.put("count", row.get("count", Integer.class));
+                    return res;
+                })
+                .first();
+    }
+
+    private Mono<List<String>> grabTableNames(DatabaseClient dbRaw) {
+        return dbRaw.sql("SELECT table_name FROM information_schema.tables " + cond)
+                .map(row -> row.get("table_name", String.class))
+                .all()
+                .collectList();
+    }
+
     @SuppressWarnings("unchecked")
     public void lifeCheck(WebServerInitializedEvent e) {
-        DatabaseClient client = db.getDb();
-
-        Mono<Map<String, Object>> result = client.sql(
-                "SELECT COUNT(*) as count " +
-                        "FROM information_schema.tables " +
-                        "WHERE table_schema = 'public' " +
-                        "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')")
-                .map(row -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("count", row.get("count", Integer.class));
-                    return map;
-                })
-                .first()
-                .flatMap(countMap -> client.sql(
-                        "SELECT table_name " +
-                                "FROM information_schema.tables " +
-                                "WHERE table_schema = 'public' " +
-                                "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')")
-                        .map(row -> row.get("table_name", String.class))
-                        .all()
-                        .collectList()
-                        .map(tables -> {
-                            countMap.put("tables", tables);
-                            return countMap;
-                        }));
+        Mono<Map<String, Object>> result = db
+                .trxRunnerMono(dbRaw -> grabTableCount(dbRaw).flatMap(res -> grabTableNames(dbRaw).map(tables -> {
+                    res.put("tables", tables);
+                    return res;
+                })));
 
         result.subscribe(res -> {
             MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
