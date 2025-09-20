@@ -9,10 +9,6 @@ import server.decorators.ErrAPI;
 public class Hiker {
     @SuppressWarnings("UseSpecificCatch")
     public static Path grabDir() {
-        // Path appDir = Path.of(System.getProperty("user.dir"));
-        // Path serverDir = appDir.resolve("../").normalize();
-
-        // return serverDir;
 
         try {
             Path appDir = Paths.get(

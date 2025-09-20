@@ -11,16 +11,16 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.stereotype.Service;
 
 import server.conf.db.DB;
-import server.conf.env.EnvKeeper;
 import server.lib.dev.MyLog;
+import server.lib.etc.Kit;
 
 @Service
 public class LifeSpawn {
-    private final EnvKeeper env;
+    private final Kit kit;
     private final DB db;
 
-    public LifeSpawn(EnvKeeper env, DB db) {
-        this.env = env;
+    public LifeSpawn(Kit kit, DB db) {
+        this.kit = kit;
         this.db = db;
     }
 
@@ -59,7 +59,7 @@ public class LifeSpawn {
             return data;
         }).thenAccept(res -> {
             MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
-                    String.format("⬜ whitelist => %s", env.getFrontUrl()));
+                    String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()));
 
             List<String> tables = (List<String>) res.get("tables");
             StringBuilder sb = new StringBuilder(

@@ -44,10 +44,6 @@ public class DB implements CommandLineRunner {
         T trxCallable(Connection conn) throws Exception;
     }
 
-    public <T> CompletableFuture<T> trxRunnerAsync(TrxCb<T> cb) {
-        return CompletableFuture.supplyAsync(() -> trxRunner(cb));
-    }
-
     public <T> T trxRunner(TrxCb<T> cb) {
         TransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = trx.getTransaction(def);
@@ -62,5 +58,9 @@ public class DB implements CommandLineRunner {
 
             throw new ErrAPI(err.getMessage(), err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
         }
+    }
+
+    public <T> CompletableFuture<T> trxRunnerAsync(TrxCb<T> cb) {
+        return CompletableFuture.supplyAsync(() -> trxRunner(cb));
     }
 }

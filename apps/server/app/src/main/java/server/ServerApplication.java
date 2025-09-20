@@ -2,6 +2,7 @@ package server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import server.decorators.LifeSpawn;
 
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;

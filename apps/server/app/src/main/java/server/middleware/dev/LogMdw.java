@@ -19,9 +19,6 @@ import java.util.stream.Stream;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,6 +28,7 @@ import jakarta.servlet.http.Cookie;
 import server.decorators.AppFile;
 import server.decorators.flow.ReqAPI;
 import server.lib.etc.Hiker;
+import server.lib.etc.Kit;
 
 @SuppressWarnings({ "UseSpecificCatch", "unchecked" })
 @Component
@@ -38,7 +36,11 @@ import server.lib.etc.Hiker;
 public class LogMdw implements Filter {
 
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
-    private static final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private final Kit kit;
+
+    public LogMdw(Kit kit) {
+        this.kit = kit;
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -135,7 +137,7 @@ public class LogMdw implements Filter {
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING)) {
 
-                String json = jack.writeValueAsString(arg);
+                String json = kit.getJack().writeValueAsString(arg);
 
                 bw.write(json);
                 bw.newLine();

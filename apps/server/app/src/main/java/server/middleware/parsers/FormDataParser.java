@@ -27,7 +27,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import server.decorators.AppFile;
 import server.decorators.flow.ReqAPI;
-import server.lib.etc.Hiker;
+import server.lib.etc.Kit;
 
 @SuppressWarnings("UseSpecificCatch")
 @Component
@@ -35,9 +35,14 @@ import server.lib.etc.Hiker;
 public class FormDataParser implements Filter {
 
     private static final ExecutorService fileExecutor = Executors.newFixedThreadPool(2);
-    private final Path serverDir = Hiker.grabDir();
-    private final Path imagesDir = serverDir.resolve("assets/images").normalize();
-    private final Path videosDir = serverDir.resolve("assets/videos").normalize();
+    private final Path imagesDir;
+    private final Path videosDir;
+
+    public FormDataParser(Kit kit) {
+        Path serverDir = kit.getServerDir();
+        this.imagesDir = serverDir.resolve("assets/images").normalize();
+        this.videosDir = serverDir.resolve("assets/videos").normalize();
+    }
 
     public static String[] splitParts(ReqAPI reqAPI) {
 
