@@ -3,6 +3,7 @@ package server.lib.dev;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 
 import server.decorators.ErrAPI;
 
@@ -35,6 +36,21 @@ public class MyLog {
 
     public static void log(Object... arg) {
         logTtl(null, arg);
+    }
+
+    public static void logCols(List<String> cols, Integer count) {
+        StringBuilder sb = new StringBuilder(
+                String.format("🔥 db tables count => %d%n", count));
+
+        for (int i = 0; i < cols.size(); i++) {
+            sb.append(String.format("%-20s|", cols.get(i)));
+            if ((i + 1) % 3 == 0)
+                sb.append("\n");
+        }
+        if (cols.size() % 3 != 0)
+            sb.append("\n");
+
+        System.out.println(sb.toString());
     }
 
     public static void logErr(Exception err) {

@@ -55,18 +55,8 @@ public class LifeSpawn {
                     String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()));
 
             List<String> tables = (List<String>) res.get("tables");
-            StringBuilder sb = new StringBuilder(
-                    String.format("🔥 db tables count => %d%n", res.get("count")));
 
-            for (int i = 0; i < tables.size(); i++) {
-                sb.append(String.format("%-20s|", tables.get(i)));
-                if ((i + 1) % 3 == 0)
-                    sb.append("\n");
-            }
-            if (tables.size() % 3 != 0)
-                sb.append("\n");
-
-            System.out.println(sb.toString());
+            MyLog.logCols(tables, (Integer) res.get("count"));
         }, err -> {
             throw new ErrAPI(err.getMessage(),
                     err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
