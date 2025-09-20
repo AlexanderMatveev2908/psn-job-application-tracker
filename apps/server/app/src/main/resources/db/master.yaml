@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001
+      author: ninja
+      changes:
+        - sqlFile:
+            path: sql/001_init_schema.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: sql/rollback/001_init_schema_down.sql
+            relativeToChangelogFile: true

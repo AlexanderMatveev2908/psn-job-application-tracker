@@ -16,6 +16,9 @@ server:
     relaxed-query-chars: "[,]"
 
 spring:
+  main:
+    banner-mode: off
+
   web:
     resources:
       add-mappings: false
@@ -44,10 +47,9 @@ spring:
     show-sql: false
     open-in-view: false
 
-  flyway:
+  liquibase:
     enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migrations
+    change-log: classpath:db/master.yaml
 
 logging:
   level:

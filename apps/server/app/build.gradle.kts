@@ -21,9 +21,7 @@ dependencies {
     // ? DB driver for app runtime
     runtimeOnly(libs.postgresql)
 
-    // ? Flyway app runtime
-    implementation(libs.flyway.core)
-    implementation(libs.flyway.postgres)
+    implementation(libs.liquibase.core)
 
     // ? dev only
     developmentOnly(libs.spring.boot.devtools)
