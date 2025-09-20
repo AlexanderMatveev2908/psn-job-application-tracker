@@ -48,9 +48,9 @@ public class DB implements CommandLineRunner {
         TransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = trx.getTransaction(def);
 
-        try (Connection cnt = db.getConnection()) {
+        try (Connection jdbc = db.getConnection()) {
 
-            T result = cb.trxCallable(cnt);
+            T result = cb.trxCallable(jdbc);
             trx.commit(status);
             return result;
         } catch (Exception err) {

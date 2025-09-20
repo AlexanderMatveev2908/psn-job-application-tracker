@@ -11,7 +11,7 @@ import server.lib.paths.Hiker;
 @Service
 public class Kit {
     private final Hiker hiker;
-    private final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private static final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private final EnvKeeper envKeeper;
 
     public Kit(Hiker hiker, EnvKeeper envKeeper) {

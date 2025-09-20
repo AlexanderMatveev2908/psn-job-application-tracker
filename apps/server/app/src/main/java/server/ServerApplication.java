@@ -8,15 +8,18 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
 import server.decorators.LifeSpawn;
+import server.services.UserSvc;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;
+    private final UserSvc userSvc;
 
-    public ServerApplication(LifeSpawn lifeSpawn) {
+    public ServerApplication(LifeSpawn lifeSpawn, UserSvc userSvc) {
         this.lifeSpawn = lifeSpawn;
+        this.userSvc = userSvc;
     }
 
     public static void main(String[] args) {
@@ -29,6 +32,9 @@ public class ServerApplication {
         return e -> {
 
             lifeSpawn.lifeCheck(e);
+
+            var users = this.userSvc.findAll();
+            System.out.println(users);
         };
     }
 

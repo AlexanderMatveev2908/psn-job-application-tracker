@@ -27,9 +27,9 @@ public class LifeSpawn {
     @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
     public void lifeCheck(WebServerInitializedEvent e) {
 
-        db.trxRunnerAsync(cnt -> {
+        db.trxRunnerAsync(jdbc -> {
             int count = 0;
-            try (PreparedStatement stmt = cnt.prepareStatement(
+            try (PreparedStatement stmt = jdbc.prepareStatement(
                     "SELECT COUNT(*) FROM information_schema.tables " +
                             "WHERE table_schema = 'public' " +
                             "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
@@ -40,7 +40,7 @@ public class LifeSpawn {
             }
 
             List<String> tableNames = new ArrayList<>();
-            try (PreparedStatement stmt = cnt.prepareStatement(
+            try (PreparedStatement stmt = jdbc.prepareStatement(
                     "SELECT table_name FROM information_schema.tables " +
                             "WHERE table_schema = 'public' " +
                             "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')");
@@ -64,6 +64,7 @@ public class LifeSpawn {
             List<String> tables = (List<String>) res.get("tables");
             StringBuilder sb = new StringBuilder(
                     String.format("🔥 db tables count => %d%n", (Integer) res.get("count")));
+
             for (int i = 0; i < tables.size(); i++) {
                 sb.append(String.format("%-20s|", tables.get(i)));
                 if ((i + 1) % 3 == 0)
