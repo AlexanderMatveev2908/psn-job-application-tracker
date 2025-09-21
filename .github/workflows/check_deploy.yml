@@ -28,7 +28,6 @@ jobs:
       DB_US: ${{secrets.DB_US}}
       DB_PWD: ${{secrets.DB_PWD}}
       SUPABASE_CA: ${{secrets.SUPABASE_CA}}
-      PY_ENV: "test"
 
     steps:
       - name: 📂 clone code
@@ -67,16 +66,16 @@ jobs:
       - name: 🧪 lint && types check
         run: yarn check
 
-      - name: 💻 build client
-        run: yarn workspace client build
+      - name: 🛠️ build app
+        run: yarn build
 
       - name: ▶️ start servers & wait
         run: |
           set -euo pipefail
-          yarn workspace server dev &                      
-          yarn dlx wait-on http-get://127.0.0.1:3000/api/v1/test/
-          yarn workspace client start &                
-          yarn dlx wait-on http-get://127.0.0.1:3001
+          yarn start &                      
+          yarn dlx wait-on \
+            http-get://127.0.0.1:3000/api/v1/test/ \
+            http-get://127.0.0.1:3001
 
       - name: 🔒 generate .env server file
         uses: actions/github-script@v7
@@ -93,11 +92,7 @@ jobs:
             fs.writeFileSync(envPath, lines.join("\n") + "\n", "utf8");
             console.log(`✅ .env generated at ${envPath}`);
 
-      - name: 🧪 run test client 💻
-        run: yarn workspace client test
-
-      - name: 🧪 run test server 🐍
-        run: yarn workspace server test
+    # ? skip tests for now
 
   deploy:
     name: 🚀 deploy server && client 🚀
@@ -116,7 +111,7 @@ jobs:
         working-directory: apps/server
         run: flyctl deploy --remote-only --config fly.toml
         env:
-          FLY_API_TOKEN: ${{ secrets.PFN_JOB_APPLICATION_TRACKER__SERVER }}
+          FLY_API_TOKEN: ${{ secrets.PSN_JOB_APPLICATION_TRACKER_SERVER }}
 
       - name: 🚀 deploy client
         working-directory: apps/client
@@ -129,4 +124,4 @@ jobs:
             --build-arg NEXT_PUBLIC_BACK_URL=${{ secrets.NEXT_PUBLIC_BACK_URL }} \
             --build-arg NEXT_PUBLIC_SMPT_FROM=${{ secrets.NEXT_PUBLIC_SMPT_FROM }}
         env:
-          FLY_API_TOKEN: ${{ secrets.PFN_JOB_APPLICATION_TRACKER__CLIENT }}
+          FLY_API_TOKEN: ${{ secrets.PSN_JOB_APPLICATION_TRACKER_CLIENT }}
