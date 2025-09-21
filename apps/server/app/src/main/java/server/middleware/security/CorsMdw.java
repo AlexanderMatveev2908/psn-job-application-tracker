@@ -1,6 +1,7 @@
 package server.middleware.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.core.annotation.Order;
@@ -47,9 +48,27 @@ public class CorsMdw implements Filter {
             return;
         }
 
+        String[] headers = {
+                "Origin",
+                "Content-Type",
+                "Accept",
+                "Authorization"
+        };
+
+        String allowHeaders = String.join(", ", headers) + ", " +
+                String.join(", ", Arrays.stream(headers)
+                        .map(String::toLowerCase)
+                        .toArray(String[]::new));
+
+        httpRes.setHeader("Access-Control-Allow-Headers", allowHeaders);
         httpRes.setHeader("Access-Control-Allow-Origin", allowed);
         httpRes.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         httpRes.setHeader("Access-Control-Allow-Credentials", "true");
+
+        if ("OPTIONS".equalsIgnoreCase(httpReq.getMethod())) {
+            httpRes.setStatus(200);
+            return;
+        }
 
         chain.doFilter(req, httpRes);
     }
