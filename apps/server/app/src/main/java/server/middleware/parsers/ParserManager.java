@@ -23,7 +23,7 @@ public class ParserManager {
                 continue;
 
             String rawKey = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
-            String rawVal = kv.length > 1 ? URLDecoder.decode(kv[1], StandardCharsets.UTF_8) : "";
+            String rawVal = URLDecoder.decode(kv[1], StandardCharsets.UTF_8);
 
             nestKeyVal(dict, rawKey, rawVal);
         }
@@ -31,6 +31,7 @@ public class ParserManager {
         return dict;
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private static void nestKeyVal(Map<String, Object> dict, String key, Object val) {
         String[] parts = key.replace("]", "").split("\\[");
 

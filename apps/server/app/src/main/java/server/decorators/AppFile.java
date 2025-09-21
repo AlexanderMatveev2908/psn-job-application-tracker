@@ -23,7 +23,7 @@ public class AppFile {
 
         this.field = field;
         this.contentType = contentType;
-        this.bts = bts;
+        this.bts = (bts == null) ? new byte[0] : bts.clone();
         this.filePath = null;
 
         String ext = "";
@@ -35,7 +35,6 @@ public class AppFile {
         this.filename = UUID.randomUUID().toString() + ext;
     }
 
-    @SuppressWarnings("UseSpecificCatch")
     public Map<String, Object> getFancyShape() {
         Map<String, Object> fancyMap = new LinkedHashMap<>();
 
@@ -53,7 +52,8 @@ public class AppFile {
                     fancyMap.put(f.getName(), val);
 
             }
-        } catch (Exception e) {
+        } catch (IllegalAccessException | IllegalArgumentException err) {
+            throw new ErrAPI("err parsing file to fancy shape", 500);
         }
 
         return fancyMap;
@@ -72,7 +72,7 @@ public class AppFile {
     }
 
     public byte[] getBts() {
-        return this.bts;
+        return bts.clone();
     }
 
     public void setFilePath(String p) {

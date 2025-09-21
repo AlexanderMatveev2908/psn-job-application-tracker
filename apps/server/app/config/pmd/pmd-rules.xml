@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Project Ruleset"
+    xmlns="https://pmd.github.io/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://pmd.github.io/ruleset/2.0.0
+                        https://pmd.github.io/ruleset_2_0_0.xsd">
+
+    <description>
+        🔍 PMD • last wall check 🧱
+    </description>
+
+    <!-- ! unused vars -->
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+
+    <!-- ! error handling  -->
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock"/>
+
+    <!-- ! java naming style -->
+    <rule ref="category/java/codestyle.xml/ClassNamingConventions"/>
+    <rule ref="category/java/codestyle.xml/MethodNamingConventions"/>
+
+    <!-- ! avoid slowing down performance -->
+    <rule ref="category/java/performance.xml/AvoidInstantiatingObjectsInLoops"/>
+    <rule ref="category/java/performance.xml/UseStringBufferForStringAppends"/>
+
+    <!-- ! avoid bad practices cryptography -->
+    <rule ref="category/java/security.xml/InsecureCryptoIv"/>
+
+</ruleset>

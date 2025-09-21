@@ -1,0 +1,132 @@
+name: 🧪 check && deploy 🚀
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: 🧪 check 🧪
+    runs-on: ubuntu-latest
+    env:
+      PSN_JOB_APPLICATION_TRACKER_CLIENT: ${{secrets.PSN_JOB_APPLICATION_TRACKER_CLIENT}}
+      PSN_JOB_APPLICATION_TRACKER_SERVER: ${{secrets.PSN_JOB_APPLICATION_TRACKER_SERVER}}
+      APP_NAME: ${{secrets.APP_NAME}}
+      NEXT_PUBLIC_ENV: "test"
+      NEXT_PUBLIC_BACK_URL: ${{secrets.NEXT_PUBLIC_BACK_URL}}
+      NEXT_PUBLIC_BACK_URL_DEV: ${{secrets.NEXT_PUBLIC_BACK_URL_DEV}}
+      NEXT_PUBLIC_FRONT_URL: ${{secrets.NEXT_PUBLIC_FRONT_URL}}
+      NEXT_PUBLIC_FRONT_URL_DEV: ${{secrets.NEXT_PUBLIC_FRONT_URL_DEV}}
+      NEXT_PUBLIC_BACK_URL_TEST: ${{secrets.NEXT_PUBLIC_BACK_URL_TEST}}
+      NEXT_PUBLIC_FRONT_URL_TEST: ${{secrets.NEXT_PUBLIC_FRONT_URL_TEST}}
+      NEXT_PUBLIC_SMPT_FROM: ${{secrets.NEXT_PUBLIC_SMPT_FROM}}
+      DB_URL: ${{secrets.DB_URL}}
+      DB_US: ${{secrets.DB_US}}
+      DB_PWD: ${{secrets.DB_PWD}}
+      SUPABASE_CA: ${{secrets.SUPABASE_CA}}
+      PY_ENV: "test"
+
+    steps:
+      - name: 📂 clone code
+        uses: actions/checkout@v4
+
+      - name: 🟩 setup node && yarn
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 🔧 enable corepack && set yarn version berry
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
+
+      - name: 🗃️ yarn cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: 📦 install client pkg
+        run: yarn install && yarn workspace client playwright install
+
+      - name: ☕ setup Java 21 Eclipse
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: 📦 Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: 🧪 lint && types check
+        run: yarn check
+
+      - name: 💻 build client
+        run: yarn workspace client build
+
+      - name: ▶️ start servers & wait
+        run: |
+          set -euo pipefail
+          yarn workspace server dev &                      
+          yarn dlx wait-on http-get://127.0.0.1:3000/api/v1/test/
+          yarn workspace client start &                
+          yarn dlx wait-on http-get://127.0.0.1:3001
+
+      - name: 🔒 generate .env server file
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const envPath = path.join(process.cwd(), "apps/server/.env");
+
+            const lines = Object.entries(process.env)
+              .map(([k, v]) => `${k}=${v ?? ""}`);
+
+            fs.writeFileSync(envPath, lines.join("\n") + "\n", "utf8");
+            console.log(`✅ .env generated at ${envPath}`);
+
+      - name: 🧪 run test client 💻
+        run: yarn workspace client test
+
+      - name: 🧪 run test server 🐍
+        run: yarn workspace server test
+
+  deploy:
+    name: 🚀 deploy server && client 🚀
+    needs: [check]
+    if: github.event_name == 'push' && needs.check.result == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 clone code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ install fly CLI lib
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: 🚀 deploy server
+        working-directory: apps/server
+        run: flyctl deploy --remote-only --config fly.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.PFN_JOB_APPLICATION_TRACKER__SERVER }}
+
+      - name: 🚀 deploy client
+        working-directory: apps/client
+        run: |
+          flyctl deploy \
+            --remote-only \
+            --config fly.toml \
+            --build-arg NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV }} \
+            --build-arg NEXT_PUBLIC_FRONT_URL=${{ secrets.NEXT_PUBLIC_FRONT_URL }} \
+            --build-arg NEXT_PUBLIC_BACK_URL=${{ secrets.NEXT_PUBLIC_BACK_URL }} \
+            --build-arg NEXT_PUBLIC_SMPT_FROM=${{ secrets.NEXT_PUBLIC_SMPT_FROM }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.PFN_JOB_APPLICATION_TRACKER__CLIENT }}

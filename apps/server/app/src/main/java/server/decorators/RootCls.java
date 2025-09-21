@@ -28,7 +28,7 @@ public interface RootCls {
             }
 
         } catch (IllegalAccessException e) {
-
+            throw new ErrAPI("err in cst toString app method", 500);
         }
 
         if (sb.lastIndexOf(", ") == sb.length() - 2)

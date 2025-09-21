@@ -3,18 +3,20 @@ package server.lib.etc;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.conf.env.EnvKeeper;
 import server.lib.paths.Hiker;
 
+@SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Kit is a bean svc 🫘")
 @Service
 public class Kit {
+    private final ObjectMapper jack;
     private final Hiker hiker;
-    private static final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private final EnvKeeper envKeeper;
 
-    public Kit(Hiker hiker, EnvKeeper envKeeper) {
+    public Kit(ObjectMapper jack, Hiker hiker, EnvKeeper envKeeper) {
+        this.jack = jack;
         this.hiker = hiker;
         this.envKeeper = envKeeper;
     }
@@ -28,7 +30,7 @@ public class Kit {
     }
 
     public EnvKeeper getEnvKeeper() {
-        return envKeeper;
+        return this.envKeeper;
     }
 
 }

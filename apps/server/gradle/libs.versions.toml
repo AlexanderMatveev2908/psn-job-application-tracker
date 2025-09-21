@@ -13,6 +13,11 @@ hibernate = "6.6.1.Final"
 liquibase = "4.30.0"
 r2dbc-postgres = "1.0.5.RELEASE"
 
+checkstyle = "10.20.1"
+spotbugs = "4.8.6"
+spotbugs-gradle = "6.0.23" 
+
+
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -30,7 +35,13 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
 r2dbc-postgres = { module = "org.postgresql:r2dbc-postgresql", version.ref = "r2dbc-postgres" }
 
+checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
+spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
+spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotations", version.ref = "spotbugs" }
+
+
 
 [plugins]
-spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs-gradle" }

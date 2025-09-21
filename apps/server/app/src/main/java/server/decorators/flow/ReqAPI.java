@@ -17,13 +17,20 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 
 @SuppressWarnings("UseSpecificCatch")
 public class ReqAPI extends HttpServletRequestWrapper {
-    private final byte[] cachedBody;
     private static final ObjectMapper jack = new ObjectMapper();
+    private final byte[] cachedBody;
 
     public ReqAPI(HttpServletRequest req) throws IOException {
         super(req);
-        InputStream bodyStream = req.getInputStream();
-        this.cachedBody = bodyStream.readAllBytes();
+
+        byte[] body;
+        try (InputStream bodyStream = req.getInputStream()) {
+            body = bodyStream.readAllBytes();
+        } catch (IOException e) {
+            body = new byte[0];
+        }
+
+        this.cachedBody = body;
     }
 
     @Override
@@ -75,7 +82,7 @@ public class ReqAPI extends HttpServletRequestWrapper {
     }
 
     public byte[] getRawBody() {
-        return cachedBody;
+        return cachedBody.clone();
     }
 
 }

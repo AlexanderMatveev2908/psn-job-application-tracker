@@ -15,10 +15,10 @@ import server.lib.etc.Kit;
 
 @Service
 public class LifeSpawn {
+    private static final String COND = "WHERE table_schema = 'public' " +
+            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')";
     private final Kit kit;
     private final DB db;
-    private final String cond = "WHERE table_schema = 'public' " +
-            "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')";
 
     public LifeSpawn(Kit kit, DB db) {
         this.kit = kit;
@@ -26,7 +26,7 @@ public class LifeSpawn {
     }
 
     private Mono<Map<String, Object>> grabTableCount(DatabaseClient dbRaw) {
-        return dbRaw.sql("SELECT COUNT(*) as count FROM information_schema.tables " + cond)
+        return dbRaw.sql("SELECT COUNT(*) as count FROM information_schema.tables " + COND)
                 .map(row -> {
                     Map<String, Object> res = new HashMap<>();
                     res.put("count", row.get("count", Integer.class));
@@ -36,7 +36,7 @@ public class LifeSpawn {
     }
 
     private Mono<List<String>> grabTableNames(DatabaseClient dbRaw) {
-        return dbRaw.sql("SELECT table_name FROM information_schema.tables " + cond)
+        return dbRaw.sql("SELECT table_name FROM information_schema.tables " + COND)
                 .map(row -> row.get("table_name", String.class))
                 .all()
                 .collectList();

@@ -6,15 +6,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -26,12 +23,13 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import server.decorators.AppFile;
+import server.decorators.ErrAPI;
 import server.decorators.flow.ReqAPI;
 import server.lib.etc.Kit;
 
-@SuppressWarnings({ "UseSpecificCatch", "unchecked" })
 @Component
 @Order(30)
+@SuppressWarnings({ "unchecked" })
 public class LogMdw implements Filter {
 
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
@@ -46,83 +44,77 @@ public class LogMdw implements Filter {
             throws IOException, ServletException {
 
         ReqAPI reqAPI = (ReqAPI) req;
-
         Path loggerFile = kit.getHiker().getLogFile();
 
         Map<String, Object> arg = new LinkedHashMap<>();
-
         arg.put("url", reqAPI.getRequestURI());
         arg.put("method", reqAPI.getMethod());
+        arg.put("accessToken", reqAPI.getHeader("authorization"));
+        arg.put("refreshToken", extractRefreshToken(reqAPI));
+        arg.put("query", normalizeEmpty(reqAPI.getQueryString()));
+        arg.put("params", normalizeEmpty(reqAPI.getParameterMap()));
+        arg.put("parsedQuery", normalizeEmpty((Map<String, Object>) reqAPI.getAttribute("parsedQuery")));
+        arg.put("parsedForm", handleParsedForm(reqAPI));
+        arg.put("body", handleBody(reqAPI));
 
-        String accessToken = reqAPI.getHeader("authorization");
-        arg.put("accessToken", accessToken);
+        asyncLog(loggerFile, arg);
+        chain.doFilter(reqAPI, res);
+    }
 
-        Cookie[] cookies = reqAPI.getCookies(); // may be null if no cookies
-        String refreshToken = null;
+    private String extractRefreshToken(ReqAPI reqAPI) {
+        Cookie[] cookies = reqAPI.getCookies();
+        if (cookies != null)
+            for (Cookie c : cookies)
+                if ("refreshToken".equals(c.getName()))
+                    return c.getValue();
 
-        if (cookies != null) {
-            for (Cookie c : cookies) {
-                if ("refreshToken".equals(c.getName())) {
-                    refreshToken = c.getValue();
-                    break;
-                }
-            }
-        }
-        arg.put("refreshToken", refreshToken);
+        return null;
+    }
 
-        String query = reqAPI.getQueryString();
-        arg.put("query", (query == null || query.isBlank()) ? null : query);
+    private Object normalizeEmpty(Object obj) {
+        if (obj == null)
+            return null;
+        if (obj instanceof String str && str.isBlank())
+            return null;
+        if (obj instanceof Map<?, ?> map && map.isEmpty())
+            return null;
+        return obj;
+    }
 
-        Map<String, String[]> params = reqAPI.getParameterMap();
-        arg.put("params", params.isEmpty() ? null : params);
-
-        Map<String, Object> parsedQuery = (Map<String, Object>) reqAPI.getAttribute("parsedQuery");
-        arg.put("parsedQuery", parsedQuery == null || parsedQuery.isEmpty() ? null : parsedQuery);
-
+    private Map<String, Object> handleParsedForm(ReqAPI reqAPI) {
         Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
-        arg.put("parsedForm", null);
+        if (parsedForm == null || parsedForm.isEmpty())
+            return null;
 
-        if (parsedForm != null && !parsedForm.isEmpty()) {
-            Map<String, Object> cpyForm = parsedForm.entrySet().stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (oldVal, newVal) -> newVal,
-                            LinkedHashMap::new));
+        Map<String, Object> cpyForm = parsedForm.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldVal, newVal) -> newVal,
+                        LinkedHashMap::new));
 
-            List<AppFile> images = (List<AppFile>) (cpyForm).get("images");
-            List<AppFile> videos = (List<AppFile>) (cpyForm).get("videos");
+        List<AppFile> images = (List<AppFile>) cpyForm.get("images");
+        List<AppFile> videos = (List<AppFile>) cpyForm.get("videos");
 
-            List<AppFile> assets = Stream.of(images, videos)
-                    .filter(Objects::nonNull)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
+        if (images != null)
+            cpyForm.put("images", images.stream().map(AppFile::getFancyShape).toList());
 
-            if (assets != null) {
-                List<Map<String, Object>> cpyImages = new ArrayList<>();
-                List<Map<String, Object>> cpyVideos = new ArrayList<>();
+        if (videos != null)
+            cpyForm.put("videos", videos.stream().map(AppFile::getFancyShape).toList());
 
-                for (AppFile img : images)
-                    cpyImages.add(img.getFancyShape());
-                for (AppFile vid : videos)
-                    cpyVideos.add(vid.getFancyShape());
+        return cpyForm;
+    }
 
-                cpyForm.put("images", cpyImages);
-                cpyForm.put("videos", cpyVideos);
-                arg.put("parsedForm", cpyForm);
-            }
-        }
-
+    private Map<String, Object> handleBody(ReqAPI reqAPI) {
         String contentType = reqAPI.getContentType();
-        Map<String, Object> body = null;
-        if (contentType != null && !contentType.startsWith("multipart/form-data"))
-            try {
-                body = reqAPI.grabBody();
-            } catch (Exception err) {
-            }
+        if (contentType == null || contentType.startsWith("multipart/form-data"))
+            return null;
 
-        arg.put("body", body);
+        return reqAPI.grabBody();
 
+    }
+
+    private void asyncLog(Path loggerFile, Map<String, Object> arg) {
         logThread.submit(() -> {
             try (BufferedWriter bw = Files.newBufferedWriter(
                     loggerFile,
@@ -131,14 +123,11 @@ public class LogMdw implements Filter {
                     StandardOpenOption.TRUNCATE_EXISTING)) {
 
                 String json = kit.getJack().writeValueAsString(arg);
-
                 bw.write(json);
                 bw.newLine();
-            } catch (Exception e) {
-                System.out.println(e);
+            } catch (IOException err) {
+                throw new ErrAPI("failed dev log", 500);
             }
         });
-
-        chain.doFilter(reqAPI, res);
     }
 }

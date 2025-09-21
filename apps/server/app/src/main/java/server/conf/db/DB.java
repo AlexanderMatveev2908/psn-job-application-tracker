@@ -28,9 +28,9 @@ public class DB {
         this.dbRaw = db.getDatabaseClient();
     }
 
-    public R2dbcEntityTemplate getDb() {
-        return db;
-    }
+    // public R2dbcEntityTemplate getDb() {
+    // return db;
+    // }
 
     public <T> Mono<T> trxRunnerMono(Function<DatabaseClient, Mono<T>> cb) {
         return cb.apply(dbRaw)

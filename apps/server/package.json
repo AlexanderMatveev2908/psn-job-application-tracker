@@ -2,6 +2,7 @@
   "name": "server",
   "scripts": {
     "dev": "find app/src/main/java app/src/main/resources -type f | entr -r ./gradlew bootRun",
+    "check": "bash -c './gradlew clean && (./gradlew checkstyleMain & ./gradlew pmdMain & ./gradlew spotbugsMain & wait) && echo \"🎉 java check passed 🎉\"'",
     "build": "./gradlew bootJar",
     "start": "java -jar app/build/libs/server-1.0.0.jar",
     "test": "./gradlew test",

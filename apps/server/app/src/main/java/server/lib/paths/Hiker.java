@@ -6,6 +6,9 @@ import java.nio.file.Path;
 
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import server.decorators.ErrAPI;
+
 @Service
 public class Hiker {
     private final Path serverDir = Seeker.grabDir();
@@ -15,6 +18,7 @@ public class Hiker {
     private final Path logDir;
     private final Path logFile;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public Hiker() {
         this.imagesDir = serverDir.resolve("assets/images").normalize();
         this.videosDir = serverDir.resolve("assets/videos").normalize();
@@ -36,7 +40,7 @@ public class Hiker {
                 Files.createFile(logFile);
 
         } catch (IOException e) {
-
+            throw new ErrAPI("err generating required app dirs", 500);
         }
     }
 
