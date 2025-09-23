@@ -46,7 +46,7 @@ public class LifeSpawn {
                 .collectList();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "UnnecessaryTemporaryOnConversionFromString" })
     public void lifeCheck(WebServerInitializedEvent e) {
         db
                 .trxRunnerMono(dbRaw -> grabTableCount(dbRaw).flatMap(res -> grabTableNames(dbRaw).map(tables -> {
@@ -54,17 +54,20 @@ public class LifeSpawn {
                     return res;
                 }))).subscribe(res -> {
 
-                    rd.checkConnection()
-                            .doOnNext(pong -> {
+                    rd.dbSize()
+                            .doOnNext(size -> {
                                 MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
                                         String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
-                                        String.format("🏓 redis => %s", pong.toLowerCase()));
+                                        String.format("🧮 redis size => %d", size));
 
                                 List<String> tables = (List<String>) res.get("tables");
 
-                                MyLog.logCols(tables, (Integer) res.get("count"));
+                                System.out.println("🗃️ db tables => ");
+                                MyLog.logCols(tables);
                             })
                             .subscribe();
+
+                    // rd.flushAll().subscribe();
 
                 }, err -> {
                     throw new ErrAPI(err.getMessage(),
