@@ -28,6 +28,7 @@ jobs:
       DB_US: ${{secrets.DB_US}}
       DB_PWD: ${{secrets.DB_PWD}}
       SUPABASE_CA: ${{secrets.SUPABASE_CA}}
+      REDIS_URL: ${{secrets.REDIS_URL}}
 
     steps:
       - name: 📂 clone code

@@ -38,9 +38,8 @@ public class MyLog {
         logTtl(null, arg);
     }
 
-    public static void logCols(List<String> cols, Integer count) {
-        StringBuilder sb = new StringBuilder(
-                String.format("🔥 db tables count => %d%n", count));
+    public static void logCols(List<String> cols) {
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < cols.size(); i++) {
             sb.append(String.format("%-20s|", cols.get(i)));

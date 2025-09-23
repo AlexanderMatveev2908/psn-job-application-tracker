@@ -9,6 +9,7 @@ app:
     nextPblFrontUrlDev: ${NEXT_PUBLIC_FRONT_URL_DEV}
     nextPblFrontUrlTest: ${NEXT_PUBLIC_FRONT_URL_TEST}
     nextPblSmptFrom: ${NEXT_PUBLIC_SMPT_FROM}
+    redisUrl: ${REDIS_URL}
 
 server:
   address: 0.0.0.0

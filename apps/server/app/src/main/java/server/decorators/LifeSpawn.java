@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 import server.conf.db.DB;
+import server.conf.db.RD;
 import server.decorators.flow.ErrAPI;
 import server.lib.dev.MyLog;
 import server.lib.etc.Kit;
@@ -20,10 +21,12 @@ public class LifeSpawn {
             "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')";
     private final Kit kit;
     private final DB db;
+    private final RD rd;
 
-    public LifeSpawn(Kit kit, DB db) {
+    public LifeSpawn(Kit kit, DB db, RD rd) {
         this.kit = kit;
         this.db = db;
+        this.rd = rd;
     }
 
     private Mono<Map<String, Object>> grabTableCount(DatabaseClient dbRaw) {
@@ -43,24 +46,32 @@ public class LifeSpawn {
                 .collectList();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "UnnecessaryTemporaryOnConversionFromString" })
     public void lifeCheck(WebServerInitializedEvent e) {
-        Mono<Map<String, Object>> result = db
+        db
                 .trxRunnerMono(dbRaw -> grabTableCount(dbRaw).flatMap(res -> grabTableNames(dbRaw).map(tables -> {
                     res.put("tables", tables);
                     return res;
-                })));
+                }))).subscribe(res -> {
 
-        result.subscribe(res -> {
-            MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
-                    String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()));
+                    rd.dbSize()
+                            .doOnNext(size -> {
+                                MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
+                                        String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
+                                        String.format("🧮 redis size => %d", size));
 
-            List<String> tables = (List<String>) res.get("tables");
+                                List<String> tables = (List<String>) res.get("tables");
 
-            MyLog.logCols(tables, (Integer) res.get("count"));
-        }, err -> {
-            throw new ErrAPI(err.getMessage(),
-                    err instanceof ErrAPI ? ((ErrAPI) err).getStatus() : 500);
-        });
+                                System.out.println("🗃️ db tables => ");
+                                MyLog.logCols(tables);
+                            })
+                            .subscribe();
+
+                    // rd.flushAll().subscribe();
+
+                }, err -> {
+                    throw new ErrAPI(err.getMessage(),
+                            500);
+                });
     }
 }

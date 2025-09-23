@@ -43,7 +43,8 @@ public class EnvKeeper {
             "nextPblFrontUrl",
             "nextPblFrontUrlDev",
             "nextPblFrontUrlTest",
-            "nextPblSmptFrom");
+            "nextPblSmptFrom",
+            "redisUrl");
 
     private Map<String, String> envVars = new HashMap<>();
 
