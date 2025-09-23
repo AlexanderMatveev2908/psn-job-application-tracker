@@ -62,7 +62,7 @@ public class FormDataParser implements WebFilter {
                     return resolved.then(chain.filter(api));
 
                 })
-                .switchIfEmpty(chain.filter(api));
+                .switchIfEmpty(Mono.defer(() -> api.isResCmt() ? Mono.empty() : chain.filter(api)));
     }
 
     private Mono<String[]> splitParts(Api api) {

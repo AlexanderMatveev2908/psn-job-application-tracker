@@ -8,7 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
 import server.lib.dev.MyLog;
@@ -19,11 +18,6 @@ public class ErrCatcher {
     @ExceptionHandler(ResponseStatusException.class)
     public Mono<ResponseEntity<ResAPI<Object>>> handleResponseStatus(
             ResponseStatusException err, ServerWebExchange exc) {
-
-        var api = (Api) exc;
-
-        if (api.isResCmt())
-            return Mono.empty();
 
         if (err.getStatusCode() != HttpStatus.NOT_FOUND ||
                 err.getMessage() == null ||
@@ -39,11 +33,6 @@ public class ErrCatcher {
 
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ResAPI<Object>>> handleGeneric(Exception err, ServerWebExchange exc) {
-
-        var api = (Api) exc;
-
-        if (api.isResCmt())
-            return Mono.empty();
 
         MyLog.logErr(err);
 
