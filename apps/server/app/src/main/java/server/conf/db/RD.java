@@ -30,14 +30,6 @@ public class RD implements RootCls {
         this.cmd = cnt.reactive();
     }
 
-    public RedisClient getClient() {
-        return client;
-    }
-
-    public StatefulRedisConnection<String, String> getCnt() {
-        return cnt;
-    }
-
     public RedisReactiveCommands<String, String> getCmd() {
         return cmd;
     }
