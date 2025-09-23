@@ -22,14 +22,13 @@ public class ResAPI<T> {
     }
 
     public static <T> Mono<ResponseEntity<ResAPI<T>>> of(int code, String msg, T data) {
-        return Mono.fromSupplier(() -> {
-            String safeMsg = (msg == null) ? MapperMsg.fromCode(code).getMsg() : msg;
-            ActT act = (code >= 200 && code < 300) ? ActT.OK : ActT.ERR;
+        String safeMsg = (msg == null) ? MapperMsg.fromCode(code).getMsg() : msg;
+        ActT act = (code >= 200 && code < 300) ? ActT.OK : ActT.ERR;
 
-            return ResponseEntity
-                    .status(code)
-                    .body(new ResAPI<>(prependEmj(safeMsg, act), code, data));
-        });
+        return Mono.just(
+                ResponseEntity
+                        .status(code)
+                        .body(new ResAPI<>(prependEmj(safeMsg, act), code, data)));
     }
 
     public static <T> Mono<ResponseEntity<ResAPI<T>>> ok200(String msg, T data) {

@@ -25,17 +25,16 @@ public class ErrCatcher {
         if (api.isResCmt())
             return Mono.empty();
 
+        if (err.getStatusCode() != HttpStatus.NOT_FOUND ||
+                err.getMessage() == null ||
+                !err.getMessage().contains("NOT_FOUND"))
+            return handleGeneric(err, exc);
+
         MyLog.logErr(err);
 
-        if (err.getStatusCode() == HttpStatus.NOT_FOUND &&
-                err.getMessage() != null &&
-                err.getMessage().contains("NOT_FOUND")) {
+        String path = exc.getRequest().getPath().value();
+        return ResAPI.err404(String.format("%s not found 🚦", path));
 
-            String path = exc.getRequest().getPath().value();
-            return ResAPI.err404(String.format("%s not found 🚦", path));
-        }
-
-        return handleGeneric(err, exc);
     }
 
     @ExceptionHandler(Exception.class)

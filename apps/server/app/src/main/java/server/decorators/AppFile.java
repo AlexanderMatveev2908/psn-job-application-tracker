@@ -20,7 +20,7 @@ public class AppFile {
     private final String filename;
     private final String contentType;
     private final byte[] bts;
-    private final String filePath;
+    private final Path filePath;
 
     public AppFile(
             String field,
@@ -39,16 +39,24 @@ public class AppFile {
         }
 
         this.filename = UUID.randomUUID().toString() + ext;
-        this.filePath = Seeker.grabDir().resolve("assets").resolve(this.field).resolve(this.filename).toString();
+        this.filePath = Seeker.grabDir().resolve("assets").resolve(this.field).resolve(this.filename);
     }
 
     public void saveLocally() {
         try {
-            Files.write(Path.of(this.getFilePath()), this.getBts(),
+            Files.write(this.getFilePath(), this.getBts(),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException err) {
             throw new ErrAPI("err saving asset locally", 500);
+        }
+    }
+
+    public void deleteLocally() {
+        try {
+            Files.deleteIfExists(this.getFilePath());
+        } catch (IOException err) {
+            throw new ErrAPI("err deleting asset locally", 500);
         }
     }
 
@@ -92,7 +100,7 @@ public class AppFile {
         return bts.clone();
     }
 
-    public String getFilePath() {
+    public Path getFilePath() {
         return this.filePath;
     }
 }

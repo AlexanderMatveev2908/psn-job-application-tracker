@@ -1,6 +1,9 @@
 package server.features.test.controllers;
 
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -8,7 +11,9 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import reactor.core.publisher.Mono;
+import server.decorators.AppFile;
 import server.decorators.flow.Api;
+import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
 import server.lib.data_structure.ShapeCheck;
 
@@ -28,11 +33,34 @@ public class PostTestCtrl {
                 });
     }
 
+    @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
     public Mono<ResponseEntity<ResAPI<Object>>> postFormData(Api api) {
+
+        var form = api.getParsedForm().orElse(null);
+
+        if (form == null)
+            return ResAPI.err400("no form data");
+
+        Set<String> assetKeys = Set.of("images", "videos");
+
+        for (String k : form.keySet()) {
+            if (!assetKeys.contains(k))
+                continue;
+
+            var arg = (List<AppFile>) form.get(k);
+
+            for (AppFile f : arg) {
+
+                if (!Files.exists(f.getFilePath()))
+                    throw new ErrAPI("file does not exist", 500);
+
+                f.deleteLocally();
+            }
+        }
 
         return ResAPI.ok200(
                 "form data received • parsed • processed • sent back",
-                api.getParsedForm().orElse(null));
+                (Object) form);
     }
 
 }
