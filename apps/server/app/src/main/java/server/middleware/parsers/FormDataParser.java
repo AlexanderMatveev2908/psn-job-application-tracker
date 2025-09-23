@@ -1,134 +1,85 @@
 package server.middleware.parsers;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import server.decorators.AppFile;
-import server.decorators.ErrAPI;
-import server.decorators.flow.ReqAPI;
-import server.lib.etc.Kit;
+import server.decorators.flow.Api;
+import server.decorators.flow.ErrAPI;
 import server.lib.paths.Hiker;
 
-class CtxParse {
-    StringBuilder sb = new StringBuilder();
-    List<AppFile> images = new ArrayList<>();
-    List<AppFile> videos = new ArrayList<>();
-    final Hiker hiker;
-
-    CtxParse(Hiker hiker) {
-        this.hiker = hiker;
-    }
-}
-
-class PartCtx {
-    final String headers;
-    final String body;
-    final String name;
-
-    PartCtx(String headers, String body) {
-        this.headers = headers;
-        this.body = body;
-        this.name = FormDataParser.findPattern("name", headers);
-    }
-}
-
 @Component
-@Order(10)
-public class FormDataParser implements Filter {
+@Order(20)
+public class FormDataParser implements WebFilter {
 
-    private static final ExecutorService fileExecutor = Executors.newFixedThreadPool(2);
-    private final Kit kit;
+    private final Hiker hiker;
 
-    public FormDataParser(Kit kit) {
-        this.kit = kit;
-    }
-
-    public static String[] splitParts(ReqAPI reqAPI) {
-
-        String contentType = reqAPI.getContentType();
-
-        if (contentType == null || !contentType.startsWith("multipart/form-data")) {
-            return null;
-        }
-
-        String boundary = "--" + contentType.split("boundary=")[1];
-        byte[] rawBody = reqAPI.getRawBody();
-        String txtBody = new String(rawBody, StandardCharsets.ISO_8859_1);
-        String[] parts = txtBody.split(Pattern.quote(boundary));
-
-        return parts;
-    }
-
-    public static String findPattern(String key, String headers) {
-        Matcher m = Pattern.compile(String.format("%s=\"([^\"]+)\"", Pattern.quote(key))).matcher(headers);
-        return !m.find() ? null
-                : m.group(1);
-    }
-
-    public static AppFile handleAsset(String body, String headers, String field) {
-        String filename = findPattern("filename", headers);
-
-        if (filename == null)
-            return null;
-
-        String contentTypePart = null;
-        Matcher cm = Pattern.compile("Content-Type: (.+)").matcher(headers);
-        if (cm.find())
-            contentTypePart = cm.group(1).trim();
-
-        byte[] rawFile = body.getBytes(StandardCharsets.ISO_8859_1);
-
-        return new AppFile(field, filename, contentTypePart, rawFile);
+    public FormDataParser(Hiker hiker) {
+        this.hiker = hiker;
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
+    public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
+        var api = (Api) exc;
 
-        ReqAPI reqAPI = new ReqAPI((HttpServletRequest) req);
-        String[] parts = splitParts(reqAPI);
+        if (!hiker.existsDir())
+            throw new ErrAPI("missing required dirs", 500);
 
-        if (parts == null) {
-            chain.doFilter(reqAPI, res);
-            return;
-        }
+        return splitParts(api)
+                .flatMap(parts -> {
+                    CtxParse ctx = new CtxParse();
+                    Arrays.stream(parts).forEach(prt -> handlePart(prt, ctx));
 
-        CtxParse ctx = new CtxParse(kit.getHiker());
+                    if (ctx.sb.length() > 0)
+                        ctx.sb.setLength(ctx.sb.length() - 1);
 
-        for (String prt : parts)
-            handlePart(prt, ctx);
+                    Map<String, Object> parsedForm = ParserManager.nestDict(ctx.sb.toString());
+                    parsedForm.put("images", ctx.images);
+                    parsedForm.put("videos", ctx.videos);
 
-        if (ctx.sb.length() > 0)
-            ctx.sb.setLength(ctx.sb.length() - 1);
+                    api.setAttr("parsedForm", parsedForm);
 
-        Map<String, Object> parsedForm = ParserManager.nestDict(ctx.sb.toString());
-        parsedForm.put("images", ctx.images);
-        parsedForm.put("videos", ctx.videos);
-        reqAPI.setAttribute("parsedForm", parsedForm);
+                    Mono<Void> resolved = ctx.promises.isEmpty()
+                            ? Mono.empty()
+                            : Mono.when(ctx.promises);
 
-        chain.doFilter(reqAPI, res);
+                    return resolved.then(chain.filter(api));
+
+                })
+                .switchIfEmpty(chain.filter(api));
+    }
+
+    private Mono<String[]> splitParts(Api api) {
+        String contentType = api.getContentType();
+        if (!contentType.startsWith("multipart/form-data"))
+            return Mono.empty();
+
+        String boundary = "--" + contentType.split("boundary=")[1];
+
+        return api.getRawBd()
+                .flatMap(raw -> {
+                    if (raw.length == 0)
+                        return Mono.empty();
+
+                    String txtBody = new String(raw, StandardCharsets.ISO_8859_1);
+                    return Mono.just(txtBody.split(Pattern.quote(boundary)));
+                });
     }
 
     private void handlePart(String prt, CtxParse ctx) {
@@ -136,14 +87,16 @@ public class FormDataParser implements Filter {
         if (headerAndBody.length < 2)
             return;
 
-        PartCtx part = new PartCtx(headerAndBody[0], headerAndBody[1]);
+        CtxPart part = new CtxPart(headerAndBody[0], headerAndBody[1]);
         if (part.name == null)
             return;
 
         if (part.headers.contains("filename=")) {
             handleAssetPart(part, ctx);
         } else {
-            String val = new String(part.body.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).trim();
+            String val = new String(
+                    part.body.getBytes(StandardCharsets.ISO_8859_1),
+                    StandardCharsets.UTF_8).trim();
             ctx.sb.append(URLEncoder.encode(part.name, StandardCharsets.UTF_8))
                     .append("=")
                     .append(URLEncoder.encode(val, StandardCharsets.UTF_8))
@@ -151,35 +104,65 @@ public class FormDataParser implements Filter {
         }
     }
 
-    private void handleAssetPart(PartCtx part, CtxParse ctx) {
+    private void handleAssetPart(CtxPart part, CtxParse ctx) {
         if (!Set.of("images", "videos").contains(part.name))
             return;
 
         boolean isImage = part.name.equals("images");
-        AppFile asset = handleAsset(part.body, part.headers, part.name);
-        if (asset == null)
-            return;
+        handleAsset(part).ifPresent(asset -> {
 
-        Path dir = isImage ? ctx.hiker.getImagesDir() : ctx.hiker.getVideosDir();
-        Path assetPath = dir.resolve(asset.getFilename());
+            Mono<Void> prm = Mono.fromCallable(() -> {
+                asset.saveLocally();
+                return (Void) null;
+            }).subscribeOn(Schedulers.boundedElastic()).cache();
 
-        fileExecutor.submit(() -> saveAsset(asset, assetPath));
+            ctx.promises.add(prm);
 
-        if (isImage)
-            ctx.images.add(asset);
-        else
-            ctx.videos.add(asset);
+            if (isImage)
+                ctx.images.add(asset);
+            else
+                ctx.videos.add(asset);
+        });
     }
 
-    private void saveAsset(AppFile asset, Path assetPath) {
-        try (OutputStream os = Files.newOutputStream(assetPath,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING)) {
-            os.write(asset.getBts());
-            asset.setFilePath(assetPath.toString());
-        } catch (IOException err) {
-            throw new ErrAPI("err saving asset locally", 500);
-        }
+    private static Optional<AppFile> handleAsset(CtxPart part) {
+        String filename = findPattern("filename", part.headers);
+        if (filename == null)
+            return Optional.empty();
+
+        Matcher cm = Pattern.compile("Content-Type: (.+)").matcher(part.headers);
+        String contentTypePart = cm.find() ? cm.group(1).trim() : null;
+        if (contentTypePart == null)
+            return Optional.empty();
+
+        byte[] rawFile = part.body.getBytes(StandardCharsets.ISO_8859_1);
+        return Optional.of(new AppFile(part.name, filename, contentTypePart,
+                rawFile));
     }
 
+    public static String findPattern(String key, String headers) {
+        Matcher m = Pattern.compile(String.format("%s=\"([^\"]+)\"",
+                Pattern.quote(key))).matcher(headers);
+        return !m.find() ? null : m.group(1);
+    }
+}
+
+class CtxParse {
+    StringBuilder sb = new StringBuilder();
+    List<AppFile> images = new ArrayList<>();
+    List<AppFile> videos = new ArrayList<>();
+    List<Mono<Void>> promises = new ArrayList<>();
+
+}
+
+class CtxPart {
+    final String headers;
+    final String body;
+    final String name;
+
+    CtxPart(String headers, String body) {
+        this.headers = headers;
+        this.body = body;
+        this.name = FormDataParser.findPattern("name", headers);
+    }
 }

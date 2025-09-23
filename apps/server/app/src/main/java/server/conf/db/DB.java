@@ -12,7 +12,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import server.decorators.ErrAPI;
+import server.decorators.flow.ErrAPI;
 
 @Component
 public class DB {

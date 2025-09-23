@@ -2,13 +2,18 @@ package server.features.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import server.decorators.flow.ReqAPI;
+import reactor.core.publisher.Mono;
+import server.decorators.flow.Api;
+import server.decorators.flow.ResAPI;
 import server.features.user.controllers.GetUserCtrl;
-import server.router.RootApi;
+import server.router.RouterAPI;
 
-@RootApi
+@RestController
+@RouterAPI
 public class UserRouter {
+
     private final GetUserCtrl getCtrl;
 
     public UserRouter(GetUserCtrl getCtrl) {
@@ -16,8 +21,7 @@ public class UserRouter {
     }
 
     @GetMapping("/user/profile")
-    public ResponseEntity<Void> postMsg(ReqAPI req) {
-        return getCtrl.getUser(req);
+    public Mono<ResponseEntity<ResAPI<Void>>> getUserProfile(Api api) {
+        return getCtrl.getUser(api);
     }
-
 }

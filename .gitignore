@@ -23,6 +23,11 @@ out/
 bin/
 .gradle
 
+!apps/server/gradlew
+!apps/server/gradlew.bat
+!apps/server/gradle/wrapper/gradle-wrapper.jar
+!apps/server/gradle/wrapper/gradle-wrapper.properties
+
 # ? useless
 .editorconfig
 

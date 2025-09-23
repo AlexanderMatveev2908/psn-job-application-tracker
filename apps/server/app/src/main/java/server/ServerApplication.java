@@ -24,6 +24,15 @@ public class ServerApplication {
         SpringApplication.run(ServerApplication.class, args);
     }
 
+    // @Bean
+    // public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
+    // return args -> {
+    // mapping.getHandlerMethods().forEach((key, value) -> {
+    // System.out.println("📡 Route =>" + key + " → " + value);
+    // });
+    // };
+    // }
+
     @Bean
     @SuppressWarnings({ "unused", })
     ApplicationListener<WebServerInitializedEvent> startCheck() {

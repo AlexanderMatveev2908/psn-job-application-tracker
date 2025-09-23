@@ -1,6 +1,4 @@
-package server.middleware.parsers;
-
-import java.util.Map;
+package server.middleware;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -12,18 +10,10 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 
 @Component
-@Order(30)
-public class QueryParserMdw implements WebFilter {
-
+@Order(0)
+public class Ninja implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
-        Api api = (Api) exc;
-
-        String query = api.getQuery();
-        Map<String, Object> parsedQuery = ParserManager.nestDict(query);
-
-        api.setAttr("parsedQuery", parsedQuery);
-
-        return chain.filter(api);
+        return chain.filter(new Api(exc));
     }
 }

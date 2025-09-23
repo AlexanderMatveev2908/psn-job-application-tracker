@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import server.decorators.ErrAPI;
+import server.decorators.flow.ErrAPI;
 
 @Service
 public class Hiker {
@@ -41,6 +41,18 @@ public class Hiker {
 
         } catch (IOException e) {
             throw new ErrAPI("err generating required app dirs", 500);
+        }
+    }
+
+    public boolean existsDir() {
+        try {
+            return Files.isDirectory(certsDir)
+                    && Files.isDirectory(imagesDir)
+                    && Files.isDirectory(videosDir)
+                    && Files.isDirectory(logDir)
+                    && Files.isRegularFile(logFile);
+        } catch (Exception e) {
+            return false;
         }
     }
 

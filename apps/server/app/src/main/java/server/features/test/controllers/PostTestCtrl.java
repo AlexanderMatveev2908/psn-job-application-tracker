@@ -5,27 +5,34 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import server.decorators.ErrAPI;
-import server.decorators.flow.ReqAPI;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import reactor.core.publisher.Mono;
+import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.lib.data_structure.ShapeCheck;
 
 @Component
 public class PostTestCtrl {
-    public ResponseEntity<ResAPI<Map<String, String>>> postMsg(ReqAPI req) {
 
-        @SuppressWarnings("unchecked")
-        var bd = (Map<String, Object>) req.grabBody();
+    public Mono<ResponseEntity<ResAPI<Object>>> postMsg(Api api) {
+        return api.getBd(new TypeReference<Map<String, Object>>() {
+        })
+                .flatMap(bd -> {
+                    var msg = (String) bd.get("msg");
 
-        String msg;
-        if (bd == null || !ShapeCheck.isStr(msg = (String) bd.get("msg")))
-            throw new ErrAPI("missing msg", 400);
+                    if (!ShapeCheck.isStr(msg))
+                        return ResAPI.err400("missing msg");
 
-        return ResAPI.ok200("msg received", Map.of("clientMsg", msg));
-
+                    return ResAPI.ok200("msg received", Map.of("clientMsg", msg));
+                });
     }
 
-    public ResponseEntity<ResAPI<Object>> postFormData(ReqAPI req) {
-        return ResAPI.ok200("form data received • parsed • processed • sent back", req.getAttribute("parsedForm"));
+    public Mono<ResponseEntity<ResAPI<Object>>> postFormData(Api api) {
+
+        return ResAPI.ok200(
+                "form data received • parsed • processed • sent back",
+                api.getParsedForm().orElse(null));
     }
+
 }

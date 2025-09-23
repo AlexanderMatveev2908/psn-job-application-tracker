@@ -1,8 +1,5 @@
-package server.middleware.parsers;
+package server.features.test.middleware;
 
-import java.util.Map;
-
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -12,17 +9,13 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 
 @Component
-@Order(30)
-public class QueryParserMdw implements WebFilter {
-
+public class GetLimitedMdw implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
-        Api api = (Api) exc;
+        var api = (Api) exc;
 
-        String query = api.getQuery();
-        Map<String, Object> parsedQuery = ParserManager.nestDict(query);
-
-        api.setAttr("parsedQuery", parsedQuery);
+        if (api.getPath().equals("/api/v1/test/limited"))
+            System.out.println("👮 mdw /limited");
 
         return chain.filter(api);
     }

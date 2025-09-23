@@ -9,13 +9,15 @@ junit-platform = "1.10.3"
 spring-boot = "3.3.4"
 
 postgres = "42.7.3"
-hibernate = "6.6.1.Final"
 liquibase = "4.30.0"
 r2dbc-postgres = "1.0.5.RELEASE"
 
 checkstyle = "10.20.1"
 spotbugs = "4.8.6"
 spotbugs-gradle = "6.0.23" 
+
+lettuce = "6.4.0.RELEASE"
+reactor = "3.6.6"
 
 
 
@@ -26,10 +28,9 @@ dotenv = { module = "io.github.cdimascio:dotenv-java", version.ref = "dotenv" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
 
-spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-starter-data-r2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
@@ -39,7 +40,8 @@ checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checks
 spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
 spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotations", version.ref = "spotbugs" }
 
-
+redis-lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
+reactor-core = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
 
 [plugins]
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }

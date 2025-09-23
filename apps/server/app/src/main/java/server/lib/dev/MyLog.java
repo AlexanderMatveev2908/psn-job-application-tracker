@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-import server.decorators.ErrAPI;
+import server.decorators.flow.ErrAPI;
 
 public class MyLog {
 

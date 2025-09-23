@@ -3,6 +3,8 @@ package server.decorators;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import server.decorators.flow.ErrAPI;
+
 public interface RootCls {
     default String reflectiveToString() {
         StringBuilder sb = new StringBuilder(this.getClass().getSimpleName() + "{");

@@ -1,24 +1,28 @@
 package server.middleware.security;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import reactor.core.publisher.Mono;
+import server.decorators.flow.Api;
 import server.lib.etc.Kit;
 
 @Component
-@Order(0)
-public class CorsMdw implements Filter {
+@Order(10)
+public class CorsMdw implements WebFilter {
 
     private final Kit kit;
 
@@ -27,49 +31,59 @@ public class CorsMdw implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
-        HttpServletResponse httpRes = (HttpServletResponse) res;
+    public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
+        var api = (Api) exc;
+        var res = api.getResponse();
 
-        HttpServletRequest httpReq = (HttpServletRequest) req;
-        String origin = httpReq.getHeader("Origin");
-
+        String origin = api.getHeader(HttpHeaders.ORIGIN);
         String allowed = kit.getEnvKeeper().getFrontUrl();
 
-        if (origin != null && !origin.equals(allowed)) {
-            httpRes.setStatus(403);
-            httpRes.setContentType("application/json");
-            httpRes.setCharacterEncoding("UTF-8");
+        if (!origin.isBlank() && !origin.startsWith(allowed))
+            return writeForbidden(res, origin);
 
-            String json = kit.getJack()
-                    .writeValueAsString(Map.of("msg", String.format("❌ %s not allowed", origin), "status", 403));
+        setCorsHeaders(res, allowed);
 
-            httpRes.getWriter().write(json);
-            return;
+        if (HttpMethod.OPTIONS.equals(api.getMethod())) {
+            res.setStatusCode(HttpStatus.OK);
+            return res.setComplete();
         }
 
-        String[] headers = {
-                "Origin",
-                "Content-Type",
-                "Accept",
-                "Authorization"
+        return chain.filter(api);
+    }
+
+    private Mono<Void> writeForbidden(org.springframework.http.server.reactive.ServerHttpResponse res, String origin) {
+        res.setStatusCode(HttpStatus.FORBIDDEN);
+        res.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        String msg = String.format("❌ %s not allowed", origin);
+        String body;
+        try {
+            body = kit.getJack().writeValueAsString(Map.of("msg", msg, "status", 403));
+        } catch (JsonProcessingException err) {
+            body = String.format("{ \"msg\": \"%s\", \"status\": 403 }", msg);
+        }
+
+        var buff = res.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
+        return res.writeWith(Mono.just(buff));
+    }
+
+    private void setCorsHeaders(org.springframework.http.server.reactive.ServerHttpResponse res, String allowed) {
+        String[] hdr = {
+                HttpHeaders.ORIGIN,
+                HttpHeaders.CONTENT_TYPE,
+                HttpHeaders.ACCEPT,
+                HttpHeaders.AUTHORIZATION
         };
 
-        String allowHeaders = String.join(", ", headers) + ", " +
-                String.join(", ", Arrays.stream(headers)
+        String allowedHdr = String.join(", ", hdr) + ", " +
+                String.join(", ", Arrays.stream(hdr)
                         .map(String::toLowerCase)
                         .toArray(String[]::new));
 
-        httpRes.setHeader("Access-Control-Allow-Headers", allowHeaders);
-        httpRes.setHeader("Access-Control-Allow-Origin", allowed);
-        httpRes.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        httpRes.setHeader("Access-Control-Allow-Credentials", "true");
-
-        if ("OPTIONS".equalsIgnoreCase(httpReq.getMethod())) {
-            httpRes.setStatus(200);
-            return;
-        }
-
-        chain.doFilter(req, httpRes);
+        var resHdr = res.getHeaders();
+        resHdr.set("Access-Control-Allow-Headers", allowedHdr);
+        resHdr.set("Access-Control-Allow-Origin", allowed);
+        resHdr.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resHdr.set("Access-Control-Allow-Credentials", "true");
     }
 }

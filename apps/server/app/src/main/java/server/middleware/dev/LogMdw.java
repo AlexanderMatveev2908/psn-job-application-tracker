@@ -15,22 +15,20 @@ import java.util.stream.Collectors;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.Cookie;
+import reactor.core.publisher.Mono;
 import server.decorators.AppFile;
-import server.decorators.ErrAPI;
-import server.decorators.flow.ReqAPI;
+import server.decorators.flow.Api;
+import server.decorators.flow.ErrAPI;
 import server.lib.etc.Kit;
 
 @Component
-@Order(30)
+@Order(100)
 @SuppressWarnings({ "unchecked" })
-public class LogMdw implements Filter {
+public class LogMdw implements WebFilter {
 
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
     private final Kit kit;
@@ -40,35 +38,29 @@ public class LogMdw implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
-
-        ReqAPI reqAPI = (ReqAPI) req;
+    public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
+        Api api = (Api) exc;
         Path loggerFile = kit.getHiker().getLogFile();
 
         Map<String, Object> arg = new LinkedHashMap<>();
-        arg.put("url", reqAPI.getRequestURI());
-        arg.put("method", reqAPI.getMethod());
-        arg.put("accessToken", reqAPI.getHeader("authorization"));
-        arg.put("refreshToken", extractRefreshToken(reqAPI));
-        arg.put("query", normalizeEmpty(reqAPI.getQueryString()));
-        arg.put("params", normalizeEmpty(reqAPI.getParameterMap()));
-        arg.put("parsedQuery", normalizeEmpty((Map<String, Object>) reqAPI.getAttribute("parsedQuery")));
-        arg.put("parsedForm", handleParsedForm(reqAPI));
-        arg.put("body", handleBody(reqAPI));
+        arg.put("url", api.getPath());
+        arg.put("method", api.getMethod().toString());
+        arg.put("accessToken", normalizeEmpty(api.getHeader("authorization")));
+        arg.put("refreshToken", normalizeEmpty(api.getCookie("refreshToken")));
+        arg.put("query", normalizeEmpty(api.getQuery()));
+        arg.put("parsedQuery", api.getParsedQuery().orElse(null));
+        arg.put("parsedForm", handleParsedForm(api));
 
-        asyncLog(loggerFile, arg);
-        chain.doFilter(reqAPI, res);
-    }
+        return api.getBdStr()
+                .defaultIfEmpty("")
+                .doOnNext(body -> {
 
-    private String extractRefreshToken(ReqAPI reqAPI) {
-        Cookie[] cookies = reqAPI.getCookies();
-        if (cookies != null)
-            for (Cookie c : cookies)
-                if ("refreshToken".equals(c.getName()))
-                    return c.getValue();
+                    arg.put("body", api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body));
 
-        return null;
+                    asyncLog(loggerFile, arg);
+                })
+                .then(chain.filter(api));
+
     }
 
     private Object normalizeEmpty(Object obj) {
@@ -81,8 +73,8 @@ public class LogMdw implements Filter {
         return obj;
     }
 
-    private Map<String, Object> handleParsedForm(ReqAPI reqAPI) {
-        Map<String, Object> parsedForm = (Map<String, Object>) reqAPI.getAttribute("parsedForm");
+    private Map<String, Object> handleParsedForm(Api api) {
+        var parsedForm = api.getParsedForm().orElse(null);
         if (parsedForm == null || parsedForm.isEmpty())
             return null;
 
@@ -105,15 +97,6 @@ public class LogMdw implements Filter {
         return cpyForm;
     }
 
-    private Map<String, Object> handleBody(ReqAPI reqAPI) {
-        String contentType = reqAPI.getContentType();
-        if (contentType == null || contentType.startsWith("multipart/form-data"))
-            return null;
-
-        return reqAPI.grabBody();
-
-    }
-
     private void asyncLog(Path loggerFile, Map<String, Object> arg) {
         logThread.submit(() -> {
             try (BufferedWriter bw = Files.newBufferedWriter(
@@ -123,6 +106,7 @@ public class LogMdw implements Filter {
                     StandardOpenOption.TRUNCATE_EXISTING)) {
 
                 String json = kit.getJack().writeValueAsString(arg);
+
                 bw.write(json);
                 bw.newLine();
             } catch (IOException err) {

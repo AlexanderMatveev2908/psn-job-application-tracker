@@ -4,8 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import server.decorators.ErrAPI;
-import server.lib.dev.MyLog;
+import server.decorators.flow.ErrAPI;
 
 public class Seeker {
     @SuppressWarnings("UseSpecificCatch")
@@ -30,8 +29,6 @@ public class Seeker {
                 // ? more points to oroginal JAR path but to a in-memory structure returning /
             } else if (appDir.toString().equals("/")) {
                 appDir = Paths.get(System.getProperty("user.dir"));
-
-                MyLog.logTtl("curr path", appDir);
 
                 if (!appDir.endsWith("server"))
                     serverDir = appDir.resolve("apps/server").normalize();

@@ -7,7 +7,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
+#
 jobs:
   check:
     name: 🧪 check 🧪
@@ -60,39 +60,31 @@ jobs:
           java-version: 21
           cache: gradle
 
-      - name: 📦 Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: 🔧 make gradlew executable
+        run: chmod +x apps/server/gradlew
 
-      - name: 🧪 lint && types check
+      - name: 🔎 lint && types check
         run: yarn check
 
       - name: 🛠️ build app
         run: yarn build
 
-      - name: ▶️ start servers & wait
+      - name: 🔒 generate .env server file
+        run: printenv > apps/server/.env
+
+      - name: ⏳ start servers & wait
         run: |
           set -euo pipefail
           yarn start &                      
           yarn dlx wait-on \
-            http-get://127.0.0.1:3000/api/v1/test/ \
+            http-get://127.0.0.1:3000/api/v1/test \
             http-get://127.0.0.1:3001
 
-      - name: 🔒 generate .env server file
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require("fs");
-            const path = require("path");
+      - name: 💻 run test client
+        run: yarn workspace client test
 
-            const envPath = path.join(process.cwd(), "apps/server/.env");
-
-            const lines = Object.entries(process.env)
-              .map(([k, v]) => `${k}=${v ?? ""}`);
-
-            fs.writeFileSync(envPath, lines.join("\n") + "\n", "utf8");
-            console.log(`✅ .env generated at ${envPath}`);
-
-    # ? skip tests for now
+      - name: ☕ run test server
+        run: yarn workspace server test
 
   deploy:
     name: 🚀 deploy server && client 🚀
@@ -107,13 +99,13 @@ jobs:
       - name: 🛠️ install fly CLI lib
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: 🚀 deploy server
+      - name: ☕ deploy server
         working-directory: apps/server
         run: flyctl deploy --remote-only --config fly.toml
         env:
           FLY_API_TOKEN: ${{ secrets.PSN_JOB_APPLICATION_TRACKER_SERVER }}
 
-      - name: 🚀 deploy client
+      - name: 💻 deploy client
         working-directory: apps/client
         run: |
           flyctl deploy \

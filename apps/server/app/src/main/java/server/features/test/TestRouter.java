@@ -1,32 +1,46 @@
 package server.features.test;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import server.decorators.flow.ReqAPI;
+import reactor.core.publisher.Mono;
+import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
+import server.features.test.controllers.GetTestCtrl;
 import server.features.test.controllers.PostTestCtrl;
-import server.router.RootApi;
+import server.router.RouterAPI;
 
-@RootApi
+@RestController
+@RouterAPI("/api/v1/test")
 public class TestRouter {
 
     private final PostTestCtrl postCtrl;
+    private final GetTestCtrl getCtrl;
 
-    public TestRouter(PostTestCtrl postCtrl) {
+    public TestRouter(PostTestCtrl postCtrl, GetTestCtrl getCtrl) {
         this.postCtrl = postCtrl;
+        this.getCtrl = getCtrl;
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<ResAPI<Map<String, String>>> postMsg(ReqAPI req) {
-        return postCtrl.postMsg(req);
+    @GetMapping("/limited")
+    public Mono<ResponseEntity<ResAPI<Void>>> getLimited(Api exc) {
+        return getCtrl.getLimited(exc);
     }
 
-    @PostMapping("/test-form-data")
-    public ResponseEntity<ResAPI<Object>> postFormData(ReqAPI req) {
-        return postCtrl.postFormData(req);
+    @GetMapping
+    public Mono<ResponseEntity<ResAPI<Object>>> getTest(Api api) {
+        return getCtrl.getTest(api);
     }
 
+    @PostMapping
+    public Mono<ResponseEntity<ResAPI<Object>>> postMsg(Api api) {
+        return postCtrl.postMsg(api);
+    }
+
+    @PostMapping("/form-data")
+    public Mono<ResponseEntity<ResAPI<Object>>> postFormData(Api api) {
+        return postCtrl.postFormData(api);
+    }
 }

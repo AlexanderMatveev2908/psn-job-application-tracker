@@ -1,11 +1,18 @@
 package server.decorators;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+import server.decorators.flow.ErrAPI;
+import server.lib.paths.Seeker;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AppFile {
@@ -13,7 +20,7 @@ public class AppFile {
     private final String filename;
     private final String contentType;
     private final byte[] bts;
-    private String filePath;
+    private final String filePath;
 
     public AppFile(
             String field,
@@ -24,7 +31,6 @@ public class AppFile {
         this.field = field;
         this.contentType = contentType;
         this.bts = (bts == null) ? new byte[0] : bts.clone();
-        this.filePath = null;
 
         String ext = "";
         int idxDot = filename.lastIndexOf('.');
@@ -33,6 +39,17 @@ public class AppFile {
         }
 
         this.filename = UUID.randomUUID().toString() + ext;
+        this.filePath = Seeker.grabDir().resolve("assets").resolve(this.field).resolve(this.filename).toString();
+    }
+
+    public void saveLocally() {
+        try {
+            Files.write(Path.of(this.getFilePath()), this.getBts(),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException err) {
+            throw new ErrAPI("err saving asset locally", 500);
+        }
     }
 
     public Map<String, Object> getFancyShape() {
@@ -73,10 +90,6 @@ public class AppFile {
 
     public byte[] getBts() {
         return bts.clone();
-    }
-
-    public void setFilePath(String p) {
-        this.filePath = p;
     }
 
     public String getFilePath() {

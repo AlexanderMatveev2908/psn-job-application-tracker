@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import server.conf.env.EnvKeeper;
+import server.conf.env_conf.EnvKeeper;
 import server.lib.paths.Hiker;
 
 @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Kit is a bean svc 🫘")

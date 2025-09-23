@@ -23,11 +23,12 @@ dependencies {
     implementation(libs.dotenv)
 
     // ? Spring Boot
-    implementation(libs.spring.boot.starter)
-    implementation(libs.spring.boot.starter.web)
-
+    implementation(libs.spring.boot.starter.webflux)
+    testImplementation(libs.spring.boot.starter.test) {
+        exclude(group = "org.junit.vintage")
+    }
+    
     // ? spring DB
-    implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.data.r2dbc)
     
     // ? DB driver
@@ -38,6 +39,10 @@ dependencies {
 
     // ? migrations
     implementation(libs.liquibase.core)
+
+    // ? redis
+    implementation(libs.redis.lettuce)    // Redis async/reactive client
+    implementation(libs.reactor.core) 
 
     // ? tests
     testImplementation(libs.junit.jupiter)
@@ -100,6 +105,16 @@ tasks.named("check") {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+
+      testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
+
+    // ? silence CDS warnings
+    jvmArgs("-Xshare:off")
+    // ? silence byte-buddy agent warnings
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 
 tasks.named<BootJar>("bootJar") {
