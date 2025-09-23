@@ -75,6 +75,10 @@ public class Api extends ServerWebExchangeDecorator {
         return Optional.ofNullable(getRequest().getHeaders().getFirst(name)).orElse("");
     }
 
+    public void addHeader(String k, Object v) {
+        getResponse().getHeaders().add(k, String.valueOf(v));
+    }
+
     public String getIp() {
         var req = getRequest();
 
