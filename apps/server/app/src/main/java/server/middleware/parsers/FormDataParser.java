@@ -55,11 +55,9 @@ public class FormDataParser implements WebFilter {
 
                     api.setAttr("parsedForm", parsedForm);
 
-                    Mono<Void> resolved = ctx.promises.isEmpty()
-                            ? Mono.empty()
-                            : Mono.when(ctx.promises);
+                    return Mono.when(ctx.promises.isEmpty() ? Mono.empty() : Mono.when(ctx.promises))
+                            .then(chain.filter(api));
 
-                    return resolved.then(chain.filter(api));
                 })
                 .switchIfEmpty(Mono.defer(() ->
                 // ? flatMap above will fallback in this block if
@@ -116,10 +114,8 @@ public class FormDataParser implements WebFilter {
         boolean isImage = part.name.equals("images");
         handleAsset(part).ifPresent(asset -> {
 
-            Mono<Void> prm = Mono.fromCallable(() -> {
-                asset.saveLocally();
-                return (Void) null;
-            }).subscribeOn(Schedulers.boundedElastic());
+            Mono<Void> prm = Mono.<Void>fromRunnable(asset::saveLocally)
+                    .subscribeOn(Schedulers.boundedElastic());
 
             ctx.promises.add(prm);
 
