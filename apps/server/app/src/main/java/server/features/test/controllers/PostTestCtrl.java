@@ -43,11 +43,11 @@ public class PostTestCtrl {
 
         Set<String> assetKeys = Set.of("images", "videos");
 
-        for (String k : form.keySet()) {
-            if (!assetKeys.contains(k))
+        for (Map.Entry<String, Object> pair : form.entrySet()) {
+            if (!assetKeys.contains(pair.getKey()))
                 continue;
 
-            var arg = (List<AppFile>) form.get(k);
+            var arg = (List<AppFile>) pair.getValue();
 
             for (AppFile f : arg) {
 

@@ -60,9 +60,14 @@ public class FormDataParser implements WebFilter {
                             : Mono.when(ctx.promises);
 
                     return resolved.then(chain.filter(api));
-
                 })
-                .switchIfEmpty(Mono.defer(() -> api.isResCmt() ? Mono.empty() : chain.filter(api)));
+                .switchIfEmpty(Mono.defer(() ->
+                // ? flatMap above will fallback in this block if
+                // ? • no form data => all ok as usual
+                // ? • form actually exists but returning Mono.empty() or Mono<Void> trigger
+                // ? flatMap to fallback to another Publisher
+                api.isResCmt() ? Mono.empty() : chain.filter(api)));
+
     }
 
     private Mono<String[]> splitParts(Api api) {
@@ -114,7 +119,7 @@ public class FormDataParser implements WebFilter {
             Mono<Void> prm = Mono.fromCallable(() -> {
                 asset.saveLocally();
                 return (Void) null;
-            }).subscribeOn(Schedulers.boundedElastic()).cache();
+            }).subscribeOn(Schedulers.boundedElastic());
 
             ctx.promises.add(prm);
 

@@ -98,7 +98,7 @@ public class Api extends ServerWebExchangeDecorator {
             if (bytes.length == 0)
                 return Mono.empty();
 
-            return Mono.fromCallable(() -> JACKSON.readValue(bytes, type));
+            return Mono.fromCallable(() -> JACKSON.readValue(bytes, type)).cache();
         });
     }
 
@@ -112,11 +112,11 @@ public class Api extends ServerWebExchangeDecorator {
                     .orElse(StandardCharsets.UTF_8);
 
             return Mono.just(new String(optBytes, charset));
-        });
+        }).cache();
     }
 
     public Mono<byte[]> getRawBd() {
-        return cachedBody.map(bytes -> bytes.clone());
+        return cachedBody.map(bytes -> bytes.clone()).cache();
     }
 
     public <T> void setAttr(String key, T value) {
