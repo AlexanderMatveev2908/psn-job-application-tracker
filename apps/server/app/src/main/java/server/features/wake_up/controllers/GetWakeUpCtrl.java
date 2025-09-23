@@ -10,6 +10,7 @@ import server.decorators.flow.ResAPI;
 public class GetWakeUpCtrl {
 
     public Mono<ResponseEntity<ResAPI<Object>>> wakeUp() {
+
         return ResAPI.ok200("Ops I did not listen the alarm ⏰", null);
     }
 }
