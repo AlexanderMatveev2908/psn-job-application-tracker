@@ -4,9 +4,20 @@ databaseChangeLog:
       author: ninja
       changes:
         - sqlFile:
-            path: sql/001_init_schema.sql
+            path: sql/001_define_root_table.sql
             relativeToChangelogFile: true
       rollback:
         - sqlFile:
-            path: sql/rollbacks/001_init_schema.sql
+            path: sql/rollbacks/001_define_root_table.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 002
+      author: ninja
+      changes:
+        - sqlFile:
+            path: sql/002_define_users_table.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: sql/rollbacks/002_define_users_table.sql
             relativeToChangelogFile: true

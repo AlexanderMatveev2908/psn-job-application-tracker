@@ -1,13 +1,9 @@
 package server.models;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("users")
-public class User {
-
-    @Id
-    private String id;
+public class User extends RootTable {
 
     private String firstName;
     private String lastName;
@@ -15,14 +11,6 @@ public class User {
     private String tmpEmail;
     private String password;
     private String totpSecret;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getFirstName() {
         return firstName;
