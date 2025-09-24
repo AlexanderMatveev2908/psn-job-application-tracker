@@ -1,4 +1,4 @@
-package server.conf.db.RD;
+package server.conf.db.remote_dictionary;
 
 import java.util.List;
 import java.util.Map;

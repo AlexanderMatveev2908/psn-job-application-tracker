@@ -9,8 +9,8 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
-import server.conf.db.DB;
-import server.conf.db.RD.RD;
+import server.conf.db.database.DB;
+import server.conf.db.remote_dictionary.RD;
 import server.lib.dev.MyLog;
 import server.lib.etc.Kit;
 

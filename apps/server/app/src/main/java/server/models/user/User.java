@@ -1,9 +1,10 @@
-package server.models;
+package server.models.user;
 
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import server.decorators.RootCls;
+import server.models.RootTable;
 
 @Table("users")
 public class User extends RootTable implements RootCls {
@@ -86,4 +87,5 @@ public class User extends RootTable implements RootCls {
     public void setTotpSecret(String totpSecret) {
         this.totpSecret = totpSecret;
     }
+
 }

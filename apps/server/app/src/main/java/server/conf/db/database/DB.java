@@ -1,4 +1,4 @@
-package server.conf.db;
+package server.conf.db.database;
 
 import java.util.function.Function;
 
@@ -74,7 +74,7 @@ public class DB {
                             .fetch()
                             .rowsUpdated()
                             .doOnNext((res) -> {
-                                System.out.println("👻 db cleaned");
+                                System.out.println(String.format("🪓 truncated %d tables", tables.size()));
                             })
                             .thenReturn(tables.size());
                 })

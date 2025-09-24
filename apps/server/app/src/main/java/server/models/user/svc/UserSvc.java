@@ -1,4 +1,4 @@
-package server.services.user;
+package server.models.user.svc;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import server.models.User;
+import server.models.user.User;
+import server.models.user.side.UserRecord;
 
 @Service
 @Transactional
@@ -27,6 +28,14 @@ public class UserSvc {
 
     public Mono<User> findByEmail(String email) {
         return repo.findUserByEmail(email);
+    }
+
+    public Mono<User> findById(UUID id) {
+        return repo.findById(id);
+    }
+
+    public Mono<UserRecord> getUserPopulated(UUID id) {
+        return repo.getUserPopulated(id);
     }
 
     public Mono<User> softDelete(UUID id) {

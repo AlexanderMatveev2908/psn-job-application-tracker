@@ -44,3 +44,18 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: false
             stripComments: true
+  - changeSet:
+      id: "004_define_tokens_table"
+      author: ninja
+      changes:
+        - sqlFile:
+            path: sql/004_define_tokens_table.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
+      rollback:
+        - sqlFile:
+            path: sql/rollbacks/004_define_tokens_table.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true

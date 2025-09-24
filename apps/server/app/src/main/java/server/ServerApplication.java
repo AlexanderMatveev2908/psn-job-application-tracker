@@ -8,10 +8,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import server.conf.db.DB;
-import server.conf.db.RD.RdCmd;
+import server.conf.db.database.DB;
+import server.conf.db.remote_dictionary.RdCmd;
 import server.decorators.LifeSpawn;
-import server.services.user.UserSvc;
+import server.models.token.svc.TokenSvc;
+import server.models.user.svc.UserSvc;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
@@ -22,13 +23,15 @@ public class ServerApplication {
     private final RdCmd cmd;
     private final DB db;
     private final UserSvc userSvc;
+    private final TokenSvc tokenSvc;
 
     @SuppressFBWarnings("EI2")
-    public ServerApplication(LifeSpawn lifeSpawn, RdCmd cmd, DB db, UserSvc userSvc) {
+    public ServerApplication(LifeSpawn lifeSpawn, RdCmd cmd, DB db, UserSvc userSvc, TokenSvc tokenSvc) {
         this.lifeSpawn = lifeSpawn;
         this.cmd = cmd;
         this.db = db;
         this.userSvc = userSvc;
+        this.tokenSvc = tokenSvc;
     }
 
     public static void main(String[] args) {
@@ -56,14 +59,26 @@ public class ServerApplication {
             // .then(userSvc.createUser(new User("john", "doe", "john@gmail.com", "12345")))
             // .doOnNext(user -> {
             // System.out.println(user);
+            // }).flatMap(user -> {
+            // return tokenSvc.createToken(user.getId(), TokenT.CHANGE_EMAIL,
+            // AlgT.HMAC_SHA256,
+            // new byte[0], System.currentTimeMillis() + Duration.ofMinutes(15).toMillis());
+            // }).flatMap(newToken -> {
+            // System.out.println(newToken);
+
+            // return tokenSvc.createToken(newToken.getUserId(), TokenT.CHANGE_PWD,
+            // AlgT.RSA_OAEP256_A256GCM,
+            // new byte[0], System.currentTimeMillis() + Duration.ofMinutes(15).toMillis());
+
+            // }).doOnNext(second -> {
+            // System.out.println(second);
+            // }).flatMap(second -> {
+
+            // return userSvc.getUserPopulated(second.getUserId());
+            // }).doOnNext(user -> {
+            // System.out.println(user);
             // })
             // .subscribe();
-
-            // userSvc.findByEmail("john@gmail.com").subscribe(res -> {
-            // System.out.println(res);
-            // }, err -> {
-            // System.out.println(err.getMessage());
-            // });
 
         };
     }

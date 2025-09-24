@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import io.lettuce.core.Range;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import reactor.core.publisher.Mono;
-import server.conf.db.RD.RD;
+import server.conf.db.remote_dictionary.RD;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 

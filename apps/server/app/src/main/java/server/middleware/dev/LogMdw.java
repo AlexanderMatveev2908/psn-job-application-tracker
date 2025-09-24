@@ -1,16 +1,8 @@
 package server.middleware.dev;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.springframework.core.annotation.Order;
@@ -22,25 +14,16 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import server.decorators.AppFile;
 import server.decorators.flow.Api;
-import server.decorators.flow.ErrAPI;
-import server.lib.etc.Kit;
+import server.lib.dev.MyLog;
 
 @Component
 @Order(100)
 @SuppressWarnings({ "unchecked" })
 public class LogMdw implements WebFilter {
 
-    private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
-    private final Kit kit;
-
-    public LogMdw(Kit kit) {
-        this.kit = kit;
-    }
-
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
         Api api = (Api) exc;
-        Path loggerFile = kit.getHiker().getLogFile();
 
         Map<String, Object> arg = new LinkedHashMap<>();
         arg.put("url", api.getPath());
@@ -57,7 +40,7 @@ public class LogMdw implements WebFilter {
 
                     arg.put("body", api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body));
 
-                    asyncLog(loggerFile, arg);
+                    MyLog.asyncLog(arg);
                 })
                 .then(chain.filter(api));
 
@@ -97,21 +80,4 @@ public class LogMdw implements WebFilter {
         return cpyForm;
     }
 
-    private void asyncLog(Path loggerFile, Map<String, Object> arg) {
-        logThread.submit(() -> {
-            try (BufferedWriter bw = Files.newBufferedWriter(
-                    loggerFile,
-                    StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING)) {
-
-                String json = kit.getJack().writeValueAsString(arg);
-
-                bw.write(json);
-                bw.newLine();
-            } catch (IOException err) {
-                throw new ErrAPI("failed dev log", 500);
-            }
-        });
-    }
 }

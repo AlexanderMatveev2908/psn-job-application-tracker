@@ -8,6 +8,10 @@ CREATE TABLE IF NOT EXISTS users (
 ) INHERITS (root_table);
 
 
+ALTER TABLE users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
 CREATE TRIGGER trigger_timestamps_users
 BEFORE INSERT OR UPDATE ON users
 FOR EACH ROW

@@ -1,15 +1,26 @@
 package server.lib.dev;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import server.decorators.flow.ErrAPI;
+import server.lib.etc.Frmt;
+import server.lib.paths.Seeker;
 
 public class MyLog {
 
     private static final String APP_PKG = "server";
+    private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
 
     public static void logTtl(String title, Object... arg) {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -95,5 +106,38 @@ public class MyLog {
         System.out.printf("👻 last cb name => %s%n", last.getMethodName());
 
         System.out.println("\t");
+    }
+
+    public static Path getLogFile() {
+        try {
+            Path logDir = Seeker.grabDir().resolve("logger");
+            Files.createDirectories(logDir);
+            Path logFile = logDir.resolve("log.json");
+
+            return logFile;
+
+        } catch (IOException err) {
+
+            throw new ErrAPI("err generating log file", 500);
+        }
+    }
+
+    public static void asyncLog(Object arg) {
+        logThread.submit(() -> {
+
+            try (BufferedWriter bw = Files.newBufferedWriter(
+                    getLogFile(),
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING)) {
+
+                String json = Frmt.toJson(arg);
+
+                bw.write(json);
+                bw.newLine();
+            } catch (IOException err) {
+                throw new ErrAPI("failed dev log", 500);
+            }
+        });
     }
 }

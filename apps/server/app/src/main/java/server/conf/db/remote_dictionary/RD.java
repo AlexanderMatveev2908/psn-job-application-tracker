@@ -1,4 +1,4 @@
-package server.conf.db.RD;
+package server.conf.db.remote_dictionary;
 
 import java.util.HashMap;
 import java.util.Map;
