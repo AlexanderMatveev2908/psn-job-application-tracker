@@ -7,6 +7,7 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
+import server.conf.db.RD.RdCmd;
 import server.decorators.LifeSpawn;
 
 @SpringBootApplication
@@ -14,9 +15,12 @@ import server.decorators.LifeSpawn;
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;
+    @SuppressWarnings("unused")
+    private final RdCmd cmd;
 
-    public ServerApplication(LifeSpawn lifeSpawn) {
+    public ServerApplication(LifeSpawn lifeSpawn, RdCmd cmd) {
         this.lifeSpawn = lifeSpawn;
+        this.cmd = cmd;
     }
 
     public static void main(String[] args) {

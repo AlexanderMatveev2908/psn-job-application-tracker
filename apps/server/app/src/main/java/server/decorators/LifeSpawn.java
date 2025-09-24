@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import server.conf.db.DB;
 import server.conf.db.RD.RD;
-import server.conf.db.RD.RdCmd;
 import server.lib.dev.MyLog;
 import server.lib.etc.Kit;
 
@@ -22,13 +21,11 @@ public class LifeSpawn {
     private final Kit kit;
     private final DB db;
     private final RD rd;
-    private final RdCmd cmd;
 
-    public LifeSpawn(Kit kit, DB db, RD rd, RdCmd cmd) {
+    public LifeSpawn(Kit kit, DB db, RD rd) {
         this.kit = kit;
         this.db = db;
         this.rd = rd;
-        this.cmd = cmd;
     }
 
     private Mono<Map<String, Object>> grabTableCount(DatabaseClient dbRaw) {
@@ -50,34 +47,27 @@ public class LifeSpawn {
 
     @SuppressWarnings({ "unchecked", "UnnecessaryTemporaryOnConversionFromString" })
     public void lifeCheck(WebServerInitializedEvent e) {
-        db
-                .trxRunnerMono(dbRaw -> grabTableCount(dbRaw).flatMap(res -> grabTableNames(dbRaw).map(tables -> {
+        db.trxRunnerMono(dbRaw -> grabTableCount(dbRaw)
+                .flatMap(res -> grabTableNames(dbRaw).map(tables -> {
                     res.put("tables", tables);
                     return res;
-                }))).subscribe(res -> {
+                })))
+                .flatMap(res -> rd.dbSize()
+                        .doOnNext(size -> {
+                            MyLog.logTtl(
+                                    String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
+                                    String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
+                                    String.format("🧮 redis keys => %d", size));
 
-                    rd.dbSize()
-                            .doOnNext(size -> {
-                                MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
-                                        String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
-                                        String.format("🧮 redis keys => %d", size));
-
-                                List<String> tables = (List<String>) res.get("tables");
-
-                                System.out.println("🗃️ db tables => ");
-                                MyLog.logCols(tables);
-                            })
-                            .subscribe();
-
-                    // rd.flushAll().subscribe();
-
-                    // cmd.setStr("some", "abc").subscribe();
-                    // cmd.getStr("some").subscribe();
-                    // cmd.delK("some").subscribe();
-
-                }, err -> {
-                    MyLog.logErr(err);
-                });
+                            List<String> tables = (List<String>) res.get("tables");
+                            System.out.println("🗃️ db tables => ");
+                            MyLog.logCols(tables);
+                        })
+                        .thenReturn(res))
+                .subscribe(
+                        res -> {
+                        },
+                        err -> MyLog.logErr(err));
 
     }
 }

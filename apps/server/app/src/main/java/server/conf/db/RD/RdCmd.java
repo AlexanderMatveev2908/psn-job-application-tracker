@@ -18,26 +18,41 @@ public class RdCmd {
         this.cmd = rd.getCmd();
     }
 
-    public Mono<String> setStr(String key, String value) {
-        return cmd.set(key, value);
+    public Mono<String> setStr(String k, String v) {
+        return cmd.set(k, v);
     }
 
-    public Mono<String> getStr(String key) {
-        return cmd.get(key)
-                .switchIfEmpty(Mono.error(new ErrAPI("❌ key not found => " + key, 404)))
-                .doOnNext(val -> MyLog.logKV(key, val));
+    public Mono<String> getStr(String k) {
+        return cmd.get(k)
+                .switchIfEmpty(Mono.error(new ErrAPI("key not found => " + k, 404)))
+                .doOnNext(val -> MyLog.logKV(k, val));
     }
 
-    public Mono<Integer> delK(String key) {
-        return cmd.del(key)
+    public Mono<Integer> delK(String k) {
+        return cmd.del(k)
                 .flatMap(v -> {
                     if (v == 0)
-                        return Mono.error(new ErrAPI("key not found => " + key, 404));
+                        return Mono.error(new ErrAPI("key not found => " + k, 404));
 
                     return Mono.just(v.intValue());
                 })
                 .doOnNext(v -> System.out.println("🔪 deleted " + v + " key"));
 
+    }
+
+    public Mono<String> setHash(String k, Map<String, String> m) {
+        return cmd.hmset(k, m);
+    }
+
+    public Mono<String> getHash(String k, String v) {
+        return cmd.hget(k, v).switchIfEmpty(Mono.error(new ErrAPI(String.format("%s.%s not found", k, v), 404)))
+                .doOnNext((res) -> MyLog.logKV(k + "." + v, res));
+    }
+
+    public Mono<String> typeOf(String key) {
+        return cmd.type(key)
+                .switchIfEmpty(Mono.error(new ErrAPI("key not found => " + key, 404)))
+                .doOnNext(type -> MyLog.logKV(key, type));
     }
 
     public Mono<Object> grabAll() {
