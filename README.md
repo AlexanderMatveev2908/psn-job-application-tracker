@@ -2,20 +2,16 @@
 
 ## 📌 About This Project
 
-This app was inspired by my own job search journey — I started out tracking applications in a simple notepad, but quickly realized I needed something more structured.  
-So I built a proper application to:
-
-- Consolidate and apply the **Python tools** I’ve recently learned
-- Create a practical tool that anyone can clone and use to manage their own job applications
+This app was inspired by my own job search journey. I first tracked applications in a simple notepad, but quickly realized I needed something more structured. The app was originally built with a Python backend, but I decided to rebuild it in Java since the client side was already complete and thoroughly tested with both unit and end-to-end tests. That let me fully focus on the server side while also broadening and strengthening my tech stack
 
 ---
 
 ## 🧱 Tech Stack
 
-The name **PFN** comes from the core stack that powers the project:
+The name **PSN** comes from the core stack that powers the project:
 
 - **P** → **PostgreSQL** for relational database storage
-- **F** → **FastAPI** for the backend REST API
+- **S** → **Spring Boot** for the backend REST API
 - **N** → **Next.js (App Router)** for the client-side application
 
 Together they form a clean, modern **full-stack architecture** 🚀
@@ -36,37 +32,20 @@ Together they form a clean, modern **full-stack architecture** 🚀
 
 ### 💾 **Server**
 
-- **Python** `>=3.12` — Primary backend language with strong async support
-- **FastAPI** — High-performance async API framework
-- **SQLAlchemy** + **Alembic** — ORM and schema migrations for relational DBs
-- **Pydantic** — Data validation and parsing
-- **Mypy** — Static type checking for Python code quality
-- **Poetry** — Dependency and environment management
-- **Gunicorn** + **Uvicorn** — ASGI stack for running FastAPI in production
-- **Amazon SES** — Transactional & notification email service
-- **Aiosmtplib** — Async SMTP client
-- **Amazon S3** — Cloud object storage for files and assets
-- **Redis** — In-memory key-value store for caching, rate limiting, and temporary data
-- **Argon2** — Modern memory-hard password hashing algorithm, used to securely store user passwords and protect against brute-force or GPU attacks
-- **JWT** — Used as short-lived access tokens for authenticating user requests.
-- **JWE** — Used as refresh tokens, securely storing session renewal data.
-- **CBC-HMAC tokens with HKDF-derived keys** — Special short-lived tokens, mainly for sensitive actions like account verification, password resets, or email confirmation.
-- **Fernet** — Symmetric encryption algorithm, used to securely encrypt sensitive secrets (e.g., **TOTP** seeds) before storing them in the database
-- **2FA** — Implemented via **TOTP** using **PyOTP**:
-  - **Secret Management** — Each user gets a **unique TOTP secret**, which is encrypted with **Fernet** before being saved in the database
-  - **QR Code Enrollment** — The secret can be encoded as a QR code (**qrcode** library) so users can easily register it in an authenticator app
-  - **Terminal Support** — For **CLI** users, the raw secret can also be provided directly
-  - **Backup Codes** — Extra **one-time** recovery codes are generated, hashed with **Argon2**, and allow login if a **TOTP device** is **lost**
-- **APScheduler** — Schedules recurring tasks
+- **Java 21** — Primary backend language
+- **Spring Boot (WebFlux)** — Reactive, non-blocking backend framework powered by an **event-loop** execution model
+- **PostgreSQL + R2DBC** — Asynchronous database access with reactive drivers
+- **Liquibase** — Database migrations, written in raw SQL for full control
 
 ---
 
-### 🧪 **Testing**
+### 🧪 **Testing & Quality**
 
 - **Playwright** — End-to-end testing for UI flows
 - **Vitest** — Unit testing for the client
-- **Pytest** — Unit and integration testing for the server
-- **Postman** — API testing
+- **JUnit Jupiter** — Unit and integration testing for the backend
+- **Postman** — Manual and automated API testing
+- **Checkstyle, SpotBugs, PMD** — Static analysis and code quality enforcement for Java
 
 ---
 
@@ -101,15 +80,14 @@ This will initialize the project and install all required packages for both clie
 
 All required environment variables are listed and validated inside:
 
-[`apps/server/src/conf/env.py`](apps/server/src/conf/env.py)
+[`apps/server/app/src/main/java/server/conf/env_conf/EnvKeeper.java`](apps/server/app/src/main/java/server/conf/env_conf/EnvKeeper.java)
 
-This file uses **Pydantic** to:
+This file uses custom logic to ensure that all required variables:
 
-- Define expected variables
-- Enforce correct types
-- Raise validation errors if anything is missing
+- **Exists** in the environment
+- **Are valid** with no leading or trailing spaces that could cause issues in production
 
-This approach ensures that all variables needed by both client and server are defined in one central place — making your app easier to configure and maintain.
+By centralizing these checks, the app guarantees that both client and server dependencies are configured consistently — making the system easier to maintain and safer to deploy.
 
 There’s no strict separation between client and server variables, but variables used by the client are easy to identify because **Next.js** requires them to start with **NEXT_PUBLIC**.
 
@@ -121,10 +99,10 @@ There’s no strict separation between client and server variables, but variable
   apiVersion: v1
   kind: Secret
   metadata:
-  name: pfn-job-application-tracker
+  name: psn-job-application-tracker
   type: Opaque
   stringData:
-  APP_NAME: "PFN-job-application-tracker"
+  APP_NAME: "psn-job-application-tracker"
   ...rest key value pairs variables
   ```
 
@@ -160,7 +138,7 @@ yarn dev
 
 This command uses **Turborepo** to run both the **Python server** and the **Next.js client** in parallel:
 
-- 🐍 **Python** runs with **Uvicorn**, featuring **auto-reload** on `src` changes, at [http://localhost:3000](http://localhost:3000)
+- ☕ **Java** runs at [http://localhost:3000](http://localhost:3000)
 - 🖥️ **Next.js** runs at [http://localhost:3001](http://localhost:3001)
 
 ---
@@ -173,8 +151,8 @@ yarn build
 
 This triggers **Turborepo** to build both the client and server in parallel:
 
-- 🐍 **Python** generates both a `.tar.gz` source archive and a `.whl` (wheel) distribution package.
-  The wheel file is saved inside the custom **app_wheel** folder for **local builds**.
+- ☕ **Java** compiles to bytecode and produces a `.jar` file at [apps/server/app/build/libs/server-1.0.0.jar](apps/server/app/build/libs/server-1.0.0.jar)
+
 - 🖥️ **Next.js** follows its standard build flow, generating **SSR** or **CSR** pages depending on page configuration and data fetching logic.
 
 ---
@@ -185,9 +163,9 @@ Once the build is complete, you can start servers with:
 yarn start
 ```
 
-This again uses **Turborepo** to launch both the **Python server** and the **Next.js client** in parallel:
+This again uses **Turborepo** to launch both the **Java server** and the **Next.js client** in parallel:
 
-- 🐍 **Python** runs via **Gunicorn**, using the **maximum available workers** on your machine, at [http://localhost:3000](http://localhost:3000)
+- ☕ **Python** runs at [http://localhost:3000](http://localhost:3000)
 - 🖥️ **Next.js** is served at [http://localhost:3001](http://localhost:3001)
 
 ---
@@ -233,7 +211,7 @@ dsi 1
 #### 🔗 Result
 
 - 🖥️ **Next.js** is packaged into a Docker image and served from a container at [http://localhost:3001](http://localhost:3001)
-- 🐍 **Python** is built with Poetry, installs the `.whl` package, and runs inside a container at [http://localhost:3000/api/v1](http://localhost:3000/api/v1)
+- ☕ **Java** compile to bytecode and the generated **.jar** file is run inside a container at [http://localhost:3000/api/v1](http://localhost:3000/api/v1)
 
 ---
 
@@ -433,21 +411,21 @@ This way, your local Kubernetes environment behaves just like your development s
 
 ---
 
-### ⚗️ Testing & Type Checking
+### ⚗️ Testing & Type Checking & Code Quality
 
-#### ✒️ Type Checking
+#### ✒️ Type Checking & Code Quality
 
 - **Client**: Formatting with **ESLint** • Type checking with **TypeScript**
-- **Server**: Formatting with **Ruff** • Type checking with **Mypy**
+- **Server**:
+  - Code style enforcement with **Checkstyle**
+  - Code quality checks with **PMD**
+  - Bug detection with **SpotBugs**
 
 Run:
 
 ```bash
 yarn check
 ```
-
-- 💡 **Note**: **Ruff** is configured to allow ambiguous variables (**E741**).
-  To disallow them, remove E741 from the ignore array in **tool.ruff.lint** in [`pyproject.toml`](apps/server/pyproject.toml)
 
 ---
 
@@ -456,7 +434,7 @@ yarn check
 If your development environment uses **HTTPS** (via Nginx or another proxy), you’ll need an additional set of environment variables for testing.  
 These variables point the **client** and **server** directly to their respective **HTTP endpoints**, bypassing the proxy.
 
-For this reason, both `PY_ENV` and `NEXT_PUBLIC_ENV` should be set to **test** when running tests.
+For this reason,`NEXT_PUBLIC_ENV` should be set to **test** when running tests.
 
 ---
 
@@ -513,14 +491,14 @@ A ready-to-use **Postman setup** is available at the root of the repo in the **p
 erDiagram
   users ||--o{ tokens : has
   users ||--o{ backup_codes : has
-  users ||--o{ job_applications : has
+  users ||--o{ applications : has
   tokens }o--|| token_type : uses
   tokens }o--|| alg_type : uses
-  job_applications }o--||application_status_type : uses
+  applications }o--||application_status_type : uses
   root_table ||--|| users : extends
   root_table ||--|| tokens : extends
   root_table ||--|| backup_codes : extends
-  root_table ||--|| job_applications : extends
+  root_table ||--|| applications : extends
 
   root_table {
     uuid id
@@ -553,7 +531,7 @@ erDiagram
     bigint exp
   }
 
-  job_applications {
+  applications {
     uuid user_id
     string company_name
     string position_name
