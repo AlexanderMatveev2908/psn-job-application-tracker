@@ -1,2 +1,3 @@
 DROP TABLE IF EXISTS root_table;
+
 DROP EXTENSION IF EXISTS "pgcrypto";
