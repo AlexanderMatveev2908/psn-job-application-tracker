@@ -7,6 +7,7 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.conf.db.RD.RdCmd;
 import server.decorators.LifeSpawn;
 
@@ -18,6 +19,7 @@ public class ServerApplication {
     @SuppressWarnings("unused")
     private final RdCmd cmd;
 
+    @SuppressFBWarnings("EI2")
     public ServerApplication(LifeSpawn lifeSpawn, RdCmd cmd) {
         this.lifeSpawn = lifeSpawn;
         this.cmd = cmd;

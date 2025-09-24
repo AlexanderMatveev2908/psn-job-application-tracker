@@ -94,5 +94,6 @@ public class MyLog {
         System.out.printf("📏 last line => %d%n", last.getLineNumber());
         System.out.printf("👻 last cb name => %s%n", last.getMethodName());
 
+        System.out.println("\t");
     }
 }

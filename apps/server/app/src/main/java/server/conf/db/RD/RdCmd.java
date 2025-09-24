@@ -1,10 +1,14 @@
 package server.conf.db.RD;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import io.lettuce.core.ScoredValue;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.lib.dev.MyLog;
@@ -16,16 +20,6 @@ public class RdCmd {
 
     public RdCmd(RD rd) {
         this.cmd = rd.getCmd();
-    }
-
-    public Mono<String> setStr(String k, String v) {
-        return cmd.set(k, v);
-    }
-
-    public Mono<String> getStr(String k) {
-        return cmd.get(k)
-                .switchIfEmpty(Mono.error(new ErrAPI("key not found => " + k, 404)))
-                .doOnNext(val -> MyLog.logKV(k, val));
     }
 
     public Mono<Integer> delK(String k) {
@@ -40,6 +34,22 @@ public class RdCmd {
 
     }
 
+    public Mono<String> typeOf(String key) {
+        return cmd.type(key)
+                .switchIfEmpty(Mono.error(new ErrAPI("key not found => " + key, 404)))
+                .doOnNext(type -> MyLog.logKV(key, type));
+    }
+
+    public Mono<String> setStr(String k, String v) {
+        return cmd.set(k, v);
+    }
+
+    public Mono<String> getStr(String k) {
+        return cmd.get(k)
+                .switchIfEmpty(Mono.error(new ErrAPI("key not found => " + k, 404)))
+                .doOnNext(val -> MyLog.logKV(k, val));
+    }
+
     public Mono<String> setHash(String k, Map<String, String> m) {
         return cmd.hmset(k, m);
     }
@@ -49,10 +59,53 @@ public class RdCmd {
                 .doOnNext((res) -> MyLog.logKV(k + "." + v, res));
     }
 
-    public Mono<String> typeOf(String key) {
-        return cmd.type(key)
-                .switchIfEmpty(Mono.error(new ErrAPI("key not found => " + key, 404)))
-                .doOnNext(type -> MyLog.logKV(key, type));
+    public Mono<Integer> appendList(String k, String... v) {
+        return cmd.rpush(k, v).map(Long::intValue);
+    }
+
+    public Mono<List<String>> getList(String k, int start, int end) {
+        return cmd.lrange(k, start, end)
+                .collectList()
+                .flatMap(list -> {
+                    if (list.isEmpty())
+                        return Mono.error(new ErrAPI("key not found => " + k, 404));
+
+                    return Mono.just(list);
+                })
+                .doOnNext(list -> MyLog.logKV(k, Frmt.toJson(list)));
+    }
+
+    public Mono<Integer> addToSet(String k, String... v) {
+        return cmd.sadd(k, v).map(Long::intValue);
+    }
+
+    public Mono<Set<String>> getSet(String k) {
+        return cmd.smembers(k)
+                .collectList()
+                .flatMap(list -> {
+                    if (list.isEmpty())
+                        return Mono.error(new ErrAPI("key not found => " + k, 404));
+
+                    return Mono.just(Set.copyOf(list));
+                })
+                .doOnNext(set -> MyLog.logKV(k, Frmt.toJson(set)));
+    }
+
+    public Mono<Integer> addToScoredSet(String k, Map<String, Double> m) {
+        return Flux.fromIterable(m.entrySet())
+                .flatMap(entry -> cmd.zadd(k, entry.getValue(), entry.getKey()))
+                .reduce(0, (acc, curr) -> acc + curr.intValue());
+    }
+
+    public Mono<Set<ScoredValue<String>>> getScoredSet(String k, int start, int end) {
+        return cmd.zrangeWithScores(k, start, end)
+                .collectList()
+                .flatMap(list -> {
+                    if (list.isEmpty())
+                        return Mono.error(new ErrAPI("key not found => " + k, 404));
+                    return Mono.just(Set.copyOf(list));
+                })
+                .doOnNext(set -> MyLog.logKV(k, Frmt.toJson(set)));
     }
 
     public Mono<Object> grabAll() {
