@@ -17,7 +17,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import server.decorators.flow.ErrAPI;
-import server.lib.paths.Seeker;
+import server.lib.paths.Hiker;
 
 public class EnvLoader implements EnvironmentPostProcessor {
 
@@ -25,7 +25,7 @@ public class EnvLoader implements EnvironmentPostProcessor {
     @SuppressWarnings("UseSpecificCatch")
     public void postProcessEnvironment(ConfigurableEnvironment env, SpringApplication app) {
         try {
-            Path serverDir = Seeker.grabDir();
+            Path serverDir = Hiker.getServerDir();
 
             Dotenv dotenv = Dotenv.configure()
                     .directory(serverDir.toString())
@@ -59,10 +59,7 @@ public class EnvLoader implements EnvironmentPostProcessor {
 
             }
 
-            Path certsDir = serverDir.resolve("certs");
-            Files.createDirectories(certsDir);
-
-            Path certFile = certsDir.resolve("supabase-ca.crt");
+            Path certFile = Hiker.getCaFile();
             Files.write(certFile, HexFormat.of().parseHex(supabaseCa));
             Path cartPath = certFile.toAbsolutePath();
 

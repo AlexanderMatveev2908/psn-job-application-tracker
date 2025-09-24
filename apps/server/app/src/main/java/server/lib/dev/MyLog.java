@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +14,7 @@ import java.util.concurrent.Executors;
 
 import server.decorators.flow.ErrAPI;
 import server.lib.etc.Frmt;
-import server.lib.paths.Seeker;
+import server.lib.paths.Hiker;
 
 public class MyLog {
 
@@ -57,7 +56,7 @@ public class MyLog {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < cols.size(); i++) {
-            sb.append(String.format("%-20s|", cols.get(i)));
+            sb.append(String.format("|%-1s%-20s", "", cols.get(i)));
             if ((i + 1) % 3 == 0)
                 sb.append("\n");
         }
@@ -108,25 +107,11 @@ public class MyLog {
         System.out.println("\t");
     }
 
-    public static Path getLogFile() {
-        try {
-            Path logDir = Seeker.grabDir().resolve("logger");
-            Files.createDirectories(logDir);
-            Path logFile = logDir.resolve("log.json");
-
-            return logFile;
-
-        } catch (IOException err) {
-
-            throw new ErrAPI("err generating log file", 500);
-        }
-    }
-
     public static void asyncLog(Object arg) {
         logThread.submit(() -> {
 
             try (BufferedWriter bw = Files.newBufferedWriter(
-                    getLogFile(),
+                    Hiker.getLogFile(),
                     StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING)) {

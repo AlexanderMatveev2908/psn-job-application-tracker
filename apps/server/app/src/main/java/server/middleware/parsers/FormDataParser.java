@@ -28,17 +28,11 @@ import server.lib.paths.Hiker;
 @Order(20)
 public class FormDataParser implements WebFilter {
 
-    private final Hiker hiker;
-
-    public FormDataParser(Hiker hiker) {
-        this.hiker = hiker;
-    }
-
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
         var api = (Api) exc;
 
-        if (!hiker.existsDir())
+        if (!Hiker.existsDir())
             throw new ErrAPI("missing required dirs", 500);
 
         return splitParts(api)
