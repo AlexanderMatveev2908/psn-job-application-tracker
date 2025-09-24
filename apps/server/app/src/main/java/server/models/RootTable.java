@@ -1,44 +1,52 @@
 package server.models;
 
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 public class RootTable {
     @Id
-    private String id;
+    private UUID id;
 
-    private long createdAt;
-    private long updatedAt;
-    private long deletedAt;
+    @Column("created_at")
+    private Long createdAt;
+
+    @Column("updated_at")
+    private Long updatedAt;
+
+    @Column("deleted_at")
+    private Long deletedAt;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public long getCreatedAt() {
         return createdAt;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) {
+    public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public long getDeletedAt() {
+    public Long getDeletedAt() {
         return deletedAt;
     }
 
-    public void setDeletedAt(long deletedAt) {
+    public void setDeletedAt(Long deletedAt) {
         this.deletedAt = deletedAt;
     }
 

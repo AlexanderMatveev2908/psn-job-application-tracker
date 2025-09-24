@@ -47,7 +47,7 @@ public class LifeSpawn {
 
     @SuppressWarnings({ "unchecked", "UnnecessaryTemporaryOnConversionFromString" })
     public void lifeCheck(WebServerInitializedEvent e) {
-        db.trxRunnerMono(dbRaw -> grabTableCount(dbRaw)
+        db.trxMono(dbRaw -> grabTableCount(dbRaw)
                 .flatMap(res -> grabTableNames(dbRaw).map(tables -> {
                     res.put("tables", tables);
                     return res;
