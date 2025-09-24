@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 import server.conf.db.DB;
-import server.conf.db.RD;
-import server.decorators.flow.ErrAPI;
+import server.conf.db.RD.RD;
+import server.conf.db.RD.RdCmd;
 import server.lib.dev.MyLog;
 import server.lib.etc.Kit;
 
@@ -22,11 +22,13 @@ public class LifeSpawn {
     private final Kit kit;
     private final DB db;
     private final RD rd;
+    private final RdCmd cmd;
 
-    public LifeSpawn(Kit kit, DB db, RD rd) {
+    public LifeSpawn(Kit kit, DB db, RD rd, RdCmd cmd) {
         this.kit = kit;
         this.db = db;
         this.rd = rd;
+        this.cmd = cmd;
     }
 
     private Mono<Map<String, Object>> grabTableCount(DatabaseClient dbRaw) {
@@ -58,7 +60,7 @@ public class LifeSpawn {
                             .doOnNext(size -> {
                                 MyLog.logTtl(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
                                         String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
-                                        String.format("🧮 redis size => %d", size));
+                                        String.format("🧮 redis keys => %d", size));
 
                                 List<String> tables = (List<String>) res.get("tables");
 
@@ -69,9 +71,13 @@ public class LifeSpawn {
 
                     // rd.flushAll().subscribe();
 
+                    // cmd.setStr("some", "abc").subscribe();
+                    // cmd.getStr("some").subscribe();
+                    // cmd.delK("some").subscribe();
+
                 }, err -> {
-                    throw new ErrAPI(err.getMessage(),
-                            500);
+                    MyLog.logErr(err);
                 });
+
     }
 }

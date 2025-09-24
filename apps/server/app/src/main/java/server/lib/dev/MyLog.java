@@ -38,6 +38,10 @@ public class MyLog {
         logTtl(null, arg);
     }
 
+    public static void logKV(String key, Object val) {
+        System.out.printf("🔑 %s => 🖍️ %s%n", key, val);
+    }
+
     public static void logCols(List<String> cols) {
         StringBuilder sb = new StringBuilder();
 
@@ -52,7 +56,7 @@ public class MyLog {
         System.out.println(sb.toString());
     }
 
-    public static void logErr(Exception err) {
+    public static void logErr(Throwable err) {
 
         if (err == null) {
             logTtl("⚠️ null error passed to logErr ⚠️");

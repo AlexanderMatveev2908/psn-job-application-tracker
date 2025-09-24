@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 import io.lettuce.core.Range;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import reactor.core.publisher.Mono;
-import server.conf.db.RD;
+import server.conf.db.RD.RD;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 
 @Component
 public class RateLimit {
-    private final RedisReactiveCommands<String, String> redis;
+    private final RedisReactiveCommands<String, String> cmd;
 
     public RateLimit(RD rd) {
-        this.redis = rd.getCmd();
+        this.cmd = rd.getCmd();
 
     }
 
@@ -41,10 +41,10 @@ public class RateLimit {
         String key = String.format("rl:%s:%s__%s", ip, path, method);
         String val = now + ":" + UUID.randomUUID();
 
-        return redis.zremrangebyscore(key, Range.create(0, now - windowMs))
-                .then(redis.zadd(key, now, val))
-                .then(redis.zcard(key))
-                .flatMap(count -> redis.pexpire(key, windowMs + 1).thenReturn(count))
+        return cmd.zremrangebyscore(key, Range.create(0, now - windowMs))
+                .then(cmd.zadd(key, now, val))
+                .then(cmd.zcard(key))
+                .flatMap(count -> cmd.pexpire(key, windowMs + 1).thenReturn(count))
                 .flatMap(count -> {
                     int remaining = Math.max(0, limit - count.intValue());
 
@@ -56,7 +56,7 @@ public class RateLimit {
                     if (count < limit)
                         return Mono.empty();
 
-                    return redis.zrangeWithScores(key, 0, 0)
+                    return cmd.zrangeWithScores(key, 0, 0)
                             .singleOrEmpty()
                             .flatMap(tuple -> {
                                 long oldest = (long) tuple.getScore();

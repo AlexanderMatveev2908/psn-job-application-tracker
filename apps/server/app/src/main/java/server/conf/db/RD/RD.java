@@ -1,13 +1,9 @@
-package server.conf.db;
+package server.conf.db.RD;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -22,7 +18,6 @@ public class RD implements RootCls {
     private final RedisClient client;
     private final StatefulRedisConnection<String, String> cnt;
     private final RedisReactiveCommands<String, String> cmd;
-    private final ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     public RD(EnvKeeper envKeeper) {
         this.client = RedisClient.create(envKeeper.get("redisUrl"));
@@ -70,66 +65,12 @@ public class RD implements RootCls {
                 .onErrorMap(err -> new ErrAPI("❌ rd fetch stats failed", 500));
     }
 
-    private String toJson(Object obj) {
-        try {
-            return jack.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-    }
-
     public Mono<Integer> dbSize() {
         return cmd.dbsize()
                 .onErrorMap(err -> new ErrAPI("❌ rd fetch db size failed", 500))
                 .map(size -> {
-                    System.out.println(String.format("🗃️ rd db size => %d", size.intValue()));
                     return size.intValue();
                 });
-    }
-
-    public Mono<Object> grabAll() {
-        return cmd.keys("*")
-                .flatMap(key -> cmd.type(key).flatMap(type -> switch (type.toLowerCase()) {
-                    case "string" -> cmd.get(key)
-                            .map(val -> Map.entry(key, val));
-
-                    case "hash" -> cmd.hgetall(key)
-                            .collectMap(kv -> kv.getKey(), kv -> kv.getValue())
-                            .map(map -> Map.entry(key, toJson(map)));
-
-                    case "list" -> cmd.lrange(key, 0, -1)
-                            .collectList()
-                            .map(list -> Map.entry(key, toJson(list)));
-
-                    case "set" -> cmd.smembers(key)
-                            .collectList()
-                            .map(list -> Map.entry(key, toJson(list)));
-
-                    case "zset" -> cmd.zrange(key, 0, -1)
-                            .collectList()
-                            .map(list -> Map.entry(key, toJson(list)));
-
-                    default -> Mono.empty();
-                }))
-                .collectMap(Map.Entry::getKey, Map.Entry::getValue)
-                .map(res -> {
-                    System.out.println("🗃️ rd cache => ");
-                    res.forEach((k, v) -> System.out.println(String.format("🔑 %s => 🖍️ %s", k, v)));
-                    return res;
-                });
-    }
-
-    public Mono<String> flushAll() {
-        return cmd.flushall()
-                .map(res -> {
-                    if (!"OK".equals(res))
-                        throw new ErrAPI("❌ rd flush all failed", 500);
-
-                    System.out.println("🔪 rd cleaned");
-
-                    return res;
-                })
-                .onErrorMap(err -> new ErrAPI("❌ rd flush all failed", 500));
     }
 
     public void close() {
