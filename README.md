@@ -34,8 +34,10 @@ Together they form a clean, modern **full-stack architecture** 🚀
 
 - **Java 21** — Primary backend language
 - **Spring Boot (WebFlux)** — Reactive, non-blocking backend framework powered by an **event-loop** execution model
+- **Project Reactor** — Core reactive foundation powering **WebFlux**, **R2DBC**, and **Redis** for fully non-blocking data flows
 - **PostgreSQL + R2DBC** — Asynchronous database access with reactive drivers
 - **Liquibase** — Database migrations, written in raw SQL for full control
+- **Redis (Lettuce)** — Async/reactive Redis client for caching and real-time data
 
 ---
 
