@@ -9,6 +9,9 @@ app:
   nextPblFrontUrlTest: ${NEXT_PUBLIC_FRONT_URL_TEST}
   nextPblSmptFrom: ${NEXT_PUBLIC_SMPT_FROM}
   redisUrl: ${REDIS_URL}
+  cloudName: ${CLOUD_NAME}
+  cloudKey: ${CLOUD_API_KEY}
+  cloudSecret: ${CLOUD_API_SECRET}
 
 server:
   address: 0.0.0.0

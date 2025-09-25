@@ -9,6 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,6 +65,19 @@ public class AppFile {
         } catch (IOException err) {
             throw new ErrAPI("err deleting asset locally", 500);
         }
+    }
+
+    public ByteArrayResource getResourceFromBts() {
+        return new ByteArrayResource(this.bts) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        };
+    }
+
+    public FileSystemResource getResourceFromPath() {
+        return new FileSystemResource(filePath);
     }
 
     public Map<String, Object> getFancyShape() {

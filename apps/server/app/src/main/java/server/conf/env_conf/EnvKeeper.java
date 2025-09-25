@@ -52,6 +52,13 @@ public class EnvKeeper {
     private String nextPblSmptFrom;
 
     @NotBlank
+    private String cloudName;
+    @NotBlank
+    private String cloudKey;
+    @NotBlank
+    private String cloudSecret;
+
+    @NotBlank
     private String redisUrl;
 
     public EnvMode getEnvMode() {

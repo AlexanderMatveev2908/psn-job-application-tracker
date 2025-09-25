@@ -1,6 +1,7 @@
 package server.features.test.controllers;
 
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.conf.cloud.CloudSvc;
 import server.decorators.AppFile;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
@@ -18,7 +22,10 @@ import server.decorators.flow.ResAPI;
 import server.lib.data_structure.ShapeCheck;
 
 @Component
+@RequiredArgsConstructor
 public class PostTestCtrl {
+
+    private final CloudSvc cloud;
 
     public Mono<ResponseEntity<ResAPI<Object>>> postMsg(Api api) {
         return api.getBd(new TypeReference<Map<String, Object>>() {
@@ -43,6 +50,8 @@ public class PostTestCtrl {
 
         Set<String> assetKeys = Set.of("images", "videos");
 
+        List<Mono<String>> promises = new ArrayList<>();
+
         for (Map.Entry<String, Object> pair : form.entrySet()) {
             if (!assetKeys.contains(pair.getKey()))
                 continue;
@@ -54,13 +63,19 @@ public class PostTestCtrl {
                 if (!Files.exists(f.getFilePath()))
                     throw new ErrAPI("file does not exist", 500);
 
-                f.deleteLocally();
+                if (f.getField().equals("images"))
+                    promises.add(cloud.upload(f).doOnSuccess(res -> {
+                        f.deleteLocally();
+                    }));
+
             }
         }
+        return Flux.merge(promises)
+                .collectList()
+                .flatMap(urls -> ResAPI.ok200(
+                        "form data received • parsed • processed • sent back",
+                        Map.of("form", form, "uploadedUrls", urls)));
 
-        return ResAPI.ok200(
-                "form data received • parsed • processed • sent back",
-                (Object) form);
     }
 
 }
