@@ -2,14 +2,12 @@ package server.lib.dev;
 
 import java.time.Duration;
 
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.db.database.DB;
+import server.conf.mail.MailSvc;
 import server.models.applications.etc.JobApplStatusT;
 import server.models.applications.svc.JobApplRepo;
 // import server.conf.db.remote_dictionary.RdCmd;
@@ -30,14 +28,19 @@ public class Dev {
     private final TokenSvc tokenSvc;
     private final BkpCodesSvc backupCodeSvc;
     private final JobApplRepo jobApplRepo;
+    private final MailSvc mailSvc;
 
-    @Bean
-    public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
-        return args -> {
-            mapping.getHandlerMethods().forEach((k, v) -> {
-                System.out.println("📡 " + k + " => " + v);
-            });
-        };
+    // @Bean
+    // public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
+    // return args -> {
+    // mapping.getHandlerMethods().forEach((k, v) -> {
+    // System.out.println("📡 " + k + " => " + v);
+    // });
+    // };
+    // }
+
+    public void doMailStuff() {
+        mailSvc.sendRctMail("matveevalexander470@gmail.com", "🧪 TEST EMAIL", "testing java mail service").subscribe();
     }
 
     public void doStuff() {

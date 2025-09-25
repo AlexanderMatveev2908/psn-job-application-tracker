@@ -10,6 +10,10 @@ app:
     nextPblFrontUrlTest: ${NEXT_PUBLIC_FRONT_URL_TEST}
     nextPblSmptFrom: ${NEXT_PUBLIC_SMPT_FROM}
     redisUrl: ${REDIS_URL}
+    smptServer: ${BREVO_SMPT_SERVER}
+    smptPort: ${BREVO_SMPT_PORT}
+    smptUser: ${BREVO_SMPT_USER}
+    smptPwd: ${BREVO_SMPT_PWD}
 
 server:
   address: 0.0.0.0
@@ -18,6 +22,15 @@ server:
     relaxed-query-chars: "[,]"
 
 spring:
+  mail:
+    host: ${BREVO_SMPT_SERVER}
+    port: ${BREVO_SMPT_PORT}
+    username: ${BREVO_SMPT_USER}
+    password: ${BREVO_SMPT_PWD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
   r2dbc:
     url: set_with_ctm_env_loader_cls
     username: set_with_ctm_env_loader_cls

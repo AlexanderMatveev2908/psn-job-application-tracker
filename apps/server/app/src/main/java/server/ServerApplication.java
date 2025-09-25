@@ -31,7 +31,8 @@ public class ServerApplication {
 
             lifeSpawn.lifeCheck(e);
 
-            // script.doStuff();
+            // dev.doStuff();
+
         };
     }
 

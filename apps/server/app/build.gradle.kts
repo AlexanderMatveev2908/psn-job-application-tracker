@@ -54,6 +54,9 @@ dependencies {
 
     // ? checkers
     compileOnly(libs.spotbugs.annotations)
+
+    // ? mails
+    implementation(libs.spring.boot.starter.mail)
 }
 
 java {

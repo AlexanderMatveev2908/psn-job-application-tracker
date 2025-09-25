@@ -47,6 +47,8 @@ reactor-core = { module = "io.projectreactor:reactor-core", version.ref = "react
 
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail", version.ref = "spring-boot" }
+
 
 
 [plugins]

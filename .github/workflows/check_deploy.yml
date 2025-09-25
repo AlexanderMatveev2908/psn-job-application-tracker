@@ -16,7 +16,7 @@ jobs:
       PSN_JOB_APPLICATION_TRACKER_CLIENT: ${{secrets.PSN_JOB_APPLICATION_TRACKER_CLIENT}}
       PSN_JOB_APPLICATION_TRACKER_SERVER: ${{secrets.PSN_JOB_APPLICATION_TRACKER_SERVER}}
       APP_NAME: ${{secrets.APP_NAME}}
-      NEXT_PUBLIC_ENV: "test"
+      NEXT_PUBLIC_ENV: ${{secrets.NEXT_PUBLIC_ENV}}
       NEXT_PUBLIC_BACK_URL: ${{secrets.NEXT_PUBLIC_BACK_URL}}
       NEXT_PUBLIC_BACK_URL_DEV: ${{secrets.NEXT_PUBLIC_BACK_URL_DEV}}
       NEXT_PUBLIC_FRONT_URL: ${{secrets.NEXT_PUBLIC_FRONT_URL}}
@@ -29,6 +29,10 @@ jobs:
       DB_PWD: ${{secrets.DB_PWD}}
       SUPABASE_CA: ${{secrets.SUPABASE_CA}}
       REDIS_URL: ${{secrets.REDIS_URL}}
+      BREVO_SMPT_SERVER: ${{secrets.BREVO_SMPT_SERVER}}
+      BREVO_SMPT_PORT: ${{secrets.BREVO_SMPT_PORT}}
+      BREVO_SMPT_USER: ${{secrets.BREVO_SMPT_USER}}
+      BREVO_SMPT_PWD: ${{secrets.BREVO_SMPT_PWD}}
 
     steps:
       - name: 📂 clone code
