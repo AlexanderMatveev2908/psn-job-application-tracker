@@ -23,17 +23,20 @@ public class MyToken extends RootTable implements RootCls {
     private AlgT algType;
 
     @Column("hashed")
-    private byte[] hashed;
+    private String hashed;
 
     @Column("exp")
     private Long exp;
 
-    public MyToken(UUID userId, TokenT tokenType, AlgT algType, byte[] hashed, Long exp) {
+    public MyToken(UUID userId, TokenT tokenType, AlgT algType, String hashed, Long exp) {
         this.userId = userId;
         this.tokenType = tokenType;
         this.algType = algType;
-        this.hashed = hashed != null ? hashed.clone() : null;
+        this.hashed = hashed;
         this.exp = exp;
+    }
+
+    public MyToken() {
     }
 
     @Override
@@ -65,12 +68,12 @@ public class MyToken extends RootTable implements RootCls {
         this.algType = algType;
     }
 
-    public byte[] getHashed() {
-        return hashed.clone();
+    public String getHashed() {
+        return hashed;
     }
 
-    public void setHashed(byte[] hashed) {
-        this.hashed = hashed != null ? hashed.clone() : null;
+    public void setHashed(String hashed) {
+        this.hashed = hashed;
     }
 
     public Long getExp() {

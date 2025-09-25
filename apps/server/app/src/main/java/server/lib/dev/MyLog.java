@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import server.decorators.flow.ErrAPI;
-import server.lib.etc.Frmt;
+import server.lib.data_structure.Frmt;
 import server.lib.paths.Hiker;
 
 public class MyLog {
@@ -121,7 +121,9 @@ public class MyLog {
                 bw.write(json);
                 bw.newLine();
             } catch (IOException err) {
-                throw new ErrAPI("failed dev log", 500);
+
+                System.out.println("❌ err writing log.json file");
+
             }
         });
     }

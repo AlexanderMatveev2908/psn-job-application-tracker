@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import reactor.core.publisher.Mono;
 import server.models.user.User;
-import server.models.user.side.UserRecord;
 
 @Repository
 public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
@@ -16,19 +15,19 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     Mono<User> findUserByEmail(String email);
 
-    @Query("""
-                    SELECT
-                us.*,
-                COALESCE(
-                    (
-                        SELECT json_agg(to_jsonb(t))
-                        FROM tokens t
-                        WHERE t.user_id = us.id
-                    ),
-                    '[]'
-                ) AS tokens
-            FROM users us
-            WHERE us.id = :id;
-            """)
-    Mono<UserRecord> getUserPopulated(UUID id);
+    // @Query("""
+    // SELECT
+    // us.*,
+    // COALESCE(
+    // (
+    // SELECT json_agg(to_jsonb(t))
+    // FROM tokens t
+    // WHERE t.user_id = us.id
+    // ),
+    // '[]'
+    // ) AS tokens
+    // FROM users us
+    // WHERE us.id = :id;
+    // """)
+    // Mono<UserPopulated> getUserPopulated(UUID id);
 }

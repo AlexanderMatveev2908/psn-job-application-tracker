@@ -1,4 +1,4 @@
-package server.lib.etc;
+package server.lib.combo;
 
 import org.springframework.stereotype.Service;
 

@@ -27,6 +27,9 @@ public class User extends RootTable implements RootCls {
     @Column("totp_secret")
     private String totpSecret;
 
+    public User() {
+    }
+
     public User(String firstName, String lastName, String email,
             String password) {
         this.firstName = firstName;

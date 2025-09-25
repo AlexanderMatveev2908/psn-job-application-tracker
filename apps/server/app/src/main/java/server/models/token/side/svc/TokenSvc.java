@@ -1,4 +1,4 @@
-package server.models.token.svc;
+package server.models.token.side.svc;
 
 import java.util.UUID;
 
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.token.MyToken;
 import server.models.token.side.AlgT;
@@ -25,7 +26,7 @@ public class TokenSvc {
     public Mono<MyToken> createToken(UUID userId,
             TokenT tokenType,
             AlgT algType,
-            byte[] hashed,
+            String hashed,
             long exp) {
         return repo
                 .insert(
@@ -40,7 +41,7 @@ public class TokenSvc {
                 .flatMap(saved -> repo.findById(saved.getId()));
     }
 
-    public Mono<MyToken> getByUserId(UUID userId) {
-        return repo.getByUserId(userId);
+    public Flux<MyToken> findByUserId(UUID userId) {
+        return repo.findByUserId(userId);
     }
 }
