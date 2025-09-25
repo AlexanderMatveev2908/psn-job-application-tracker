@@ -1,3 +1,4 @@
+package server.models.user.etc;
 // package server.models.user.side;
 
 // import java.util.List;

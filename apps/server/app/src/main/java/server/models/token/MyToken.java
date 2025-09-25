@@ -7,8 +7,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import server.decorators.RootCls;
 import server.models.RootTable;
-import server.models.token.side.AlgT;
-import server.models.token.side.TokenT;
+import server.models.token.etc.AlgT;
+import server.models.token.etc.TokenT;
 
 @Table("tokens")
 public class MyToken extends RootTable implements RootCls {

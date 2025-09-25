@@ -11,7 +11,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
 import server.decorators.LifeSpawn;
-import server.models.token.side.svc.TokenSvc;
+import server.models.token.svc.TokenSvc;
 import server.models.user.svc.UserSvc;
 
 @SpringBootApplication

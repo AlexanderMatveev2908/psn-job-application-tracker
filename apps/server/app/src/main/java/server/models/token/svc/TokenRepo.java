@@ -1,4 +1,4 @@
-package server.models.token.side.svc;
+package server.models.token.svc;
 
 import java.util.UUID;
 
@@ -8,8 +8,8 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.token.MyToken;
-import server.models.token.side.AlgT;
-import server.models.token.side.TokenT;
+import server.models.token.etc.AlgT;
+import server.models.token.etc.TokenT;
 
 public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
 

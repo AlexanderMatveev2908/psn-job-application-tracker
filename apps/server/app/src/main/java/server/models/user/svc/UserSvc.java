@@ -11,9 +11,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.token.MyToken;
-import server.models.token.side.svc.TokenRepo;
+import server.models.token.svc.TokenRepo;
 import server.models.user.User;
-import server.models.user.side.UserPop;
+import server.models.user.etc.UserPop;
 
 @Service
 @Transactional

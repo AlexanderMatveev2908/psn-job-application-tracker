@@ -1,4 +1,4 @@
-package server.models.token.side;
+package server.models.token.etc;
 
 public enum TokenT {
     REFRESH("REFRESH"),

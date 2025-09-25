@@ -1,4 +1,4 @@
-package server.models.token.side;
+package server.models.token.etc;
 
 public enum AlgT {
     AES_CBC_HMAC_SHA256("AES_CBC_HMAC_SHA256"),
