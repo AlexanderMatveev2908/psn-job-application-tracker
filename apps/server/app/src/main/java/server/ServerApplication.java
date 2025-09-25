@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
-import server.conf.mail.etc.MailTmpl;
 import server.decorators.LifeSpawn;
 // import server.lib.dev.Dev;
 
@@ -32,7 +31,6 @@ public class ServerApplication {
 
             lifeSpawn.lifeCheck(e);
 
-            System.out.println(new MailTmpl().readTmpl());
             // dev.doStuff();
 
         };
