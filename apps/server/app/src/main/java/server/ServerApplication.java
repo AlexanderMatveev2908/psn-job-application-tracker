@@ -1,5 +1,7 @@
 package server;
 
+import java.time.Duration;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -11,12 +13,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
 import server.decorators.LifeSpawn;
+import server.lib.dev.MyLog;
+import server.models.token.etc.AlgT;
+import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenSvc;
+import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
+@SuppressWarnings({ "unused", "UseSpecificCatch", "CallToPrintStackTrace" })
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;
@@ -54,35 +60,35 @@ public class ServerApplication {
 
             lifeSpawn.lifeCheck(e);
 
-            // db.truncateAll()
-            // .flatMap(res -> {
+            db.truncateAll()
+                    .flatMap(res -> {
 
-            // return userSvc.createUser(
+                        return userSvc.createUser(
 
-            // new User("john", "doe", "john@gmail.com", "12345"));
-            // })
-            // .flatMap(user -> {
+                                new User("john", "doe", "john@gmail.com", "12345"));
+                    })
+                    .flatMap(user -> {
 
-            // return tokenSvc.createToken(
-            // user.getId(),
-            // TokenT.CHANGE_EMAIL,
-            // AlgT.HMAC_SHA256,
-            // "12345",
-            // System.currentTimeMillis() + Duration.ofMinutes(15).toMillis());
-            // })
-            // .flatMap(token -> {
+                        return tokenSvc.createToken(
+                                user.getId(),
+                                TokenT.CHANGE_EMAIL,
+                                AlgT.HMAC_SHA256,
+                                "12345",
+                                System.currentTimeMillis() + Duration.ofMinutes(15).toMillis());
+                    })
+                    .flatMap(token -> {
 
-            // return userSvc.getUserPop(token.getUserId());
-            // })
-            // .doOnNext(user -> {
-            // System.out.println(user);
-            // MyLog.asyncLog(user);
+                        return userSvc.getUserPop(token.getUserId());
+                    })
+                    .doOnNext(user -> {
+                        System.out.println(user);
+                        MyLog.asyncLog(user);
 
-            // })
-            // .subscribe(res -> {
-            // }, err -> {
-            // System.out.println(err.getMessage());
-            // });
+                    })
+                    .subscribe(res -> {
+                    }, err -> {
+                        System.out.println(err.getMessage());
+                    });
 
         };
     }

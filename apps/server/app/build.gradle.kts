@@ -22,6 +22,10 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.dotenv)
 
+    // ? faster coding
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)  
+
     // ? Spring Boot
     implementation(libs.spring.boot.starter.webflux)
     testImplementation(libs.spring.boot.starter.test) {

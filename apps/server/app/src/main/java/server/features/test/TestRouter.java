@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
@@ -14,15 +15,11 @@ import server.router.RouterAPI;
 
 @RestController
 @RouterAPI("/api/v1/test")
+@RequiredArgsConstructor
 public class TestRouter {
 
     private final PostTestCtrl postCtrl;
     private final GetTestCtrl getCtrl;
-
-    public TestRouter(PostTestCtrl postCtrl, GetTestCtrl getCtrl) {
-        this.postCtrl = postCtrl;
-        this.getCtrl = getCtrl;
-    }
 
     @GetMapping("/limited")
     public Mono<ResponseEntity<ResAPI<Void>>> getLimited(Api exc) {

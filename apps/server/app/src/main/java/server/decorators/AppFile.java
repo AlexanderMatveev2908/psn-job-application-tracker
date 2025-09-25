@@ -11,10 +11,14 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Getter;
 import server.decorators.flow.ErrAPI;
 import server.lib.paths.Hiker;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+@SuppressFBWarnings("EI_EXPOSE_REP")
+@Getter
 public class AppFile {
     private final String field;
     private final String filename;
@@ -84,23 +88,4 @@ public class AppFile {
         return fancyMap;
     }
 
-    public String getFilename() {
-        return this.filename;
-    }
-
-    public String getContentType() {
-        return this.contentType;
-    }
-
-    public String getField() {
-        return this.field;
-    }
-
-    public byte[] getBts() {
-        return bts.clone();
-    }
-
-    public Path getFilePath() {
-        return this.filePath;
-    }
 }

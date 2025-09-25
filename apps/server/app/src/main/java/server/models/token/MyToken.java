@@ -5,13 +5,16 @@ import java.util.UUID;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import server.decorators.RootCls;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import server.models.RootTable;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 @Table("tokens")
-public class MyToken extends RootTable implements RootCls {
+public class MyToken extends RootTable {
 
     @Column("user_id")
     private UUID userId;
@@ -37,51 +40,6 @@ public class MyToken extends RootTable implements RootCls {
     }
 
     public MyToken() {
-    }
-
-    @Override
-    public String toString() {
-        return reflectiveToString();
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public TokenT getTokenType() {
-        return tokenType;
-    }
-
-    public void setTokenType(TokenT tokenType) {
-        this.tokenType = tokenType;
-    }
-
-    public AlgT getAlgType() {
-        return algType;
-    }
-
-    public void setAlgType(AlgT algType) {
-        this.algType = algType;
-    }
-
-    public String getHashed() {
-        return hashed;
-    }
-
-    public void setHashed(String hashed) {
-        this.hashed = hashed;
-    }
-
-    public Long getExp() {
-        return exp;
-    }
-
-    public void setExp(Long exp) {
-        this.exp = exp;
     }
 
 }

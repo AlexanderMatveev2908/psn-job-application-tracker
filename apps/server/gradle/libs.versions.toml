@@ -19,6 +19,8 @@ spotbugs-gradle = "6.0.23"
 lettuce = "6.4.0.RELEASE"
 reactor = "3.6.6"
 
+lombok = "1.18.34"
+
 
 
 [libraries]
@@ -42,6 +44,10 @@ spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotat
 
 redis-lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 reactor-core = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
+
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+
+
 
 [plugins]
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }

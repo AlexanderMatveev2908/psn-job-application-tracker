@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.token.MyToken;
@@ -17,16 +18,12 @@ import server.models.user.etc.UserPop;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 @SuppressFBWarnings({ "EI2" })
 public class UserSvc {
 
     private final UserRepo userRepo;
     private final TokenRepo tokensRepo;
-
-    public UserSvc(UserRepo userRepo, TokenRepo tokensRepo) {
-        this.userRepo = userRepo;
-        this.tokensRepo = tokensRepo;
-    }
 
     public Mono<User> createUser(User u) {
         return userRepo.save(u)

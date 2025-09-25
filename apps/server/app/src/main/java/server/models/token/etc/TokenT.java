@@ -1,5 +1,10 @@
 package server.models.token.etc;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum TokenT {
     REFRESH("REFRESH"),
     CONF_EMAIL("CONF_EMAIL"),
@@ -14,11 +19,4 @@ public enum TokenT {
 
     private final String value;
 
-    TokenT(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
 }

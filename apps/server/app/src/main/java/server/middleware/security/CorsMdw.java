@@ -16,19 +16,17 @@ import org.springframework.web.server.WebFilterChain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.lib.combo.Kit;
 
 @Component
 @Order(10)
+@RequiredArgsConstructor
 public class CorsMdw implements WebFilter {
 
     private final Kit kit;
-
-    public CorsMdw(Kit kit) {
-        this.kit = kit;
-    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {

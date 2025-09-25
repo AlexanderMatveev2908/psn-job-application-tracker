@@ -8,6 +8,7 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RD;
@@ -15,18 +16,13 @@ import server.lib.combo.Kit;
 import server.lib.dev.MyLog;
 
 @Service
+@RequiredArgsConstructor
 public class LifeSpawn {
     private static final String COND = "WHERE table_schema = 'public' " +
             "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')";
     private final Kit kit;
     private final DB db;
     private final RD rd;
-
-    public LifeSpawn(Kit kit, DB db, RD rd) {
-        this.kit = kit;
-        this.db = db;
-        this.rd = rd;
-    }
 
     private Mono<Map<String, Object>> grabTableCount(DatabaseClient dbRaw) {
         return dbRaw.sql("SELECT COUNT(*) as count FROM information_schema.tables " + COND)

@@ -7,20 +7,17 @@ import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 enum EnvMode {
     DEV("development"),
     TEST("test"),
     PROD("production");
 
     private final String val;
-
-    EnvMode(String val) {
-        this.val = val;
-    }
-
-    public String getVal() {
-        return val;
-    }
 
     public static EnvMode fromValue(String val) {
         for (EnvMode mode : values())
