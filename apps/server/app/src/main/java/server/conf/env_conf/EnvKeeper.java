@@ -54,15 +54,6 @@ public class EnvKeeper {
     @NotBlank
     private String redisUrl;
 
-    @NotBlank
-    private String smptServer;
-    @NotBlank
-    private String smptPort;
-    @NotBlank
-    private String smptUser;
-    @NotBlank
-    private String smptPwd;
-
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);
     }

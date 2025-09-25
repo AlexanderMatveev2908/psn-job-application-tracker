@@ -80,16 +80,17 @@ This will initialize the project and install all required packages for both clie
 
 ### 🔒 Environment Variables
 
-All required environment variables are listed and validated inside:
+All required environment variables are listed in:
 
-[`apps/server/app/src/main/java/server/conf/env_conf/EnvKeeper.java`](apps/server/app/src/main/java/server/conf/env_conf/EnvKeeper.java)
+[`apps/server/app/src/main/resources/application.yml`](apps/server/app/src/main/resources/application.yml)
 
-This file uses custom logic to ensure that all required variables:
+This file not only configures the server but also declares the environment variables required by the application.
 
-- **Exists** in the environment
-- **Are valid** with no leading or trailing spaces that could cause issues in production
+- **Main runtime** variables are grouped under the top-level key **app**.
 
-By centralizing these checks, the app guarantees that both client and server dependencies are configured consistently — making the system easier to maintain and safer to deploy.
+- **Mail service** settings are located under **spring.mail**.
+
+- **Database connection** settings are under **spring.r2dbc**.
 
 There’s no strict separation between client and server variables, but variables used by the client are easy to identify because **Next.js** requires them to start with **NEXT_PUBLIC**.
 
@@ -608,7 +609,7 @@ To allow GitHub Actions to deploy the app, you’ll need to configure deployment
 
 #### 🐈 GitHub Secrets
 
-- GitHub requires the same environment variables you used in development (with adjustments for production, e.g. `PY_ENV`, `NEXT_PUBLIC_ENV`, or API URLs).
+- GitHub requires the same environment variables you used in development (with adjustments for production, e.g. `NEXT_PUBLIC_ENV`, or API URLs).
 - You can manage them in your repo under **Settings → Secrets and variables → Actions**.
 - Alternatively, you can use the **GitHub CLI** to upload local environment variables automatically — reducing the risk of forgetting or mistyping values.
 
