@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
 import server.decorators.LifeSpawn;
-// import server.lib.dev.Dev;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan

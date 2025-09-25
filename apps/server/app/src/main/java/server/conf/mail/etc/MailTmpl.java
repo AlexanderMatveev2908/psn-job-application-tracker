@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
@@ -19,6 +20,7 @@ import server.lib.paths.Hiker;
 
 @Service
 @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" })
 public class MailTmpl {
 
     private final EnvKeeper envKeeper;

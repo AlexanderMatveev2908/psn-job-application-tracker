@@ -39,8 +39,14 @@ public class Dev {
     // };
     // }
 
-    public void doMailStuff() {
-        mailSvc.sendRctMail("matveevalexander470@gmail.com", "🧪 TEST EMAIL", "testing java mail service").subscribe();
+    public void doMailTxtStuff() {
+        mailSvc.sendRctTxtMail("matveevalexander470@gmail.com", "🧪 TEST EMAIL", "testing java mail service")
+                .subscribe();
+    }
+
+    public void doMailHtmlStuff() {
+        mailSvc.sendRctHtmlMail("matveevalexander470@gmail.com", "🧪 TEST EMAIL", "john")
+                .subscribe();
     }
 
     public void doStuff() {
