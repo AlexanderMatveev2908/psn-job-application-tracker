@@ -1,12 +1,10 @@
 package server.conf.env_conf;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,73 +26,60 @@ enum EnvMode {
     }
 }
 
+@Data
+@Validated
 @ConfigurationProperties(prefix = "app")
 public class EnvKeeper {
 
-    private static final List<String> REQUIRED_KEYS = List.of(
-            "appName",
-            "nextPblEnv",
-            "nextPblBackUrl",
-            "nextPblBackUrlDev",
-            "nextPblBackUrlTest",
-            "nextPblFrontUrl",
-            "nextPblFrontUrlDev",
-            "nextPblFrontUrlTest",
-            "nextPblSmptFrom",
-            "redisUrl",
-            "smptServer",
-            "smptPort",
-            "smptUser",
-            "smptPwd");
+    @NotBlank
+    private String appName;
 
-    private Map<String, String> envVars = new HashMap<>();
+    @NotBlank
+    private String nextPblEnv;
+    @NotBlank
+    private String nextPblBackUrl;
+    @NotBlank
+    private String nextPblBackUrlDev;
+    @NotBlank
+    private String nextPblBackUrlTest;
+    @NotBlank
+    private String nextPblFrontUrl;
+    @NotBlank
+    private String nextPblFrontUrlDev;
+    @NotBlank
+    private String nextPblFrontUrlTest;
+    @NotBlank
+    private String nextPblSmptFrom;
 
-    public Map<String, String> getEnvVars() {
-        return Collections.unmodifiableMap(this.envVars);
-    }
+    @NotBlank
+    private String redisUrl;
 
-    public void setEnvVars(Map<String, String> props) {
+    @NotBlank
+    private String smptServer;
+    @NotBlank
+    private String smptPort;
+    @NotBlank
+    private String smptUser;
+    @NotBlank
+    private String smptPwd;
 
-        for (String k : REQUIRED_KEYS) {
-            String v = props.get(k);
-
-            if (!props.containsKey(k))
-                throw new IllegalArgumentException("❌ missing env key => " + k);
-            else if (v == null || v.isBlank())
-                throw new IllegalArgumentException("❌ empty key => " + k);
-            else if (v.startsWith(" ") || v.endsWith(" "))
-                throw new IllegalArgumentException(String.format("❌ Key %s %s with a space", k,
-                        v.startsWith(" ") ? "starts" : "ends"));
-        }
-
-        this.envVars = Map.copyOf(props);
-    }
-
-    public String get(String key) {
-        return this.envVars.get(key);
-    }
-
-    public String getMode() {
-        return this.envVars.get("nextPblEnv");
+    public EnvMode getEnvMode() {
+        return EnvMode.fromValue(this.nextPblEnv);
     }
 
     public String getFrontUrl() {
-        EnvMode envMode = EnvMode.fromValue(this.envVars.get("nextPblEnv"));
-
-        return switch (envMode) {
-            case DEV -> this.envVars.get("nextPblFrontUrlDev");
-            case TEST -> this.envVars.get("nextPblFrontUrlTest");
-            case PROD -> this.envVars.get("nextPblFrontUrl");
+        return switch (getEnvMode()) {
+            case DEV -> nextPblFrontUrlDev;
+            case TEST -> nextPblFrontUrlTest;
+            case PROD -> nextPblFrontUrl;
         };
     }
 
     public String getBackUrl() {
-        EnvMode envMode = EnvMode.fromValue(this.envVars.get("nextPblEnv"));
-
-        return switch (envMode) {
-            case DEV -> this.envVars.get("nextPblBackUrlDev");
-            case TEST -> this.envVars.get("nextPblBackUrlTest");
-            case PROD -> this.envVars.get("nextPblBackUrl");
+        return switch (getEnvMode()) {
+            case DEV -> nextPblBackUrlDev;
+            case TEST -> nextPblBackUrlTest;
+            case PROD -> nextPblBackUrl;
         };
     }
 }

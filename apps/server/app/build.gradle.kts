@@ -31,6 +31,9 @@ dependencies {
     testImplementation(libs.spring.boot.starter.test) {
         exclude(group = "org.junit.vintage")
     }
+
+    // ? validator
+    implementation(libs.spring.boot.starter.validation)
     
     // ? spring DB
     implementation(libs.spring.boot.starter.data.r2dbc)

@@ -20,7 +20,7 @@ public class MailSvc {
 
     public void sendMail(String to, String subject, String text) {
         SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setFrom(envKeeper.get("nextPblSmptFrom"));
+        msg.setFrom(envKeeper.getNextPblSmptFrom());
         msg.setTo(to);
         msg.setSubject(subject);
         msg.setText(text);

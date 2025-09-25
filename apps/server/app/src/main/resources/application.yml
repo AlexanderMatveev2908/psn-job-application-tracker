@@ -1,19 +1,18 @@
 app:
-  env-vars:
-    appName: ${APP_NAME}
-    nextPblEnv: ${NEXT_PUBLIC_ENV}
-    nextPblBackUrl: ${NEXT_PUBLIC_BACK_URL}
-    nextPblBackUrlDev: ${NEXT_PUBLIC_BACK_URL_DEV}
-    nextPblBackUrlTest: ${NEXT_PUBLIC_BACK_URL_TEST}
-    nextPblFrontUrl: ${NEXT_PUBLIC_FRONT_URL}
-    nextPblFrontUrlDev: ${NEXT_PUBLIC_FRONT_URL_DEV}
-    nextPblFrontUrlTest: ${NEXT_PUBLIC_FRONT_URL_TEST}
-    nextPblSmptFrom: ${NEXT_PUBLIC_SMPT_FROM}
-    redisUrl: ${REDIS_URL}
-    smptServer: ${BREVO_SMPT_SERVER}
-    smptPort: ${BREVO_SMPT_PORT}
-    smptUser: ${BREVO_SMPT_USER}
-    smptPwd: ${BREVO_SMPT_PWD}
+  appName: ${APP_NAME}
+  nextPblEnv: ${NEXT_PUBLIC_ENV}
+  nextPblBackUrl: ${NEXT_PUBLIC_BACK_URL}
+  nextPblBackUrlDev: ${NEXT_PUBLIC_BACK_URL_DEV}
+  nextPblBackUrlTest: ${NEXT_PUBLIC_BACK_URL_TEST}
+  nextPblFrontUrl: ${NEXT_PUBLIC_FRONT_URL}
+  nextPblFrontUrlDev: ${NEXT_PUBLIC_FRONT_URL_DEV}
+  nextPblFrontUrlTest: ${NEXT_PUBLIC_FRONT_URL_TEST}
+  nextPblSmptFrom: ${NEXT_PUBLIC_SMPT_FROM}
+  redisUrl: ${REDIS_URL}
+  smptServer: ${BREVO_SMPT_SERVER}
+  smptPort: ${BREVO_SMPT_PORT}
+  smptUser: ${BREVO_SMPT_USER}
+  smptPwd: ${BREVO_SMPT_PWD}
 
 server:
   address: 0.0.0.0

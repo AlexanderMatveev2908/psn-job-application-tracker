@@ -20,7 +20,7 @@ public class RD implements RootCls {
     private final RedisReactiveCommands<String, String> cmd;
 
     public RD(EnvKeeper envKeeper) {
-        this.client = RedisClient.create(envKeeper.get("redisUrl"));
+        this.client = RedisClient.create(envKeeper.getRedisUrl());
         this.cnt = client.connect();
         this.cmd = cnt.reactive();
     }
