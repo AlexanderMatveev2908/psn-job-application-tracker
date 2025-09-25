@@ -11,6 +11,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.models.applications.JobAppl;
+import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.MyToken;
@@ -27,14 +29,15 @@ public class UserSvc {
     private final UserRepo userRepo;
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
+    private final JobApplSvc jobApplSvc;
 
-    public Mono<User> createUser(User u) {
+    public Mono<User> insert(User u) {
         return userRepo.save(u)
                 .flatMap(saved -> userRepo.findById(saved.getId()));
     }
 
     public Mono<User> findByEmail(String email) {
-        return userRepo.findUserByEmail(email);
+        return userRepo.findByEmail(email);
     }
 
     public Mono<User> findById(UUID id) {
@@ -45,9 +48,10 @@ public class UserSvc {
         Mono<User> userMono = userRepo.findById(userId);
         Mono<List<MyToken>> tokensMono = tokensRepo.findByUserId(userId).collectList();
         Mono<List<BkpCodes>> codesMono = bkpCodesRepo.findByUserId(userId).collectList();
+        Mono<List<JobAppl>> applMono = jobApplSvc.findByUserId(userId).collectList();
 
-        return Mono.zip(userMono, tokensMono, codesMono)
-                .map(tuple -> new UserPop(tuple.getT1(), tuple.getT2(), tuple.getT3()));
+        return Mono.zip(userMono, tokensMono, codesMono, applMono)
+                .map(tuple -> new UserPop(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4()));
     }
 
     public Mono<User> softDelete(UUID id) {

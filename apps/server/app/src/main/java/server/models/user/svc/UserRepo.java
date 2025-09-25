@@ -13,7 +13,7 @@ import server.models.user.User;
 public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
 
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
-    Mono<User> findUserByEmail(String email);
+    Mono<User> findByEmail(String email);
 
     // @Query("""
     // SELECT

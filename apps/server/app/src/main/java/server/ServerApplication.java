@@ -9,27 +9,21 @@ import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
 import server.decorators.LifeSpawn;
+// import server.lib.dev.Dev;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @RequiredArgsConstructor
+
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;
+    // private final Dev dev;
 
     public static void main(String[] args) {
 
         SpringApplication.run(ServerApplication.class, args);
     }
-
-    // @Bean
-    // public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
-    // return args -> {
-    // mapping.getHandlerMethods().forEach((key, value) -> {
-    // System.out.println("📡 Route =>" + key + " → " + value);
-    // });
-    // };
-    // }
 
     @Bean
     ApplicationListener<WebServerInitializedEvent> startCheck() {
@@ -37,6 +31,7 @@ public class ServerApplication {
 
             lifeSpawn.lifeCheck(e);
 
+            // script.doStuff();
         };
     }
 
