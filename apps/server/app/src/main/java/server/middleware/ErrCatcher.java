@@ -28,7 +28,7 @@ public class ErrCatcher implements WebExceptionHandler {
     public Mono<Void> handle(ServerWebExchange exc, Throwable err) {
 
         String msg = err.getMessage();
-        boolean isRouteNotFound = msg.equals("404 NOT_FOUND");
+        boolean isRouteNotFound = msg != null && msg.equals("404 NOT_FOUND");
         if (isRouteNotFound) {
             String endpoint = exc.getRequest().getPath().value();
             msg = String.format("❌ route %s not found", endpoint);

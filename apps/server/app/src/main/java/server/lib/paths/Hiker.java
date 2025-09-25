@@ -17,6 +17,7 @@ public final class Hiker {
     public static final Path LOG_FILE;
     public static final Path LOG_FILE_ERR;
     public static final Path CA_FILE;
+    public static final Path MAIL_TMPL;
 
     static {
         CERTS_DIR = SERVER_DIR.resolve("certs").normalize();
@@ -27,6 +28,7 @@ public final class Hiker {
         LOG_FILE = LOG_DIR.resolve("log.json");
         LOG_FILE_ERR = LOG_DIR.resolve("log_err.json");
         CA_FILE = CERTS_DIR.resolve("supabase-ca.crt");
+        MAIL_TMPL = SERVER_DIR.resolve("app/src/main/java/server/conf/mail/templates/template.html").normalize();
 
         ensureDirs();
     }
@@ -62,8 +64,10 @@ public final class Hiker {
                     && Files.isDirectory(VIDEOS_DIR)
                     && Files.isDirectory(LOG_DIR)
                     && Files.isRegularFile(LOG_FILE)
-                    && Files.isRegularFile(CA_FILE);
-        } catch (Exception e) {
+                    && Files.isRegularFile(LOG_FILE_ERR)
+                    && Files.isRegularFile(CA_FILE)
+                    && Files.isRegularFile(MAIL_TMPL);
+        } catch (Exception err) {
             return false;
         }
     }
