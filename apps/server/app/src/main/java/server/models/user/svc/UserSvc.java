@@ -11,6 +11,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.models.backup_code.BkpCodes;
+import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.MyToken;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
@@ -24,6 +26,7 @@ public class UserSvc {
 
     private final UserRepo userRepo;
     private final TokenRepo tokensRepo;
+    private final BkpCodesRepo bkpCodesRepo;
 
     public Mono<User> createUser(User u) {
         return userRepo.save(u)
@@ -41,9 +44,10 @@ public class UserSvc {
     public Mono<UserPop> getUserPop(UUID userId) {
         Mono<User> userMono = userRepo.findById(userId);
         Mono<List<MyToken>> tokensMono = tokensRepo.findByUserId(userId).collectList();
+        Mono<List<BkpCodes>> codesMono = bkpCodesRepo.findByUserId(userId).collectList();
 
-        return Mono.zip(userMono, tokensMono)
-                .map(tuple -> new UserPop(tuple.getT1(), tuple.getT2()));
+        return Mono.zip(userMono, tokensMono, codesMono)
+                .map(tuple -> new UserPop(tuple.getT1(), tuple.getT2(), tuple.getT3()));
     }
 
     public Mono<User> softDelete(UUID id) {

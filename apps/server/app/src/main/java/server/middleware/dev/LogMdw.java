@@ -40,7 +40,7 @@ public class LogMdw implements WebFilter {
 
                     arg.put("body", api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body));
 
-                    MyLog.asyncLog(arg);
+                    MyLog.wLogOk(arg);
                 })
                 .then(chain.filter(api));
 

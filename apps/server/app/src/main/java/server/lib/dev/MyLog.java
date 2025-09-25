@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -67,6 +68,7 @@ public class MyLog {
     }
 
     public static void logErr(Throwable err) {
+        wLogErr(err);
 
         if (err == null) {
             logTtl("⚠️ null error passed to logErr ⚠️");
@@ -107,11 +109,12 @@ public class MyLog {
         System.out.println("\t");
     }
 
-    public static void asyncLog(Object arg) {
+    public static void asyncLog(Path p, Object arg) {
+
         logThread.submit(() -> {
 
             try (BufferedWriter bw = Files.newBufferedWriter(
-                    Hiker.getLogFile(),
+                    p,
                     StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -126,5 +129,13 @@ public class MyLog {
 
             }
         });
+    }
+
+    public static void wLogOk(Object arg) {
+        asyncLog(Hiker.LOG_FILE, arg);
+    }
+
+    public static void wLogErr(Object arg) {
+        asyncLog(Hiker.LOG_FILE_ERR, arg);
     }
 }

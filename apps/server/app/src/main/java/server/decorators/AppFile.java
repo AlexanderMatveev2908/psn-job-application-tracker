@@ -43,7 +43,7 @@ public class AppFile {
         }
 
         this.filename = UUID.randomUUID().toString() + ext;
-        this.filePath = Hiker.getAssetsDir().resolve(this.field).resolve(this.filename);
+        this.filePath = Hiker.ASSETS_DIR.resolve(this.field).resolve(this.filename);
     }
 
     public void saveLocally() {

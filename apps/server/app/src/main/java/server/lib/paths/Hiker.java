@@ -8,14 +8,15 @@ import server.decorators.flow.ErrAPI;
 
 public final class Hiker {
 
-    private static final Path SERVER_DIR = Seeker.grabDir();
-    private static final Path CERTS_DIR;
-    private static final Path ASSETS_DIR;
-    private static final Path IMAGES_DIR;
-    private static final Path VIDEOS_DIR;
-    private static final Path LOG_DIR;
-    private static final Path LOG_FILE;
-    private static final Path CA_FILE;
+    public static final Path SERVER_DIR = Seeker.grabDir();
+    public static final Path CERTS_DIR;
+    public static final Path ASSETS_DIR;
+    public static final Path IMAGES_DIR;
+    public static final Path VIDEOS_DIR;
+    public static final Path LOG_DIR;
+    public static final Path LOG_FILE;
+    public static final Path LOG_FILE_ERR;
+    public static final Path CA_FILE;
 
     static {
         CERTS_DIR = SERVER_DIR.resolve("certs").normalize();
@@ -24,9 +25,14 @@ public final class Hiker {
         VIDEOS_DIR = ASSETS_DIR.resolve("videos").normalize();
         LOG_DIR = SERVER_DIR.resolve("logger").normalize();
         LOG_FILE = LOG_DIR.resolve("log.json");
+        LOG_FILE_ERR = LOG_DIR.resolve("log_err.json");
         CA_FILE = CERTS_DIR.resolve("supabase-ca.crt");
 
         ensureDirs();
+    }
+
+    private Hiker() {
+        throw new ErrAPI("do not instantiate", 500);
     }
 
     private static void ensureDirs() {
@@ -38,6 +44,8 @@ public final class Hiker {
 
             if (!Files.exists(LOG_FILE))
                 Files.createFile(LOG_FILE);
+            if (!Files.exists(LOG_FILE_ERR))
+                Files.createFile(LOG_FILE_ERR);
 
             if (!Files.exists(CA_FILE))
                 Files.createFile(CA_FILE);
@@ -60,35 +68,4 @@ public final class Hiker {
         }
     }
 
-    public static Path getServerDir() {
-        return SERVER_DIR;
-    }
-
-    public static Path getAssetsDir() {
-        return ASSETS_DIR;
-    }
-
-    public static Path getImagesDir() {
-        return IMAGES_DIR;
-    }
-
-    public static Path getVideosDir() {
-        return VIDEOS_DIR;
-    }
-
-    public static Path getLogDir() {
-        return LOG_DIR;
-    }
-
-    public static Path getLogFile() {
-        return LOG_FILE;
-    }
-
-    public static Path getCertsDir() {
-        return CERTS_DIR;
-    }
-
-    public static Path getCaFile() {
-        return CA_FILE;
-    }
 }

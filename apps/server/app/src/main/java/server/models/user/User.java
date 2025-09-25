@@ -41,4 +41,9 @@ public class User extends RootTable {
         this.password = password;
     }
 
+    @Override
+    public String toString() {
+        return reflectiveToString();
+    }
+
 }

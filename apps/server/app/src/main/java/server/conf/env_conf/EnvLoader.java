@@ -25,7 +25,7 @@ public class EnvLoader implements EnvironmentPostProcessor {
     @SuppressWarnings("UseSpecificCatch")
     public void postProcessEnvironment(ConfigurableEnvironment env, SpringApplication app) {
         try {
-            Path serverDir = Hiker.getServerDir();
+            Path serverDir = Hiker.SERVER_DIR;
 
             Dotenv dotenv = Dotenv.configure()
                     .directory(serverDir.toString())
@@ -59,7 +59,7 @@ public class EnvLoader implements EnvironmentPostProcessor {
 
             }
 
-            Path certFile = Hiker.getCaFile();
+            Path certFile = Hiker.CA_FILE;
             Files.write(certFile, HexFormat.of().parseHex(supabaseCa));
             Path cartPath = certFile.toAbsolutePath();
 

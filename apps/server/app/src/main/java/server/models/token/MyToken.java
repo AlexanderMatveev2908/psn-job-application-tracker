@@ -42,4 +42,9 @@ public class MyToken extends RootTable {
     public MyToken() {
     }
 
+    @Override
+    public String toString() {
+        return reflectiveToString();
+    }
+
 }
