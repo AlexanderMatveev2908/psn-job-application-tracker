@@ -1,32 +1,42 @@
-package server.features.auth.middleware.register;
+package server.features.auth.paperwork;
 
 import java.util.Map;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import server.conf.Reg;
 
 @Data
+@PwdMatch
 public class RegisterForm {
 
     @NotBlank(message = "first name required")
+    @Pattern(regexp = Reg.NAME, message = "first name invalid")
     private final String firstName;
 
     @NotBlank(message = "last name required")
+    @Pattern(regexp = Reg.NAME, message = "last name invalid")
     private final String lastName;
 
     @NotBlank(message = "email required")
-    @Email(message = "invalid email format")
+    @Email(message = "email invalid")
     private final String email;
 
     @NotBlank(message = "password required")
+    @Pattern(regexp = Reg.PWD, message = "password invalid")
     private final String password;
+
+    @NotBlank(message = "confirm password required")
+    private final String confirmPassword;
 
     public static RegisterForm mapToForm(Map<String, String> bd) {
         return new RegisterForm(
                 bd.get("firstName"),
                 bd.get("lastName"),
                 bd.get("email"),
-                bd.get("password"));
+                bd.get("password"),
+                bd.get("confirmPassword"));
     }
 }

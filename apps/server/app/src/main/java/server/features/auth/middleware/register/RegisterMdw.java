@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.features.auth.paperwork.RegisterForm;
 import server.middleware.BaseMdw;
 import server.middleware.security.RateLimit;
 
@@ -40,15 +41,15 @@ public class RegisterMdw extends BaseMdw {
             if (errs.isEmpty())
                 return chain.filter(api);
 
-            List<String> msgs = errs.stream()
-                    .map(ConstraintViolation::getMessage)
+            List<Map<String, String>> errors = errs.stream()
+                    .map(err -> Map.of(
+                            "field", err.getPropertyPath().toString(),
+                            "msg", err.getMessage()))
                     .toList();
 
-            return Mono.error(new ErrAPI(msgs.get(0), 400, Map.entry("errors", msgs)));
+            return Mono.error(new ErrAPI(errors.get(0).get("msg"), 400, Map.entry("errs", errors)));
 
-        })).switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400))).doOnError(err -> {
-            System.out.println(err.getMessage());
-        });
+        })).switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400)));
     }
 
 }
