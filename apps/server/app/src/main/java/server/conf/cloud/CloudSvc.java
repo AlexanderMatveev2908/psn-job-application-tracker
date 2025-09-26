@@ -3,9 +3,9 @@ package server.conf.cloud;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
@@ -39,28 +39,44 @@ public class CloudSvc {
                 .build();
     }
 
-    private String getSign(String tmsp, String folder, String publicId) {
-        String cloudSecret = envKeeper.getCloudSecret();
-
-        Map<String, String> paramsToSign = new TreeMap<>();
-        paramsToSign.put("folder", folder);
-        paramsToSign.put("timestamp", tmsp);
-        paramsToSign.put("public_id", publicId);
-
-        String stringToSign = paramsToSign.entrySet().stream()
-                .map(el -> el.getKey() + "=" + el.getValue())
-                .collect(Collectors.joining("&")) + cloudSecret;
-
-        String sig;
+    private String sign(String stringToSign) {
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             byte[] digest = sha1.digest(stringToSign.getBytes(StandardCharsets.UTF_8));
-            sig = HexFormat.of().formatHex(digest);
+            String sig = HexFormat.of().formatHex(digest);
+
+            return sig;
         } catch (Exception err) {
             throw new ErrAPI("err creating cloud sign", 500);
         }
+    }
 
-        return sig;
+    private String genSign(Map<String, String> params) {
+        String cloudSecret = envKeeper.getCloudSecret();
+
+        String stringToSign = params.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(el -> el.getKey() + "=" + el.getValue())
+                .collect(Collectors.joining("&")) + cloudSecret;
+
+        return sign(stringToSign);
+    }
+
+    private String getSignUpload(String tmsp, String folder, String publicId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("folder", folder);
+        params.put("timestamp", tmsp);
+        params.put("public_id", publicId);
+
+        return genSign(params);
+    }
+
+    private String getSignDelete(String tmsp, String publicId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("timestamp", tmsp);
+        params.put("public_id", publicId);
+
+        return genSign(params);
 
     }
 
@@ -78,7 +94,7 @@ public class CloudSvc {
 
         MultipartBodyBuilder form = new MultipartBodyBuilder();
         form.part("api_key", cloudKey);
-        form.part("signature", getSign(tmsp, folder, publicId));
+        form.part("signature", getSignUpload(tmsp, folder, publicId));
         form.part("timestamp", tmsp);
         form.part("folder", folder);
         form.part("public_id", publicId);
@@ -95,11 +111,42 @@ public class CloudSvc {
 
                     Map<String, Object> parsed = Frmt.toMap(str);
 
-                    var asset = new CloudAsset((String) parsed.get("asset_id"), (String) parsed.get("public_id"),
-                            (String) parsed.get("secure_url"));
+                    var asset = new CloudAsset((String) parsed.get("public_id"),
+                            (String) parsed.get("secure_url"), (String) parsed.get("resource_type"));
 
                     return Mono.just(
                             asset);
+                });
+    }
+
+    public Mono<Integer> delete(String publicId, String resourceType) {
+        String cloudKey = envKeeper.getCloudKey();
+        String tmsp = String.valueOf(Instant.now().getEpochSecond());
+
+        MultipartBodyBuilder form = new MultipartBodyBuilder();
+        form.part("api_key", cloudKey);
+        form.part("public_id", publicId);
+        form.part("timestamp", tmsp);
+        form.part("signature", getSignDelete(tmsp, publicId));
+
+        String url = "/" + resourceType + "/destroy";
+
+        return getClient()
+                .post()
+                .uri(url)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(form.build()))
+                .retrieve()
+                .bodyToMono(String.class)
+                .flatMap(response -> {
+                    Map<String, Object> parsed = Frmt.toMap(response);
+
+                    String result = parsed.get("result").toString();
+                    int count = "ok".equals(result) ? 1 : 0;
+
+                    System.out.println(String.format("✂️ deleted %d %s", count, resourceType));
+
+                    return Mono.just(count);
                 });
     }
 

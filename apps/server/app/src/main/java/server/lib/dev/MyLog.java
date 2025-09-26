@@ -68,7 +68,7 @@ public class MyLog {
     }
 
     public static void logErr(Throwable err) {
-        wLogErr(err);
+        wErr(err);
 
         if (err == null) {
             logTtl("⚠️ null error passed to logErr ⚠️");
@@ -131,11 +131,11 @@ public class MyLog {
         });
     }
 
-    public static void wLogOk(Object arg) {
+    public static void wOk(Object arg) {
         asyncLog(Hiker.LOG_FILE, arg);
     }
 
-    public static void wLogErr(Object arg) {
+    public static void wErr(Object arg) {
         asyncLog(Hiker.LOG_FILE_ERR, arg);
     }
 }

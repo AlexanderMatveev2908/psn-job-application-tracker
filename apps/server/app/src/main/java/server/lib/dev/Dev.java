@@ -65,7 +65,7 @@ public class Dev {
                 .flatMap(appl -> userSvc.getUserPop(appl.getUserId()))
                 .doOnNext(user -> {
 
-                    MyLog.wLogOk(user);
+                    MyLog.wOk(user);
 
                 })
                 .subscribe(res -> {

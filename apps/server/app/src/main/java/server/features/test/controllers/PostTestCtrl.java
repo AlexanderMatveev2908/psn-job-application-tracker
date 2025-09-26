@@ -21,7 +21,6 @@ import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
 import server.lib.data_structure.ShapeCheck;
-import server.lib.dev.MyLog;
 
 @Component
 @RequiredArgsConstructor
@@ -71,13 +70,20 @@ public class PostTestCtrl {
 
             }
         }
+
         return Flux.merge(promises)
-                .collectList().doOnNext(assets -> {
-                    MyLog.wLogOk(assets);
-                })
-                .flatMap(urls -> ResAPI.ok200(
-                        "form data received • parsed • processed • sent back",
-                        Map.of("form", form, "uploaded", urls)));
+                .collectList()
+                .zipWhen(saved -> Flux.fromIterable(saved)
+                        .flatMap(el -> cloud.delete(el.getPublicId(), el.getResourceType()))
+                        .collectList())
+                .flatMap(tuple -> {
+                    List<CloudAsset> saved = tuple.getT1();
+                    List<Integer> deleted = tuple.getT2();
+
+                    return ResAPI.ok200(
+                            "form parsed • processed • saved locally • uploaded on cloud • deleted locally • deleted from cloud",
+                            Map.of("saved", saved, "deleted", deleted.stream().reduce(0, (acc, curr) -> acc + curr)));
+                });
 
     }
 
