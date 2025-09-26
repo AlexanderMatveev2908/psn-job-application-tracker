@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,6 +25,7 @@ import server.lib.data_structure.ShapeCheck;
 
 @Component
 @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" })
 public class PostTestCtrl {
 
     private final CloudSvc cloud;
