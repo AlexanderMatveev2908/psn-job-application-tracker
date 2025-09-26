@@ -61,6 +61,10 @@ public class Api extends ServerWebExchangeDecorator {
         return getRequest().getPath().toString();
     }
 
+    public boolean isSamePath(String arg) {
+        return getPath().equals(arg);
+    }
+
     public HttpMethod getMethod() {
         return getRequest().getMethod();
     }

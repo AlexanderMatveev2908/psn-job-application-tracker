@@ -24,7 +24,7 @@ public class RateLimit {
     private String getClientIp(Api api) {
         String xff = api.getHeader("x-forwarded-for");
 
-        if (xff != null && !xff.isBlank())
+        if (!xff.isBlank())
             return xff.split(",")[0].trim();
 
         return api.getIp();
@@ -68,5 +68,9 @@ public class RateLimit {
                                         429));
                             });
                 });
+    }
+
+    public Mono<Void> limit(Api api) {
+        return limit(api, 5, 15);
     }
 }
