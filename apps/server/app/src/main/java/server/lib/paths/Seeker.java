@@ -37,11 +37,11 @@ public final class Seeker {
 
                 return serverDir;
             } else {
-                throw new ErrAPI("not sure where I am 👻", 500);
+                throw new ErrAPI("not sure where I am 👻");
             }
         } catch (Exception err) {
 
-            throw new ErrAPI(err.getMessage(), 500);
+            throw new ErrAPI(err.getMessage());
         }
 
     }

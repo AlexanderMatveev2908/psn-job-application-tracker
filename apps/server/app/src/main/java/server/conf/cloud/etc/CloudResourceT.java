@@ -16,7 +16,7 @@ public enum CloudResourceT {
         return switch (field) {
             case "images" -> IMAGE.getVal();
             case "videos" -> VIDEO.getVal();
-            default -> throw new ErrAPI("field not supported => " + field, 500);
+            default -> throw new ErrAPI("field not supported => " + field);
         };
     }
 }

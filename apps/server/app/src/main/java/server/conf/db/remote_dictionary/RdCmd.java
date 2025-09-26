@@ -144,12 +144,12 @@ public class RdCmd {
         return cmd.flushall()
                 .map(res -> {
                     if (!"OK".equals(res))
-                        throw new ErrAPI("❌ rd flush all failed", 500);
+                        throw new ErrAPI("rd flush all failed");
 
                     System.out.println("🔪 rd cleaned");
 
                     return res;
                 })
-                .onErrorMap(err -> new ErrAPI("❌ rd flush all failed", 500));
+                .onErrorMap(err -> new ErrAPI("rd flush all failed"));
     }
 }

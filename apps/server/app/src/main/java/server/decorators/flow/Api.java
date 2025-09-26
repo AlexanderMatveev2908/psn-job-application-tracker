@@ -116,7 +116,7 @@ public final class Api extends ServerWebExchangeDecorator {
                 return Mono.empty();
 
             return Mono.fromCallable(() -> JACKSON.readValue(bytes, type)).cache();
-        });
+        }).onErrorMap(err -> new ErrAPI("wrong data format", 400));
     }
 
     public Mono<String> getBdStr() {

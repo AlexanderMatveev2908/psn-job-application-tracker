@@ -53,8 +53,7 @@ public final class EnvLoader implements EnvironmentPostProcessor {
                 missing.ifPresent(el -> {
                     throw new ErrAPI(
                             String.format("⚠️ %s key db cnt => %s", el.getValue() == null ? "missing" : "blank",
-                                    el.getKey()),
-                            500);
+                                    el.getKey()));
                 });
 
             }
@@ -88,7 +87,7 @@ public final class EnvLoader implements EnvironmentPostProcessor {
             env.getPropertySources().addFirst(new PropertiesPropertySource("dotenv", props));
 
         } catch (ErrAPI | IOException err) {
-            throw new ErrAPI(err.getMessage(), 500);
+            throw new ErrAPI(err.getMessage());
         }
     }
 }

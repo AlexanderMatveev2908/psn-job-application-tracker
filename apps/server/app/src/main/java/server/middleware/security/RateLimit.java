@@ -9,15 +9,18 @@ import io.lettuce.core.Range;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import reactor.core.publisher.Mono;
 import server.conf.db.remote_dictionary.RD;
+import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 
 @Component
 public class RateLimit {
     private final RedisReactiveCommands<String, String> cmd;
+    private final EnvKeeper envKeeper;
 
-    public RateLimit(RD rd) {
+    public RateLimit(RD rd, EnvKeeper envKeeper) {
         this.cmd = rd.getCmd();
+        this.envKeeper = envKeeper;
 
     }
 
@@ -31,6 +34,10 @@ public class RateLimit {
     }
 
     public Mono<Void> limit(Api api, int limit, int minutes) {
+
+        if (envKeeper.getNextPblEnv().equals("test"))
+            return Mono.empty();
+
         long now = System.currentTimeMillis();
         long windowMs = Duration.ofMinutes(minutes).toMillis();
 

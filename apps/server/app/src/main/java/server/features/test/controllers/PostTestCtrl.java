@@ -64,7 +64,7 @@ public class PostTestCtrl {
             for (AppFile f : arg) {
 
                 if (!Files.exists(f.getFilePath()))
-                    throw new ErrAPI("file does not exist", 500);
+                    throw new ErrAPI("file does not exist");
 
                 promises.add(cloud.upload(f).doFinally(sig -> {
                     f.deleteLocally();

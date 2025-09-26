@@ -75,7 +75,7 @@ public final class MyLog {
             return;
         }
 
-        logTtl(err instanceof ErrAPI ? "💣 " + err.toString() : "❌ unexpected err");
+        logTtl(err instanceof ErrAPI ? err.toString() : "💣 unexpected err");
 
         StackTraceElement[] frames = err.getStackTrace();
 

@@ -55,7 +55,7 @@ public final class AppFile {
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException err) {
-            throw new ErrAPI("err saving asset locally", 500);
+            throw new ErrAPI("err saving asset locally");
         }
     }
 
@@ -63,7 +63,7 @@ public final class AppFile {
         try {
             Files.deleteIfExists(this.getFilePath());
         } catch (IOException err) {
-            throw new ErrAPI("err deleting asset locally", 500);
+            throw new ErrAPI("err deleting asset locally");
         }
     }
 
@@ -98,7 +98,7 @@ public final class AppFile {
 
             }
         } catch (IllegalAccessException | IllegalArgumentException err) {
-            throw new ErrAPI("err parsing file to fancy shape", 500);
+            throw new ErrAPI("err parsing file to fancy shape");
         }
 
         return fancyMap;

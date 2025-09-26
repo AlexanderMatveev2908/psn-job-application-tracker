@@ -30,13 +30,13 @@ public class DB {
     public <T> Mono<T> trxMono(Function<DatabaseClient, Mono<T>> cb) {
         return cb.apply(dbRaw)
                 .as(trx::transactional)
-                .onErrorResume(err -> Mono.error(new ErrAPI("❌ trx failed => " + err.getMessage(), 500)));
+                .onErrorResume(err -> Mono.error(new ErrAPI("trx failed => " + err.getMessage())));
     }
 
     public <T> Flux<T> trxFlux(Function<DatabaseClient, Flux<T>> cb) {
         return cb.apply(dbRaw)
                 .as(trx::transactional)
-                .onErrorResume(err -> Flux.error(new ErrAPI("❌ trx failed => " + err.getMessage(), 500)));
+                .onErrorResume(err -> Flux.error(new ErrAPI("trx failed => " + err.getMessage())));
     }
 
     public Mono<Void> trx(ConnectionFactory factory,
@@ -79,7 +79,7 @@ public class DB {
                             .thenReturn(tables.size());
                 })
                 .onErrorResume(err -> Mono.error(
-                        new ErrAPI("❌ failed to truncate tables => " + err.getMessage(), 500)));
+                        new ErrAPI("failed to truncate tables => " + err.getMessage())));
     }
 
 }

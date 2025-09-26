@@ -11,8 +11,8 @@ public final class ErrAPI extends RuntimeException implements RootCls {
     private final Object data;
 
     public ErrAPI(String msg, int status, Object data) {
-        super(msg);
-        this.msg = msg;
+        super("❌ " + msg);
+        this.msg = super.getMessage();
         this.status = status;
         this.data = data;
     }
@@ -30,8 +30,4 @@ public final class ErrAPI extends RuntimeException implements RootCls {
         return reflectiveToString();
     }
 
-    @Override
-    public String getMessage() {
-        return getMsg();
-    }
 }
