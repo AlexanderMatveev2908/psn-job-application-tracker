@@ -22,7 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
-public class Api extends ServerWebExchangeDecorator {
+public final class Api extends ServerWebExchangeDecorator {
 
     private static final ObjectMapper JACKSON = new ObjectMapper();
     private static final DefaultDataBufferFactory BUFFER_FACTORY = new DefaultDataBufferFactory();

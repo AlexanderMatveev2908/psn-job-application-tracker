@@ -4,7 +4,7 @@ import lombok.Getter;
 import server.decorators.RootCls;
 
 @Getter
-public class ErrAPI extends RuntimeException implements RootCls {
+public final class ErrAPI extends RuntimeException implements RootCls {
 
     private final String msg;
     private final int status;
@@ -19,6 +19,10 @@ public class ErrAPI extends RuntimeException implements RootCls {
 
     public ErrAPI(String msg, int status) {
         this(msg, status, null);
+    }
+
+    public ErrAPI(String msg) {
+        this(msg, 500, null);
     }
 
     @Override

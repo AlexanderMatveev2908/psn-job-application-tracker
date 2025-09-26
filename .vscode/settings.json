@@ -8,5 +8,6 @@
   "java.configuration.annotationProcessing.enabled": true,
   "java.project.importOnFirstTimeStartup": "automatic",
   "java.import.gradle.projects": ["apps/server"],
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "liveServer.settings.port": 5501
 }

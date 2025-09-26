@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 
 import server.decorators.flow.ErrAPI;
 
-public class Seeker {
+public final class Seeker {
     @SuppressWarnings("UseSpecificCatch")
     public static Path grabDir() {
 

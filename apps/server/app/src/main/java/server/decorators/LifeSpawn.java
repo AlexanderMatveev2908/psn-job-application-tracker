@@ -17,7 +17,7 @@ import server.lib.dev.MyLog;
 
 @Service
 @RequiredArgsConstructor
-public class LifeSpawn {
+public final class LifeSpawn {
     private static final String COND = "WHERE table_schema = 'public' " +
             "AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')";
     private final Kit kit;

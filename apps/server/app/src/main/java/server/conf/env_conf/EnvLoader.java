@@ -19,7 +19,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import server.decorators.flow.ErrAPI;
 import server.lib.paths.Hiker;
 
-public class EnvLoader implements EnvironmentPostProcessor {
+public final class EnvLoader implements EnvironmentPostProcessor {
 
     @Override
     @SuppressWarnings("UseSpecificCatch")

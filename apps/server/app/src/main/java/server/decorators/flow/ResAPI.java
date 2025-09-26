@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 
-public class ResAPI<T> {
+public final class ResAPI<T> {
     public final String msg;
     public final Integer status;
     public final T data;

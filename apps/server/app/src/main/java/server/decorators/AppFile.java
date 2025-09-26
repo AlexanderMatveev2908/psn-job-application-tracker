@@ -22,7 +22,7 @@ import server.lib.paths.Hiker;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @SuppressFBWarnings("EI_EXPOSE_REP")
 @Getter
-public class AppFile {
+public final class AppFile {
     private final String field;
     private final String filename;
     private final String contentType;
