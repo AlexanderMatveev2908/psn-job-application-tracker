@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CloudAssetT {
-    IMAGE("images"),
-    VIDEO("vidoes");
+    IMAGE("image"),
+    VIDEO("video");
 
     private final String val;
 }

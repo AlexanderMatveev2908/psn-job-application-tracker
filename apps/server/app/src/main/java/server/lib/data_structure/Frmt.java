@@ -1,5 +1,8 @@
 package server.lib.data_structure;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -19,6 +22,19 @@ public class Frmt {
 
             return null;
 
+        }
+    }
+
+    public static Map<String, Object> toMap(String txt) {
+
+        try {
+            return jack.readValue(txt, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (Exception err) {
+
+            System.out.println("❌ err parsing arg to map");
+
+            return null;
         }
     }
 }

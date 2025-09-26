@@ -1,12 +1,16 @@
 package server.conf.cloud;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
+import java.util.HexFormat;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -15,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.AppFile;
+import server.decorators.flow.ErrAPI;
+import server.lib.data_structure.Frmt;
+import server.lib.dev.MyLog;
 
 @Service
 @RequiredArgsConstructor
@@ -31,33 +38,58 @@ public class CloudSvc {
                 .build();
     }
 
+    private String getSign(String tmsp, String folder, String publicId) {
+        String cloudSecret = envKeeper.getCloudSecret();
+
+        Map<String, String> paramsToSign = new TreeMap<>();
+        paramsToSign.put("folder", folder);
+        paramsToSign.put("timestamp", tmsp);
+        paramsToSign.put("public_id", publicId);
+
+        String stringToSign = paramsToSign.entrySet().stream()
+                .map(el -> el.getKey() + "=" + el.getValue())
+                .collect(Collectors.joining("&")) + cloudSecret;
+
+        String sig;
+        try {
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+            byte[] digest = sha1.digest(stringToSign.getBytes(StandardCharsets.UTF_8));
+            sig = HexFormat.of().formatHex(digest);
+        } catch (Exception err) {
+            throw new ErrAPI("err creating cloud sign", 500);
+        }
+
+        return sig;
+
+    }
+
     public Mono<String> upload(AppFile file) {
         String cloudKey = envKeeper.getCloudKey();
-        String cloudSecret = envKeeper.getCloudSecret();
         String tmsp = String.valueOf(Instant.now().getEpochSecond());
+        String folder = envKeeper.getAppName().replace("-", "_") + "__" + file.getField();
+        String filename = file.getFilename();
+        String publicId = filename.substring(0, filename.lastIndexOf('.'));
 
-        String sigBase = "timestamp=" + tmsp + cloudSecret;
+        MultipartBodyBuilder form = new MultipartBodyBuilder();
+        form.part("api_key", cloudKey);
+        form.part("signature", getSign(tmsp, folder, publicId));
+        form.part("timestamp", tmsp);
+        form.part("folder", folder);
+        form.part("public_id", publicId);
+        form.part("file", file.getResourceFromBts());
 
-        String sig = DigestUtils.appendMd5DigestAsHex(
-                sigBase.getBytes(StandardCharsets.UTF_8),
-                new StringBuilder()).toString();
-
-        MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-        bodyBuilder.part("api_key", cloudKey);
-        bodyBuilder.part("signature", sig);
-        bodyBuilder.part("timestamp", tmsp);
-        bodyBuilder.part("folder", envKeeper.getAppName().replace("-", "_") + "__" +
-                file.getField());
-        bodyBuilder.part("file", file.getResourceFromBts());
-
-        return getClient().post()
+        return getClient()
+                .post()
                 .uri("/image/upload")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                .body(BodyInserters.fromMultipartData(form.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnNext(res -> System.out.println("📸 res cloud" + res)).doOnError(err -> {
-                    System.out.println(err);
-                });
+                .doOnNext(res -> {
+                    var parsed = Frmt.toMap(res);
+                    MyLog.wLogOk((parsed));
+                })
+                .doOnError(err -> System.out.println("❌ cloud err: " + err.getMessage()));
     }
+
 }

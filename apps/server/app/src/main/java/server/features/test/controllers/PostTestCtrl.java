@@ -64,7 +64,7 @@ public class PostTestCtrl {
                     throw new ErrAPI("file does not exist", 500);
 
                 if (f.getField().equals("images"))
-                    promises.add(cloud.upload(f).doOnSuccess(res -> {
+                    promises.add(cloud.upload(f).doFinally(sig -> {
                         f.deleteLocally();
                     }));
 
@@ -74,7 +74,7 @@ public class PostTestCtrl {
                 .collectList()
                 .flatMap(urls -> ResAPI.ok200(
                         "form data received • parsed • processed • sent back",
-                        Map.of("form", form, "uploadedUrls", urls)));
+                        Map.of("form", form, "uploaded", urls)));
 
     }
 
