@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
 import server.decorators.LifeSpawn;
+import server.lib.dev.MyLog;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
@@ -21,7 +22,12 @@ public class ServerApplication {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(ServerApplication.class, args);
+        try {
+            SpringApplication.run(ServerApplication.class, args);
+
+        } catch (Exception err) {
+            MyLog.logErr(err);
+        }
     }
 
     @Bean

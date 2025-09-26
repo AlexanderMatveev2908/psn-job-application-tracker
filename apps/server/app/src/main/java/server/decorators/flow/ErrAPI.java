@@ -25,4 +25,9 @@ public class ErrAPI extends RuntimeException implements RootCls {
     public String toString() {
         return reflectiveToString();
     }
+
+    @Override
+    public String getMessage() {
+        return getMsg();
+    }
 }

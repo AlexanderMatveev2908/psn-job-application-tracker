@@ -38,6 +38,8 @@ Together they form a clean, modern **full-stack architecture** 🚀
 - **PostgreSQL + R2DBC** — Asynchronous database access with reactive drivers
 - **Liquibase** — Database migrations, written in raw SQL for full control
 - **Redis (Lettuce)** — Async/reactive Redis client for caching and real-time data
+- **Cloudinary (Reactive WebClient)** — Manually integrated using Spring’s WebClient, enabling fully non-blocking image and video uploads
+- **JavaMailSender (MimeMessage)**— For sending HTML email content, including transactional emails built with custom, hand-crafted templates for full control over design and layout
 
 ---
 
