@@ -17,11 +17,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import server.conf.cloud.etc.CloudAsset;
+import server.conf.cloud.etc.CloudResourceT;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.AppFile;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
-import server.lib.dev.MyLog;
 
 @Service
 @RequiredArgsConstructor
@@ -63,12 +64,17 @@ public class CloudSvc {
 
     }
 
-    public Mono<String> upload(AppFile file) {
+    public Mono<CloudAsset> upload(AppFile file) {
         String cloudKey = envKeeper.getCloudKey();
         String tmsp = String.valueOf(Instant.now().getEpochSecond());
         String folder = envKeeper.getAppName().replace("-", "_") + "__" + file.getField();
+
         String filename = file.getFilename();
         String publicId = filename.substring(0, filename.lastIndexOf('.'));
+
+        String assetT = CloudResourceT.fromFileField(file.getField());
+        var fileResource = assetT.equals("image") ? file.getResourceFromBts() : file.getResourceFromPath();
+        String url = "/" + assetT + "/upload";
 
         MultipartBodyBuilder form = new MultipartBodyBuilder();
         form.part("api_key", cloudKey);
@@ -76,20 +82,25 @@ public class CloudSvc {
         form.part("timestamp", tmsp);
         form.part("folder", folder);
         form.part("public_id", publicId);
-        form.part("file", file.getResourceFromBts());
+        form.part("file", fileResource);
 
         return getClient()
                 .post()
-                .uri("/image/upload")
+                .uri(url)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(form.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnNext(res -> {
-                    var parsed = Frmt.toMap(res);
-                    MyLog.wLogOk((parsed));
-                })
-                .doOnError(err -> System.out.println("❌ cloud err: " + err.getMessage()));
+                .flatMap(str -> {
+
+                    Map<String, Object> parsed = Frmt.toMap(str);
+
+                    var asset = new CloudAsset((String) parsed.get("asset_id"), (String) parsed.get("public_id"),
+                            (String) parsed.get("secure_url"));
+
+                    return Mono.just(
+                            asset);
+                });
     }
 
 }

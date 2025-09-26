@@ -15,11 +15,13 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.conf.cloud.CloudSvc;
+import server.conf.cloud.etc.CloudAsset;
 import server.decorators.AppFile;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
 import server.lib.data_structure.ShapeCheck;
+import server.lib.dev.MyLog;
 
 @Component
 @RequiredArgsConstructor
@@ -50,7 +52,7 @@ public class PostTestCtrl {
 
         Set<String> assetKeys = Set.of("images", "videos");
 
-        List<Mono<String>> promises = new ArrayList<>();
+        List<Mono<CloudAsset>> promises = new ArrayList<>();
 
         for (Map.Entry<String, Object> pair : form.entrySet()) {
             if (!assetKeys.contains(pair.getKey()))
@@ -63,15 +65,16 @@ public class PostTestCtrl {
                 if (!Files.exists(f.getFilePath()))
                     throw new ErrAPI("file does not exist", 500);
 
-                if (f.getField().equals("images"))
-                    promises.add(cloud.upload(f).doFinally(sig -> {
-                        f.deleteLocally();
-                    }));
+                promises.add(cloud.upload(f).doFinally(sig -> {
+                    f.deleteLocally();
+                }));
 
             }
         }
         return Flux.merge(promises)
-                .collectList()
+                .collectList().doOnNext(assets -> {
+                    MyLog.wLogOk(assets);
+                })
                 .flatMap(urls -> ResAPI.ok200(
                         "form data received • parsed • processed • sent back",
                         Map.of("form", form, "uploaded", urls)));
