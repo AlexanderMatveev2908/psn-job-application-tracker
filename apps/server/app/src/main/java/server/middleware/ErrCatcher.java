@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
+import server.lib.dev.MyLog;
 
 @Component
 @Order(-1)
@@ -26,6 +27,8 @@ public class ErrCatcher implements WebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exc, Throwable err) {
+
+        MyLog.logErr(err);
 
         String msg = err.getMessage();
         boolean isRouteNotFound = msg != null && msg.equals("404 NOT_FOUND");
