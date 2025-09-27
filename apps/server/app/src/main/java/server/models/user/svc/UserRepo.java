@@ -15,6 +15,16 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     Mono<User> findByEmail(String email);
 
+    @Query("""
+                INSERT INTO users (first_name, last_name, email, password)
+                VALUES (:firstName, :lastName, :email, :password)
+                RETURNING *
+            """)
+    Mono<User> insert(String firstName,
+            String lastName,
+            String email,
+            String password);
+
     // @Query("""
     // SELECT
     // us.*,

@@ -47,7 +47,7 @@ public class CloudSvc {
 
             return sig;
         } catch (Exception err) {
-            throw new ErrAPI("err creating cloud sign", 500);
+            throw new ErrAPI("err creating cloud sign");
         }
     }
 

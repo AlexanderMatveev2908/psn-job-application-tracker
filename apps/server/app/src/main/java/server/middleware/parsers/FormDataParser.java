@@ -33,7 +33,7 @@ public class FormDataParser implements WebFilter {
         var api = (Api) exc;
 
         if (!Hiker.existsDir())
-            throw new ErrAPI("missing required dirs", 500);
+            throw new ErrAPI("missing required dirs");
 
         return splitParts(api)
                 .flatMap(parts -> {

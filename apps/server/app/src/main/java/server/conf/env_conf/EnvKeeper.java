@@ -29,7 +29,7 @@ enum EnvMode {
 @Data
 @Validated
 @ConfigurationProperties(prefix = "app")
-public class EnvKeeper {
+public final class EnvKeeper {
 
     @NotBlank
     private String appName;

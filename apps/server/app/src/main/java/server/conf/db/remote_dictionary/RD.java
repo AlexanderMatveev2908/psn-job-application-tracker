@@ -31,10 +31,10 @@ public class RD implements RootCls {
 
     public Mono<String> checkConnection() {
         return cmd.ping()
-                .onErrorMap(err -> new ErrAPI("❌ rd cnt failed", 500))
+                .onErrorMap(err -> new ErrAPI("rd cnt failed"))
                 .map(res -> {
                     if (!"PONG".equals(res))
-                        throw new ErrAPI("❌ rd cnt failed", 500);
+                        throw new ErrAPI("rd cnt failed");
 
                     return res;
                 });
@@ -62,12 +62,12 @@ public class RD implements RootCls {
 
                     return parsed;
                 })
-                .onErrorMap(err -> new ErrAPI("❌ rd fetch stats failed", 500));
+                .onErrorMap(err -> new ErrAPI("rd fetch stats failed"));
     }
 
     public Mono<Integer> dbSize() {
         return cmd.dbsize()
-                .onErrorMap(err -> new ErrAPI("❌ rd fetch db size failed", 500))
+                .onErrorMap(err -> new ErrAPI("rd fetch db size failed"))
                 .map(size -> {
                     return size.intValue();
                 });

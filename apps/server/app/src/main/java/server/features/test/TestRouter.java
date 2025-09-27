@@ -3,7 +3,6 @@ package server.features.test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -13,7 +12,6 @@ import server.features.test.controllers.GetTestCtrl;
 import server.features.test.controllers.PostTestCtrl;
 import server.router.RouterAPI;
 
-@RestController
 @RouterAPI("/api/v1/test")
 @RequiredArgsConstructor
 public class TestRouter {
@@ -22,22 +20,22 @@ public class TestRouter {
     private final GetTestCtrl getCtrl;
 
     @GetMapping("/limited")
-    public Mono<ResponseEntity<ResAPI<Void>>> getLimited(Api exc) {
+    public Mono<ResponseEntity<ResAPI>> getLimited(Api exc) {
         return getCtrl.getLimited(exc);
     }
 
     @GetMapping
-    public Mono<ResponseEntity<ResAPI<Object>>> getTest(Api api) {
+    public Mono<ResponseEntity<ResAPI>> getTest(Api api) {
         return getCtrl.getTest(api);
     }
 
     @PostMapping
-    public Mono<ResponseEntity<ResAPI<Object>>> postMsg(Api api) {
+    public Mono<ResponseEntity<ResAPI>> postMsg(Api api) {
         return postCtrl.postMsg(api);
     }
 
     @PostMapping("/form-data")
-    public Mono<ResponseEntity<ResAPI<Object>>> postFormData(Api api) {
+    public Mono<ResponseEntity<ResAPI>> postFormData(Api api) {
         return postCtrl.postFormData(api);
     }
 }

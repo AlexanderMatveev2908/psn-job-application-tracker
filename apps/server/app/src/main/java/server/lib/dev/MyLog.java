@@ -17,7 +17,7 @@ import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
 import server.lib.paths.Hiker;
 
-public class MyLog {
+public final class MyLog {
 
     private static final String APP_PKG = "server";
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
@@ -75,7 +75,7 @@ public class MyLog {
             return;
         }
 
-        logTtl(err instanceof ErrAPI ? "💣 " + err.toString() : "❌ unexpected err");
+        logTtl(err instanceof ErrAPI ? err.toString() : "💣 unexpected err");
 
         StackTraceElement[] frames = err.getStackTrace();
 

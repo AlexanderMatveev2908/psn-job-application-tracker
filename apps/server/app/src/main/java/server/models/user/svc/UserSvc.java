@@ -31,8 +31,8 @@ public class UserSvc {
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
 
-    public Mono<User> insert(User u) {
-        return userRepo.save(u)
+    public Mono<User> insert(User us) {
+        return userRepo.insert(us.getFirstName(), us.getLastName(), us.getEmail(), us.getPassword())
                 .flatMap(saved -> userRepo.findById(saved.getId()));
     }
 

@@ -1,7 +1,5 @@
 package server.middleware;
 
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -9,15 +7,13 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 
-// ! without it all app would crash
-// ! most logic base itself on custom methods
-// ! implemented in 'Api'
-@Component
-@Order(0)
-public class Ninja implements WebFilter {
+public abstract class BaseMdw implements WebFilter {
+    protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
+
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
+        var api = (Api) exc;
 
-        return chain.filter(new Api(exc));
+        return handle(api, chain);
     }
 }

@@ -5,32 +5,41 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.lettuce.core.Range;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import reactor.core.publisher.Mono;
 import server.conf.db.remote_dictionary.RD;
+import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 
 @Component
+@SuppressFBWarnings({ "EI2" })
 public class RateLimit {
     private final RedisReactiveCommands<String, String> cmd;
+    private final EnvKeeper envKeeper;
 
-    public RateLimit(RD rd) {
+    public RateLimit(RD rd, EnvKeeper envKeeper) {
         this.cmd = rd.getCmd();
+        this.envKeeper = envKeeper;
 
     }
 
     private String getClientIp(Api api) {
         String xff = api.getHeader("x-forwarded-for");
 
-        if (xff != null && !xff.isBlank())
+        if (!xff.isBlank())
             return xff.split(",")[0].trim();
 
         return api.getIp();
     }
 
     public Mono<Void> limit(Api api, int limit, int minutes) {
+
+        if (envKeeper.getNextPblEnv().equals("test"))
+            return Mono.empty();
+
         long now = System.currentTimeMillis();
         long windowMs = Duration.ofMinutes(minutes).toMillis();
 
@@ -68,5 +77,9 @@ public class RateLimit {
                                         429));
                             });
                 });
+    }
+
+    public Mono<Void> limit(Api api) {
+        return limit(api, 5, 15);
     }
 }

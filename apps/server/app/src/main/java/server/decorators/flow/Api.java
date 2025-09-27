@@ -22,7 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
-public class Api extends ServerWebExchangeDecorator {
+public final class Api extends ServerWebExchangeDecorator {
 
     private static final ObjectMapper JACKSON = new ObjectMapper();
     private static final DefaultDataBufferFactory BUFFER_FACTORY = new DefaultDataBufferFactory();
@@ -59,6 +59,10 @@ public class Api extends ServerWebExchangeDecorator {
 
     public String getPath() {
         return getRequest().getPath().toString();
+    }
+
+    public boolean isSamePath(String arg) {
+        return getPath().equals(arg);
     }
 
     public HttpMethod getMethod() {
@@ -112,7 +116,7 @@ public class Api extends ServerWebExchangeDecorator {
                 return Mono.empty();
 
             return Mono.fromCallable(() -> JACKSON.readValue(bytes, type)).cache();
-        });
+        }).onErrorMap(err -> new ErrAPI("wrong data format", 400));
     }
 
     public Mono<String> getBdStr() {
@@ -140,6 +144,14 @@ public class Api extends ServerWebExchangeDecorator {
         else
             getAttributes().put(key, value);
 
+    }
+
+    // ? the middleware FormChecker after parsed the body to Map<String,Object>
+    // ? has checked with Hibernate validator that the body respect shape
+    // ? expected defined in a separate class.
+    // ? at this point mappedData could be RegisterForm, LoginForm etc...
+    public <T> T getMappedData() {
+        return getAttribute("mappedData");
     }
 
     public boolean isResCmt() {

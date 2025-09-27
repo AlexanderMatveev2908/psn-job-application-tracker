@@ -10,7 +10,7 @@ import server.decorators.flow.ResAPI;
 @Component
 public class GetUserCtrl {
 
-    public Mono<ResponseEntity<ResAPI<Void>>> getUser(Api api) {
+    public Mono<ResponseEntity<ResAPI>> getUser(Api api) {
         return ResAPI.ok204();
     }
 }

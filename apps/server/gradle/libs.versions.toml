@@ -21,6 +21,8 @@ reactor = "3.6.6"
 
 lombok = "1.18.34"
 
+argon2 = "2.12"
+
 
 
 [libraries]
@@ -49,6 +51,8 @@ reactor-core = { module = "io.projectreactor:reactor-core", version.ref = "react
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 
 spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail", version.ref = "spring-boot" }
+
+argon2 = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2" }
 
 
 

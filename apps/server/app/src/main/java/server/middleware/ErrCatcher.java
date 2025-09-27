@@ -1,6 +1,8 @@
 package server.middleware;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -30,20 +32,21 @@ public class ErrCatcher implements WebExceptionHandler {
 
         MyLog.logErr(err);
 
-        String msg = err.getMessage();
-        boolean isRouteNotFound = msg != null && msg.equals("404 NOT_FOUND");
+        String msg = Optional.of(err.getMessage()).orElse("");
+        boolean isRouteNotFound = msg.equals("404 NOT_FOUND");
         if (isRouteNotFound) {
             String endpoint = exc.getRequest().getPath().value();
-            msg = String.format("❌ route %s not found", endpoint);
+            msg = String.format("route %s not found 🚦", endpoint);
         }
+        msg = String.format("%s %s", err instanceof ErrAPI ? "" : "💣", msg);
         int status = (err instanceof ErrAPI) ? ((ErrAPI) err).getStatus() : isRouteNotFound ? 404 : 500;
-        Object data = (err instanceof ErrAPI) ? ((ErrAPI) err).getData() : null;
+        Map<String, Object> data = (err instanceof ErrAPI) ? ((ErrAPI) err).getData() : null;
 
         var res = exc.getResponse();
         res.setStatusCode(HttpStatus.valueOf(status));
         res.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        var apiBody = new ResAPI<>(msg, status, data);
+        var apiBody = new ResAPI(msg, status, data);
 
         byte[] bytes;
         try {

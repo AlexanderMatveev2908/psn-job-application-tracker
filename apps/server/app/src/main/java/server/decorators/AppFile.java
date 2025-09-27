@@ -22,7 +22,7 @@ import server.lib.paths.Hiker;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @SuppressFBWarnings("EI_EXPOSE_REP")
 @Getter
-public class AppFile {
+public final class AppFile {
     private final String field;
     private final String filename;
     private final String contentType;
@@ -55,7 +55,7 @@ public class AppFile {
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException err) {
-            throw new ErrAPI("err saving asset locally", 500);
+            throw new ErrAPI("err saving asset locally");
         }
     }
 
@@ -63,7 +63,7 @@ public class AppFile {
         try {
             Files.deleteIfExists(this.getFilePath());
         } catch (IOException err) {
-            throw new ErrAPI("err deleting asset locally", 500);
+            throw new ErrAPI("err deleting asset locally");
         }
     }
 
@@ -98,7 +98,7 @@ public class AppFile {
 
             }
         } catch (IllegalAccessException | IllegalArgumentException err) {
-            throw new ErrAPI("err parsing file to fancy shape", 500);
+            throw new ErrAPI("err parsing file to fancy shape");
         }
 
         return fancyMap;

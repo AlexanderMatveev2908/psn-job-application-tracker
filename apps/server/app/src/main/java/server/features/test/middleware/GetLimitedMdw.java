@@ -1,32 +1,28 @@
 package server.features.test.middleware;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
+import server.middleware.BaseMdw;
 import server.middleware.security.RateLimit;
 
 @Component
-public class GetLimitedMdw implements WebFilter {
+@RequiredArgsConstructor
+public class GetLimitedMdw extends BaseMdw {
 
     private final RateLimit rl;
 
-    public GetLimitedMdw(RateLimit rl) {
-        this.rl = rl;
-    }
-
     @Override
-    public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
-        var api = (Api) exc;
+    public Mono<Void> handle(Api api, WebFilterChain chain) {
 
-        if (!api.getPath().equals("/api/v1/test/limited"))
+        if (!api.isSamePath("/api/v1/test/limited"))
             return chain.filter(api);
 
-        return rl.limit(api, 5, 15)
-                .then(Mono.defer(() -> chain.filter(api)));
+        return rl.limit(api)
+                .then(chain.filter(api));
 
     }
 }

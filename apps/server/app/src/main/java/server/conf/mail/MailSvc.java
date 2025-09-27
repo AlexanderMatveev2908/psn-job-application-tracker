@@ -47,7 +47,7 @@ public class MailSvc {
             mailSender.send(msg);
 
         } catch (Exception err) {
-            throw new ErrAPI(err.getMessage(), 500);
+            throw new ErrAPI(err.getMessage());
         }
     }
 

@@ -34,7 +34,7 @@ public final class Hiker {
     }
 
     private Hiker() {
-        throw new ErrAPI("do not instantiate", 500);
+        throw new ErrAPI("do not instantiate");
     }
 
     private static void ensureDirs() {
@@ -53,7 +53,7 @@ public final class Hiker {
                 Files.createFile(CA_FILE);
 
         } catch (IOException e) {
-            throw new ErrAPI("err generating required app dirs", 500);
+            throw new ErrAPI("err generating required app dirs");
         }
     }
 

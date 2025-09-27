@@ -34,7 +34,7 @@ public class MailTmpl {
 
             return content.toString();
         } catch (IOException err) {
-            throw new ErrAPI("err reading mail tmpl", 500);
+            throw new ErrAPI("err reading mail tmpl");
         }
     }
 
@@ -45,7 +45,7 @@ public class MailTmpl {
             bw.write(content);
             bw.newLine();
         } catch (IOException err) {
-            throw new ErrAPI("err writing parsed file", 500);
+            throw new ErrAPI("err writing parsed file");
         }
     }
 

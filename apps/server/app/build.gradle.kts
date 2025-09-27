@@ -60,6 +60,9 @@ dependencies {
 
     // ? mails
     implementation(libs.spring.boot.starter.mail)
+
+    // ? hash
+    implementation(libs.argon2)
 }
 
 java {
