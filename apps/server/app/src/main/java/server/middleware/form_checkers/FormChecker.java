@@ -30,6 +30,6 @@ public class FormChecker {
                         "msg", err.getMessage()))
                 .toList();
 
-        return Mono.error(new ErrAPI(errors.get(0).get("msg"), 400, Map.entry("errs", errors)));
+        return Mono.error(new ErrAPI(errors.get(0).get("msg"), 400, Map.of("errs", errors)));
     }
 }

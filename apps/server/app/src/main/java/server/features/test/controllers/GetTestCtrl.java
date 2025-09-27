@@ -10,12 +10,12 @@ import server.decorators.flow.ResAPI;
 @Component
 public class GetTestCtrl {
 
-    public Mono<ResponseEntity<ResAPI<Void>>> getLimited(Api api) {
+    public Mono<ResponseEntity<ResAPI>> getLimited(Api api) {
 
         return ResAPI.ok200("get request limited 🚦", null);
     }
 
-    public Mono<ResponseEntity<ResAPI<Object>>> getTest(Api api) {
+    public Mono<ResponseEntity<ResAPI>> getTest(Api api) {
         return ResAPI.ok200("get request received 👻", null);
     }
 }

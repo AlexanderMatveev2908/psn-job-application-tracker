@@ -16,7 +16,7 @@ public class WakeUpRouter {
     private final GetWakeUpCtrl getCtrl;
 
     @GetMapping
-    public Mono<ResponseEntity<ResAPI<Object>>> wakeUp() {
+    public Mono<ResponseEntity<ResAPI>> wakeUp() {
         return getCtrl.wakeUp();
     }
 }

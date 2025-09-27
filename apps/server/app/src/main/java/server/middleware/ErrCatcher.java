@@ -1,6 +1,8 @@
 package server.middleware;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.core.annotation.Order;
@@ -39,17 +41,20 @@ public class ErrCatcher implements WebExceptionHandler {
         }
         msg = String.format("%s %s", err instanceof ErrAPI ? "" : "💣", msg);
         int status = (err instanceof ErrAPI) ? ((ErrAPI) err).getStatus() : isRouteNotFound ? 404 : 500;
-        Object data = (err instanceof ErrAPI) ? ((ErrAPI) err).getData() : null;
+        Map<String, Object> data = (err instanceof ErrAPI) ? ((ErrAPI) err).getData() : null;
 
         var res = exc.getResponse();
         res.setStatusCode(HttpStatus.valueOf(status));
         res.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        var apiBody = new ResAPI<>(msg, status, data);
+        Map<String, Object> bd = new LinkedHashMap<>();
+        bd.put("status", status);
+        bd.put("msg", msg);
+        bd.putAll(ResAPI.flatData(data));
 
         byte[] bytes;
         try {
-            bytes = mapper.writeValueAsBytes(apiBody);
+            bytes = mapper.writeValueAsBytes(bd);
         } catch (JacksonException e) {
             bytes = ("{\"msg\":\"serialization failed\",\"status\":500,\"data\":null}")
                     .getBytes(StandardCharsets.UTF_8);

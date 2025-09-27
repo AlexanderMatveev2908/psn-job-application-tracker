@@ -1,5 +1,7 @@
 package server.features.auth.controllers;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +19,14 @@ public class PostAuthCtrl {
 
     private final UserSvc userSvc;
 
-    public Mono<ResponseEntity<ResAPI<User>>> register(Api api) {
+    public Mono<ResponseEntity<ResAPI>> register(Api api) {
         RegisterForm form = api.getMappedData();
         var us = new User(form.getFirstName(), form.getLastName(), form.getEmail(), form.getPassword());
 
         return us.hashPwd().flatMap(hash -> {
             return userSvc.insert(us);
         }).flatMap(saved -> {
-            return ResAPI.ok201("user created", saved);
+            return ResAPI.ok201("user created", Map.of("user", saved));
         });
     }
 }

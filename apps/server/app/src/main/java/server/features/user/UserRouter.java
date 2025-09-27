@@ -17,7 +17,7 @@ public class UserRouter {
     private final GetUserCtrl getCtrl;
 
     @GetMapping("/user/profile")
-    public Mono<ResponseEntity<ResAPI<Void>>> getUserProfile(Api api) {
+    public Mono<ResponseEntity<ResAPI>> getUserProfile(Api api) {
         return getCtrl.getUser(api);
     }
 }

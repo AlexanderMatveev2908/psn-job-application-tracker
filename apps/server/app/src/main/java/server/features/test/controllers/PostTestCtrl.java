@@ -30,7 +30,7 @@ public class PostTestCtrl {
 
     private final CloudSvc cloud;
 
-    public Mono<ResponseEntity<ResAPI<Object>>> postMsg(Api api) {
+    public Mono<ResponseEntity<ResAPI>> postMsg(Api api) {
         return api.getBd(new TypeReference<Map<String, Object>>() {
         })
                 .flatMap(bd -> {
@@ -44,7 +44,7 @@ public class PostTestCtrl {
     }
 
     @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
-    public Mono<ResponseEntity<ResAPI<Object>>> postFormData(Api api) {
+    public Mono<ResponseEntity<ResAPI>> postFormData(Api api) {
 
         var form = api.getParsedForm().orElse(null);
 

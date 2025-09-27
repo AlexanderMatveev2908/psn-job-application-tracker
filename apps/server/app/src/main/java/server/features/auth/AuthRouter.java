@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.auth.controllers.PostAuthCtrl;
-import server.models.user.User;
 import server.router.RouterAPI;
 
 @RouterAPI("/api/v1/auth")
@@ -17,7 +16,7 @@ public class AuthRouter {
     private final PostAuthCtrl postCtrl;
 
     @PostMapping("/register")
-    public Mono<ResponseEntity<ResAPI<User>>> register(Api api) {
+    public Mono<ResponseEntity<ResAPI>> register(Api api) {
         return postCtrl.register(api);
     }
 
