@@ -519,7 +519,6 @@ erDiagram
     string tmp_email
     string password
     bytes totp_secret
-    boolean terms
     boolean is_verified
   }
 

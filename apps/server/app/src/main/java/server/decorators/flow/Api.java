@@ -146,6 +146,14 @@ public final class Api extends ServerWebExchangeDecorator {
 
     }
 
+    // ? the middleware FormChecker after parsed the body to Map<String,Object>
+    // ? has checked with Hibernate validator that the body respect shape
+    // ? expected defined in a separate class.
+    // ? at this point mappedData could be RegisterForm, LoginForm etc...
+    public <T> T getMappedData() {
+        return getAttribute("mappedData");
+    }
+
     public boolean isResCmt() {
         return getResponse().isCommitted();
     }

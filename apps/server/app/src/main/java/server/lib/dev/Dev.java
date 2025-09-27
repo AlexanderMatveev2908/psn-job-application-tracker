@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.db.database.DB;
+import server.conf.db.remote_dictionary.RdCmd;
 import server.conf.mail.MailSvc;
 import server.models.applications.etc.JobApplStatusT;
 import server.models.applications.svc.JobApplRepo;
@@ -24,6 +25,7 @@ import server.models.user.svc.UserSvc;
 public class Dev {
     // private final RdCmd cmd;
     private final DB db;
+    private final RdCmd cmd;
     private final UserSvc userSvc;
     private final TokenSvc tokenSvc;
     private final BkpCodesSvc backupCodeSvc;
@@ -74,5 +76,11 @@ public class Dev {
                     MyLog.logErr(err);
 
                 });
+    }
+
+    public void dropAll() {
+        db.truncateAll().flatMap(count -> {
+            return cmd.flushAll();
+        }).subscribe();
     }
 }

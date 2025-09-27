@@ -5,6 +5,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import reactor.core.publisher.Mono;
+import server.lib.hash.MyHasher;
 import server.models.RootTable;
 
 @Data
@@ -44,6 +46,11 @@ public class User extends RootTable {
     @Override
     public String toString() {
         return reflectiveToString();
+    }
+
+    public Mono<String> hashPwd() {
+        return MyHasher.rctHash(password)
+                .doOnNext(this::setPassword);
     }
 
 }
