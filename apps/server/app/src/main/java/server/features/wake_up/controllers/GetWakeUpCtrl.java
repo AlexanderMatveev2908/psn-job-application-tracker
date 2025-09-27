@@ -11,6 +11,6 @@ public class GetWakeUpCtrl {
 
     public Mono<ResponseEntity<ResAPI>> wakeUp() {
 
-        return ResAPI.ok200("Ops I did not listen the alarm ⏰", null);
+        return ResAPI.ok200("ops I did not listen the alarm ⏰", null);
     }
 }

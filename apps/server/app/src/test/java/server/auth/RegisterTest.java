@@ -30,7 +30,7 @@ public class RegisterTest {
 
     @BeforeEach
     void setup() {
-        req = new ReqT(web);
+        req = ReqT.withUrl(web, URL);
     }
 
     static Stream<Arguments> errCases() {
@@ -42,7 +42,7 @@ public class RegisterTest {
     @ParameterizedTest
     @MethodSource("errCases")
     void err(String msg, int status, Object bd) {
-        ResT res = req.reqBd(URL, HttpMethod.POST, bd);
+        ResT res = req.method(HttpMethod.POST).body(bd).send();
 
         MyAssrt.assrt(res, msg, status);
     }

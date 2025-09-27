@@ -1,5 +1,6 @@
 package server._lib_tests;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -8,18 +9,45 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestBodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestHeadersSpec;
 
-import lombok.RequiredArgsConstructor;
 import server.lib.dev.MyLog;
 
-@RequiredArgsConstructor
-public final class ReqT {
-    private final WebTestClient web;
+public class ReqT {
 
-    public ResT reqFull(String url, HttpMethod method, Object body, Map<String, String> hdr) {
+    private final WebTestClient web;
+    private final String url;
+    private HttpMethod method = HttpMethod.GET;
+    private Object body;
+    private final Map<String, String> headers = new HashMap<>();
+
+    private ReqT(WebTestClient web, String url) {
+        this.web = web;
+        this.url = url;
+    }
+
+    public static ReqT withUrl(WebTestClient web, String url) {
+        return new ReqT(web, url);
+    }
+
+    public ReqT method(HttpMethod method) {
+        this.method = method;
+        return this;
+    }
+
+    public ReqT body(Object body) {
+        this.body = body;
+        return this;
+    }
+
+    public ReqT header(String key, String value) {
+        this.headers.put(key, value);
+        return this;
+    }
+
+    public ResT send() {
         RequestHeadersSpec<?> req = web.method(method).uri(url);
 
-        if (hdr != null && !hdr.isEmpty())
-            req = req.headers(h -> hdr.forEach(h::add));
+        if (!headers.isEmpty())
+            req = req.headers(existing -> headers.forEach(existing::add));
 
         if (body != null && req instanceof RequestBodySpec bodySpec)
             req = bodySpec.bodyValue(body);
@@ -31,20 +59,10 @@ public final class ReqT {
                         .returnResult());
 
         MyLog.logTtl(url, "🚦 " + res.getStatus(), "📜 " + res.getHdrs(), "🍪 " + res.getCks());
-        res.getBd().entrySet().stream()
-                .forEach(pair -> MyLog.logKV(pair.getKey(), pair.getValue()));
-
+        res.getBd().forEach((k, v) -> MyLog.logKV(k, v));
         MyLog.wOk(res);
 
         return res;
-    }
-
-    public ResT reqHdr(String url, HttpMethod method, Map<String, String> hdr) {
-        return reqFull(url, method, null, hdr);
-    }
-
-    public ResT reqBd(String url, HttpMethod method, Object body) {
-        return reqFull(url, method, body, null);
     }
 
 }
