@@ -9,6 +9,9 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 
+// ! without it all app would crash
+// ! most logic base itself on custom methods
+// ! implemented in 'Api'
 @Component
 @Order(0)
 public class Ninja implements WebFilter {

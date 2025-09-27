@@ -11,6 +11,6 @@ import server.decorators.flow.ResAPI;
 public class PostAuthCtrl {
 
     public Mono<ResponseEntity<ResAPI<Void>>> register(Api api) {
-        return ResAPI.ok200("user registered", null);
+        return ResAPI.ok201("user registered", null);
     }
 }

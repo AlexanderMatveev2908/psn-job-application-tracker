@@ -1,4 +1,4 @@
-package server.features.auth.paperwork;
+package server.features.auth.paperwork.pwd;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

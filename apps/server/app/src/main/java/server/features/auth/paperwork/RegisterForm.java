@@ -2,11 +2,13 @@ package server.features.auth.paperwork;
 
 import java.util.Map;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import server.conf.Reg;
+import server.features.auth.paperwork.pwd.PwdMatch;
 
 @Data
 @PwdMatch
@@ -31,12 +33,16 @@ public class RegisterForm {
     @NotBlank(message = "confirm password required")
     private final String confirmPassword;
 
-    public static RegisterForm mapToForm(Map<String, String> bd) {
+    @AssertTrue(message = "terms must be accepted")
+    private final Boolean terms;
+
+    public static RegisterForm mapToForm(Map<String, Object> bd) {
         return new RegisterForm(
-                bd.get("firstName"),
-                bd.get("lastName"),
-                bd.get("email"),
-                bd.get("password"),
-                bd.get("confirmPassword"));
+                (String) bd.get("firstName"),
+                (String) bd.get("lastName"),
+                (String) bd.get("email"),
+                (String) bd.get("password"),
+                (String) bd.get("confirmPassword"),
+                Boolean.parseBoolean(String.valueOf(bd.getOrDefault("terms", ""))));
     }
 }
