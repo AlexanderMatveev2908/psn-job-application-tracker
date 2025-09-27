@@ -36,7 +36,7 @@ public class RegisterTest {
     static Stream<Arguments> errCases() {
         return Stream.of(
                 Arguments.of("data not provided", 400, null),
-                Arguments.of("wrong data format", 401, "server do not expect a string as body"));
+                Arguments.of("wrong data format", 400, "server do not expect a string as body"));
     }
 
     @ParameterizedTest

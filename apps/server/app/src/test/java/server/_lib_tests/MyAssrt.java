@@ -8,10 +8,10 @@ public class MyAssrt {
     public static String buildStr(Object expected, Object received) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("🧪 expected =>%n");
+        sb.append("\n\n🧪 expected =>\n");
         sb.append(expected);
-        sb.append("❌ received =>%n");
-        sb.append(received);
+        sb.append("\n❌ received =>\n");
+        sb.append(received + "\n\n");
 
         return sb.toString();
     }
