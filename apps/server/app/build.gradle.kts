@@ -54,6 +54,8 @@ dependencies {
     // ? tests
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
 
     // ? checkers
     compileOnly(libs.spotbugs.annotations)
