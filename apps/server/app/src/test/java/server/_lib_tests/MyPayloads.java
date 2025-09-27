@@ -24,12 +24,18 @@ public class MyPayloads {
     }
 
     public Map<String, Object> registerPatch(String key, Object newValue) {
-        return changeKeyForm(register(), el -> el.getKey().equals(key) ? newValue : el.getValue());
+        return changeValByKey(register(), el -> el.getKey().equals(key) ? newValue : el.getValue());
 
     }
 
-    public Map<String, Object> changeKeyForm(Map<String, Object> form, Function<Map.Entry<String, Object>, Object> cb) {
+    public Map<String, Object> changeValByKey(Map<String, Object> form,
+            Function<Map.Entry<String, Object>, Object> cb) {
         return form.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, el -> cb.apply(el)));
+    }
+
+    public Map<String, Object> changeValByKey(Map<String, Object> form,
+            String key, Object newVal) {
+        return changeValByKey(form, el -> el.getKey().equals(key) ? newVal : el.getValue());
     }
 
 }

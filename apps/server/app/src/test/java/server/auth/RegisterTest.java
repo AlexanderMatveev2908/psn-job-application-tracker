@@ -42,7 +42,15 @@ public class RegisterTest {
                 Arguments.of("first name invalid", 422,
                         payloads.registerPatch("firstName", "<script>alert(\"hacked😈\")</script>")),
                 Arguments.of("last name required", 422,
-                        payloads.registerPatch("lastName", ""))
+                        payloads.registerPatch("lastName", "")),
+                Arguments.of("email invalid", 422,
+                        payloads.registerPatch("email", "@@@invalid....email?")),
+                Arguments.of("password invalid", 422,
+                        payloads.changeValByKey(payloads.registerPatch("password", "123"), "confirmPassword", "123")),
+                Arguments.of("passwords do not match", 422,
+                        payloads.registerPatch("confirmPassword", "different from password")),
+                Arguments.of("terms must be accepted", 422,
+                        payloads.registerPatch("terms", "false"))
 
         );
     }
