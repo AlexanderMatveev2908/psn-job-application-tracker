@@ -1,7 +1,6 @@
 package server.middleware;
 
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,14 +46,11 @@ public class ErrCatcher implements WebExceptionHandler {
         res.setStatusCode(HttpStatus.valueOf(status));
         res.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> bd = new LinkedHashMap<>();
-        bd.put("status", status);
-        bd.put("msg", msg);
-        bd.putAll(ResAPI.flatData(data));
+        var apiBody = new ResAPI(msg, status, data);
 
         byte[] bytes;
         try {
-            bytes = mapper.writeValueAsBytes(bd);
+            bytes = mapper.writeValueAsBytes(apiBody);
         } catch (JacksonException e) {
             bytes = ("{\"msg\":\"serialization failed\",\"status\":500,\"data\":null}")
                     .getBytes(StandardCharsets.UTF_8);

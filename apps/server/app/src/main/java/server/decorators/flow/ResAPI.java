@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Data;
@@ -20,23 +19,28 @@ public final class ResAPI {
     private final Integer status;
     private final Map<String, Object> data;
 
+    public ResAPI(String msg, Integer status, Map<String, Object> data) {
+        this.msg = msg;
+        this.status = status;
+        this.data = (data == null) ? null : Map.copyOf(data);
+    }
+
     private static String prependEmj(String msg, ActT act) {
         return String.format("%s %s", act.getEmj(), msg);
     }
 
-    @SuppressWarnings("unchecked")
     public static Map<String, Object> flatData(Map<String, Object> data) {
         Map<String, Object> flatten = new HashMap<>();
-        if (data == null) {
+        if (data == null)
             flatten.put("data", null);
-        } else if (data instanceof Map<?, ?> map) {
-            map.forEach((k, v) -> flatten.put(String.valueOf(k), v));
-        } else {
-            Map<String, Object> map = new ObjectMapper().convertValue(data, Map.class);
-            flatten.putAll(map);
-        }
+        else
+            flatten.putAll(data);
 
         return flatten;
+    }
+
+    public Map<String, Object> getData() {
+        return data == null ? null : Map.copyOf(data);
     }
 
     public static Mono<ResponseEntity<ResAPI>> of(int code, String msg, Map<String, Object> data) {

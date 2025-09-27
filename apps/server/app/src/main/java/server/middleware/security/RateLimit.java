@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.lettuce.core.Range;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,7 @@ import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 
 @Component
+@SuppressFBWarnings({ "EI2" })
 public class RateLimit {
     private final RedisReactiveCommands<String, String> cmd;
     private final EnvKeeper envKeeper;

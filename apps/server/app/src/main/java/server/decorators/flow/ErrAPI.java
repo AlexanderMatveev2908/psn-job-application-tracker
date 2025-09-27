@@ -16,7 +16,7 @@ public final class ErrAPI extends RuntimeException implements RootCls {
         super("❌ " + msg);
         this.msg = super.getMessage();
         this.status = status;
-        this.data = data;
+        this.data = (data == null) ? null : Map.copyOf(data);
     }
 
     public ErrAPI(String msg, int status) {
@@ -25,6 +25,10 @@ public final class ErrAPI extends RuntimeException implements RootCls {
 
     public ErrAPI(String msg) {
         this(msg, 500, null);
+    }
+
+    public Map<String, Object> getData() {
+        return data == null ? null : Map.copyOf(data);
     }
 
     @Override
