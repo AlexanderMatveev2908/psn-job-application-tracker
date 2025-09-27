@@ -44,4 +44,8 @@ public class ResT implements RootCls {
     public String getJWE() {
         return getCk("refreshToken");
     }
+
+    public String getMsg() {
+        return (String) getBd().get("msg");
+    }
 }

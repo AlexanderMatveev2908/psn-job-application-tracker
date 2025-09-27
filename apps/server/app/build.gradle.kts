@@ -1,7 +1,7 @@
 import org.gradle.api.plugins.quality.Checkstyle
 import com.github.spotbugs.snom.SpotBugsTask
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     alias(libs.plugins.spring.boot)
@@ -123,7 +123,11 @@ tasks.named<Test>("test") {
 
       testLogging {
         events("passed", "skipped", "failed")
-        showStandardStreams = true
+        // showStandardStreams = true
+        // showExceptions = true
+        // showCauses = true
+        exceptionFormat = TestExceptionFormat.FULL
+        showStackTraces = false
     }
 
     // ? silence CDS warnings
