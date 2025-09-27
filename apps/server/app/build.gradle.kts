@@ -5,6 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import com.adarshr.gradle.testlogger.theme.ThemeType
 
 
+
 plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.dependency.management)
@@ -61,12 +62,6 @@ dependencies {
     testAnnotationProcessor(libs.lombok)
     // ? dummy data
     testImplementation(libs.datafaker)
-    // testImplementation(libs.faker) {
-    // // ! exclude broken module which returns 404 on Maven fetch
-    //     exclude(group = "org.yaml", module = "snakeyaml")
-    // }
-    // // | manual pull correct one
-    // testImplementation("org.yaml:snakeyaml:2.2")
 
     // ? checkers
     compileOnly(libs.spotbugs.annotations)
@@ -132,13 +127,13 @@ tasks.named("check") {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-      testLogging {
+    testLogging {
         events("passed", "skipped", "failed")
-        // showExceptions = true
-        // showCauses = true
-        exceptionFormat = TestExceptionFormat.FULL
-        // showStandardStreams = true
-        showStackTraces = false
+        exceptionFormat = TestExceptionFormat.SHORT
+        // showExceptions = false
+        // showCauses = false
+        // showStackTraces = false
+        showStandardStreams = true
     }
 
     // ? silence CDS warnings
@@ -148,7 +143,6 @@ tasks.named<Test>("test") {
 }
 
 testlogger {
-// ? options => STANDARD • MOCHA • PLAIN • PARALLEL
     theme = ThemeType.MOCHA
     showPassed = true
     showSkipped = true
