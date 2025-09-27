@@ -23,6 +23,7 @@ public class ServerApplication {
     public static void main(String[] args) {
 
         try {
+
             SpringApplication.run(ServerApplication.class, args);
 
         } catch (Exception err) {
