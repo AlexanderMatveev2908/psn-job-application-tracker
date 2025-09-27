@@ -25,6 +25,9 @@ argon2 = "2.12"
 
 datafaker = "2.1.0" 
 
+testlogger = "4.0.0"
+
+
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -61,3 +64,4 @@ datafaker = { group = "net.datafaker", name = "datafaker", version.ref = "datafa
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs-gradle" }
+testlogger = { id = "com.adarshr.test-logger", version.ref = "testlogger" }

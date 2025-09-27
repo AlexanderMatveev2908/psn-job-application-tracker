@@ -2,6 +2,8 @@ import org.gradle.api.plugins.quality.Checkstyle
 import com.github.spotbugs.snom.SpotBugsTask
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import com.adarshr.gradle.testlogger.theme.ThemeType
+
 
 plugins {
     alias(libs.plugins.spring.boot)
@@ -10,7 +12,8 @@ plugins {
 
     id("checkstyle")
     alias(libs.plugins.spotbugs)
-    id("pmd")  
+    id("pmd")
+    alias(libs.plugins.testlogger)
 }
 
 repositories {
@@ -131,10 +134,10 @@ tasks.named<Test>("test") {
 
       testLogging {
         events("passed", "skipped", "failed")
-        // showStandardStreams = true
         // showExceptions = true
         // showCauses = true
         exceptionFormat = TestExceptionFormat.FULL
+        // showStandardStreams = true
         showStackTraces = false
     }
 
@@ -142,6 +145,14 @@ tasks.named<Test>("test") {
     jvmArgs("-Xshare:off")
     // ? silence byte-buddy agent warnings
     jvmArgs("-XX:+EnableDynamicAgentLoading")
+}
+
+testlogger {
+// ? options => STANDARD • MOCHA • PLAIN • PARALLEL
+    theme = ThemeType.MOCHA
+    showPassed = true
+    showSkipped = true
+    showFailed = true
 }
 
 tasks.named<BootJar>("bootJar") {

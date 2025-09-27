@@ -40,7 +40,11 @@ public class RegisterTest {
                 Arguments.of("data not provided", 400, null),
                 Arguments.of("wrong data format", 400, "server do not expect a string as body"),
                 Arguments.of("first name invalid", 422,
-                        payloads.registerPatch("firstName", "<script>alert(\"hacked😈\")</script>")));
+                        payloads.registerPatch("firstName", "<script>alert(\"hacked😈\")</script>")),
+                Arguments.of("last name required", 422,
+                        payloads.registerPatch("lastName", ""))
+
+        );
     }
 
     @ParameterizedTest
