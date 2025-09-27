@@ -56,6 +56,14 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
     testCompileOnly(libs.lombok)
     testAnnotationProcessor(libs.lombok)
+    // ? dummy data
+    testImplementation(libs.datafaker)
+    // testImplementation(libs.faker) {
+    // // ! exclude broken module which returns 404 on Maven fetch
+    //     exclude(group = "org.yaml", module = "snakeyaml")
+    // }
+    // // | manual pull correct one
+    // testImplementation("org.yaml:snakeyaml:2.2")
 
     // ? checkers
     compileOnly(libs.spotbugs.annotations)

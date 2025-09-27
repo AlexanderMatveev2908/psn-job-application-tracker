@@ -23,6 +23,7 @@ lombok = "1.18.34"
 
 argon2 = "2.12"
 
+datafaker = "2.1.0" 
 
 
 [libraries]
@@ -54,7 +55,7 @@ spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-star
 
 argon2 = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2" }
 
-
+datafaker = { group = "net.datafaker", name = "datafaker", version.ref = "datafaker" }
 
 [plugins]
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
