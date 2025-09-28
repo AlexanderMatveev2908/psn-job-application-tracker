@@ -41,7 +41,7 @@ are_args_ok(args)
 ctx = CtxCatalog(doc)
 
 add_catalog(args, ctx)
-toml_pkg.write_text(doc.as_string())
+toml_pkg.write_text(doc.as_string().replace('"version.ref"', "version.ref"))
 
 # ? gradle
 add_gradle(gradle_pkg, args)

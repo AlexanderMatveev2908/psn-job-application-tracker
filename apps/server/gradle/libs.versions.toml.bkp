@@ -58,6 +58,7 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 datafaker = { group = "net.datafaker", name = "datafaker", version.ref = "datafaker" }
 
 
+
 [plugins]
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
 

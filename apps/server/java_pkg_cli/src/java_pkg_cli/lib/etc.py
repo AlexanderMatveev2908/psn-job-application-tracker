@@ -5,8 +5,14 @@ from java_pkg_cli.lib.gradle_pkg.conf_gradle import GradleConf
 from java_pkg_cli.lib.reg import REG_LIB
 
 
-def to_alias(name: str) -> str:
+def to_toml_alias(name: str) -> str:
     return name.replace("-", "_").replace(".", "_")
+
+
+def to_gradle_alias(name: str) -> str:
+    parts = to_toml_alias(name).split("_")
+
+    return parts[0].lower() + "".join(word.capitalize() for word in parts[1:])
 
 
 def err(msg: str) -> None:

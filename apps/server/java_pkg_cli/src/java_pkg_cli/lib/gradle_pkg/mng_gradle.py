@@ -4,7 +4,7 @@ import re
 import sys
 from typing import cast
 
-from java_pkg_cli.lib.etc import err, to_alias
+from java_pkg_cli.lib.etc import err, to_gradle_alias, to_toml_alias
 from java_pkg_cli.lib.gradle_pkg.conf_gradle import GradleConf
 
 
@@ -30,9 +30,9 @@ def add_gradle(p: Path, args: Namespace) -> None:
     type_pkg: str = GradleConf.from_short(args.config)
 
     splitted: list[str] = args.lib.split(":")
-    alias = to_alias(splitted[1])
+    gradle_alias = to_gradle_alias(splitted[1])
 
-    pkg.append(f"{type_pkg}(libs.{alias})")
+    pkg.append(f"{type_pkg}(libs.{gradle_alias})")
 
     new_block = (f"\n{' ' * 4}").join(pkg)
     new_content = pattern.sub(

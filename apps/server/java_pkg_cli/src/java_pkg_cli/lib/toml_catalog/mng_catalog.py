@@ -1,22 +1,24 @@
 from argparse import Namespace
 from tomlkit import string, inline_table
 
+
 from java_pkg_cli.lib.reg import REG_VERSION
 from java_pkg_cli.lib.toml_catalog.ctx_catalog import CtxCatalog
-from java_pkg_cli.lib.etc import to_alias
+from java_pkg_cli.lib.etc import to_gradle_alias, to_toml_alias
 
 
 def add_catalog(args: Namespace, ctx: CtxCatalog) -> None:
     splitted: list[str] = args.lib.split(":")
-    alias = to_alias(splitted[1])
+    toml_alias = to_toml_alias(splitted[1])
+    gradle_alias = to_gradle_alias(splitted[1])
 
     row = inline_table()
     row["module"] = f"{splitted[0]}:{splitted[1]}"
 
     if len(splitted) > 2 and REG_VERSION.fullmatch(version := splitted[2]):
-        ctx.versions[alias] = string(version)
-        row["version.ref"] = alias
+        ctx.versions[toml_alias] = string(version)
+        row["version.ref"] = toml_alias
 
-    ctx.libs[alias] = row
+    ctx.libs[gradle_alias] = row
 
     print("🗃️ toml updated")

@@ -26,39 +26,32 @@ repositories {
 
 //_s
 dependencies {
-    // ? general
+// ? general
     implementation(libs.guava)
     implementation(libs.dotenv)
     compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)  
+    annotationProcessor(libs.lombok)
     implementation(libs.spring.boot.starter.validation)
-
     // ? core
-    implementation(libs.reactor.core) 
+    implementation(libs.reactor.core)
     implementation(libs.spring.boot.starter.webflux)
- 
     // ? DB
     implementation(libs.spring.boot.starter.data.r2dbc)
     runtimeOnly(libs.postgresql)
     implementation(libs.r2dbc.postgres)
     // ? migrations
     implementation(libs.liquibase.core)
-
     // ? redis
-    implementation(libs.redis.lettuce)    
-
+    implementation(libs.redis.lettuce)
     // ? mails
     implementation(libs.spring.boot.starter.mail)
-
     // ? hash
     implementation(libs.argon2)
-
     // ? checkers
     compileOnly(libs.spotbugs.annotations)
-
     // ? tests
     testImplementation(libs.spring.boot.starter.test) {
-        exclude(group = "org.junit.vintage")
+    exclude(group = "org.junit.vintage")
     }
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
