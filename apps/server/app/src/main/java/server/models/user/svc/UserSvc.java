@@ -11,6 +11,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.decorators.flow.ErrAPI;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
@@ -32,8 +33,13 @@ public class UserSvc {
     private final JobApplSvc jobApplSvc;
 
     public Mono<User> insert(User us) {
-        return userRepo.insert(us.getFirstName(), us.getLastName(), us.getEmail(), us.getPassword())
-                .flatMap(saved -> userRepo.findById(saved.getId()));
+        return findByEmail(us.getEmail())
+                .flatMap(existing -> Mono.<User>error(
+                        new ErrAPI("an account with this email already exists", 409)))
+                .switchIfEmpty(
+                        Mono.defer(() -> userRepo
+                                .insert(us.getFirstName(), us.getLastName(), us.getEmail(), us.getPassword())
+                                .flatMap(saved -> userRepo.findById(saved.getId()))));
     }
 
     public Mono<User> findByEmail(String email) {
