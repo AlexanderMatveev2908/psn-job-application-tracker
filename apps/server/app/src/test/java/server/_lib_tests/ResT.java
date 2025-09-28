@@ -1,0 +1,51 @@
+package server._lib_tests;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import server.decorators.RootCls;
+
+import java.util.Map;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.util.MultiValueMap;
+
+@Data
+@AllArgsConstructor
+public class ResT implements RootCls {
+
+    private final int status;
+    private final HttpHeaders hdrs;
+    private final MultiValueMap<String, ResponseCookie> cks;
+
+    private final Map<String, Object> bd;
+
+    public static ResT of(EntityExchangeResult<Map<String, Object>> res) {
+        Map<String, Object> bd = res.getResponseBody();
+
+        return new ResT(
+                res.getStatus().value(),
+                res.getResponseHeaders(),
+                res.getResponseCookies(),
+                bd);
+    }
+
+    public String getHdr(String k) {
+        return hdrs.getFirst(k);
+    }
+
+    public String getCk(String k) {
+        var cksByKey = cks.get(k);
+
+        return (cksByKey == null || cksByKey.isEmpty()) ? null : cksByKey.get(0).getValue();
+    }
+
+    public String getJWE() {
+        return getCk("refreshToken");
+    }
+
+    public String getMsg() {
+        return (String) getBd().get("msg");
+    }
+}

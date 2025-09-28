@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ServerT {
+class ServerTest {
 
     @Value("${server.port}")
     private int port;
@@ -17,6 +17,6 @@ class ServerT {
 
     @Test
     void serverLogOnConsole() {
-        assertEquals(3000, port, "server should run on port 3000 🚀");
+        assertEquals(3000, port, "server should run on 3000");
     }
 }

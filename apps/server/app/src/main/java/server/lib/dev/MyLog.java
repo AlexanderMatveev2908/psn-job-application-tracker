@@ -35,7 +35,7 @@ public final class MyLog {
         String thread = Thread.currentThread().getName();
 
         if (title != null)
-            System.out.printf("⏰ %s • 🗃️ %s • 🧵 %s%n%s%n", time, fileName, thread, title);
+            System.out.printf("⏰ %s • 🗃️ %s • 📌 %s%n", time, fileName, title);
         else
             System.out.printf("⏰ %s • 🗃️ %s • 🧵 %s%n", time, fileName, thread);
 

@@ -1,6 +1,9 @@
 import org.gradle.api.plugins.quality.Checkstyle
 import com.github.spotbugs.snom.SpotBugsTask
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import com.adarshr.gradle.testlogger.theme.ThemeType
+
 
 
 plugins {
@@ -10,7 +13,8 @@ plugins {
 
     id("checkstyle")
     alias(libs.plugins.spotbugs)
-    id("pmd")  
+    id("pmd")
+    alias(libs.plugins.testlogger)
 }
 
 repositories {
@@ -18,51 +22,45 @@ repositories {
 }
 
 dependencies {
-    // ? side stuff
+    // ? general
     implementation(libs.guava)
     implementation(libs.dotenv)
-
-    // ? faster coding
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)  
-
-    // ? Spring Boot
-    implementation(libs.spring.boot.starter.webflux)
-    testImplementation(libs.spring.boot.starter.test) {
-        exclude(group = "org.junit.vintage")
-    }
-
-    // ? validator
     implementation(libs.spring.boot.starter.validation)
-    
-    // ? spring DB
-    implementation(libs.spring.boot.starter.data.r2dbc)
-    
-    // ? DB driver
-    runtimeOnly(libs.postgresql)
-    
-    // ? async DB
-    implementation(libs.r2dbc.postgres)
 
+    // ? core
+    implementation(libs.reactor.core) 
+    implementation(libs.spring.boot.starter.webflux)
+ 
+    // ? DB
+    implementation(libs.spring.boot.starter.data.r2dbc)
+    runtimeOnly(libs.postgresql)
+    implementation(libs.r2dbc.postgres)
     // ? migrations
     implementation(libs.liquibase.core)
 
     // ? redis
-    implementation(libs.redis.lettuce)    // Redis async/reactive client
-    implementation(libs.reactor.core) 
-
-    // ? tests
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.platform.launcher)
-
-    // ? checkers
-    compileOnly(libs.spotbugs.annotations)
+    implementation(libs.redis.lettuce)    
 
     // ? mails
     implementation(libs.spring.boot.starter.mail)
 
     // ? hash
     implementation(libs.argon2)
+
+    // ? checkers
+    compileOnly(libs.spotbugs.annotations)
+
+    // ? tests
+    testImplementation(libs.spring.boot.starter.test) {
+        exclude(group = "org.junit.vintage")
+    }
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
+    testImplementation(libs.datafaker)
 }
 
 java {
@@ -81,7 +79,7 @@ spotbugs {
 }
 
 pmd {
-    toolVersion = "7.0.0"
+    toolVersion = libs.versions.pmd.get()
     ruleSets = listOf()
     ruleSetFiles = files("$projectDir/config/pmd/pmd-rules.xml")
     isIgnoreFailures = false
@@ -119,8 +117,12 @@ tasks.named("check") {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-      testLogging {
+    testLogging {
         events("passed", "skipped", "failed")
+        exceptionFormat = TestExceptionFormat.SHORT
+        // showExceptions = false
+        // showCauses = false
+        // showStackTraces = false
         showStandardStreams = true
     }
 
@@ -128,6 +130,13 @@ tasks.named<Test>("test") {
     jvmArgs("-Xshare:off")
     // ? silence byte-buddy agent warnings
     jvmArgs("-XX:+EnableDynamicAgentLoading")
+}
+
+testlogger {
+    theme = ThemeType.MOCHA
+    showPassed = true
+    showSkipped = true
+    showFailed = true
 }
 
 tasks.named<BootJar>("bootJar") {
