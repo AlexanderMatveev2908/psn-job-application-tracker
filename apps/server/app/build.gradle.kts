@@ -21,6 +21,10 @@ repositories {
     mavenCentral()
 }
 
+// ! Python CLI depends on these markers //_s  //_e
+// ! changing or deleting them will break dependency parsing.
+
+//_s
 dependencies {
     // ? general
     implementation(libs.guava)
@@ -62,6 +66,7 @@ dependencies {
     testAnnotationProcessor(libs.lombok)
     testImplementation(libs.datafaker)
 }
+//_e
 
 java {
     toolchain {

@@ -1,0 +1,48 @@
+{
+  "python.languageServer": "Pylance",
+  "python.analysis.autoImportCompletions": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.snippetSuggestions": "inline",
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.typeCheckingMode": "standard",
+  "python.linting.enabled": true,
+  "python.linting.ruffEnabled": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.ruff": "explicit"
+  },
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.analysis.extraPaths": ["apps/server"],
+  "python.envFile": "${workspaceFolder}/.env",
+  "better-comments.tags": [
+    {
+      "tag": "?",
+      "color": "#2563EB",
+      "bold": true
+    },
+    {
+      "tag": "!",
+      "color": "#DC2626",
+      "bold": true
+    },
+    {
+      "tag": "|",
+      "color": "#CA8A04",
+      "bold": true
+    },
+    {
+      "tag": ">",
+      "color": "#16A34A",
+      "bold": true
+    }
+  ]
+}

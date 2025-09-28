@@ -1,4 +1,4 @@
-# PFN-job-application-tracker 📈
+# PSN-job-application-tracker 📈
 
 ## 📌 About This Project
 
@@ -40,6 +40,7 @@ Together they form a clean, modern **full-stack architecture** 🚀
 - **Redis (Lettuce)** — Async/reactive Redis client for caching and real-time data
 - **Cloudinary (Reactive WebClient)** — Manually integrated using Spring’s WebClient, enabling fully non-blocking image and video uploads
 - **JavaMailSender (MimeMessage)**— For sending HTML email content, including transactional emails built with custom, hand-crafted templates for full control over design and layout
+- **Custom Python CLI Tool** — Built a Python CLI utility to automatically add dependencies to both the **TOML catalog** and **Gradle build file**, eliminating repetitive hardcoding and improving consistency in dependency management
 
 ---
 
@@ -63,7 +64,7 @@ Together they form a clean, modern **full-stack architecture** 🚀
 - **Fly.io** — Hosting platform (client and server deployed as separate services)
 - **Supabase** — PostgreSQL hosting
 - **Upstash** — Hosting platform for Redis
-- **Brevo (SMTP)** — Outbound transactional email deliver
+- **Brevo (SMTP)** — Outbound transactional email delivery
 - **Zoho Mail** — Inbound email hosting for custom domain addresses
 - **Namecheap** — Domain provider, configured with DNS records (SPF, DKIM, DMARC) to support both Brevo + Zoho
 - **Zsh** — Custom shell scripts for scaffolding and developer productivity
@@ -98,7 +99,7 @@ There’s no strict separation between client and server variables, but variable
 
 - **💡Note**:
   The same variables must also be present in a **kind-secrets.yml** file (not committed to git). This file is required if you want to run the app in a local **Kubernetes cluster** via **Kind**.
-  Template of file is the following:
+  A template for this file looks like:
 
   ```bash
   apiVersion: v1
@@ -141,7 +142,7 @@ To start a development session, run:
 yarn dev
 ```
 
-This command uses **Turborepo** to run both the **Python server** and the **Next.js client** in parallel:
+This command uses **Turborepo** to run both the **Java server** and the **Next.js client** in parallel:
 
 - ☕ **Java** runs at [http://localhost:3000](http://localhost:3000)
 - 🖥️ **Next.js** runs at [http://localhost:3001](http://localhost:3001)
@@ -226,56 +227,21 @@ To mirror the production setup, I use an **Nginx reverse proxy** that listens on
 
 - In **development**:
 
-  - 🐍 Server → port **3000**
+  - ☕ Server → port **3000**
   - 🖥️ Client → port **3001**
 
 - In **Kubernetes**:
-  - 🐍 Server → port **30080**
+  - ☕ Server → port **30080**
   - 🖥️ Client → port **30081**
 
 This setup provides a **single HTTPS entrypoint** while internally forwarding traffic to the right service.  
 It also avoids the need for a separate `kind` mode (like `PY_ENV=kind` or `NEXT_PUBLIC_ENV=kind`) — Nginx handles all routing automatically.
 
+Configuration files can be found at [nginx](nginx)
+
 ---
 
 #### 🚦 Root nginx.conf
-
-The main config file is:
-
-```bash
-/etc/nginx/nginx.conf
-
-user http;
-worker_processes auto;
-
-events {
-worker_connections 1024;
-}
-
-http {
-include mime.types;
-default_type application/octet-stream;
-
-    sendfile on;
-    keepalive_timeout 60;
-    server_tokens off;
-
-    types_hash_max_size 2048;
-    types_hash_bucket_size 128;
-
-    server {
-        listen 80;
-        server_name localhost;
-
-        location / {
-            return 301 https://$host$request_uri;
-        }
-    }
-
-    include /etc/nginx/env/active.conf;
-
-}
-```
 
 Instead of hardcoding routes, the last line **include /etc/nginx/env/active.conf** acts as an entrypoint for environment-specific configs.
 
@@ -290,7 +256,7 @@ The script [`ngx`](scripts/nginx/ngx) in **scripts/nginx** manages a **symlink**
 
 ---
 
-##### 🛠️ Development Config
+##### Development config
 
 Running
 
@@ -300,45 +266,9 @@ ngx
 
 Activates dev.conf
 
-```bash
-server {
-    listen 443 ssl;
-    server_name localhost;
-
-    client_max_body_size 200M;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
-    access_log /var/log/nginx/access.log;
-    error_log  /var/log/nginx/error.log warn;
-
-    ssl_certificate     /etc/nginx/certs/localhost.pem;
-    ssl_certificate_key /etc/nginx/certs/localhost-key.pem;
-
-    location /api/v1/ {
-        proxy_pass http://localhost:3000/api/v1/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    location / {
-        proxy_pass http://localhost:3001/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
 ---
 
-##### ⚔️ Kubernetes Config
+##### Kind config
 
 Running
 
@@ -347,42 +277,6 @@ ngx k
 ```
 
 Activates kind.conf
-
-```bash
-server {
-    listen 443 ssl;
-    server_name localhost;
-
-    client_max_body_size 200M;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
-    access_log /var/log/nginx/access.log;
-    error_log  /var/log/nginx/error.log warn;
-
-    ssl_certificate     /etc/nginx/certs/localhost.pem;
-    ssl_certificate_key /etc/nginx/certs/localhost-key.pem;
-
-    location /api/v1/ {
-        proxy_pass http://localhost:30080/api/v1/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    location / {
-        proxy_pass http://localhost:30081/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
 
 ---
 
@@ -622,6 +516,80 @@ To allow GitHub Actions to deploy the app, you’ll need to configure deployment
 
 ---
 
+Got it buddy 😎 let’s make your **Python CLI section** read smooth, professional, and clear while still keeping it developer-friendly. Here’s a polished version of what you wrote:
+
+---
+
+## ⚙️ Python CLI
+
+### Working Directory
+
+The following commands can be run directly inside the **java_pkg_cli** directory.
+Alternatively, to avoid changing the directory each time, you can use the script **ja** present at [scripts/java.zsh](scripts/java.zsh) which is implemented using a **subshell** to keep directory changes isolated.
+
+---
+
+### Installation
+
+To install dependencies run:
+
+```bash
+poetry install
+```
+
+---
+
+### Build
+
+To build the package, run:
+
+```bash
+poetry build
+```
+
+This generates two artifacts inside `dist/`:
+
+- A **wheel (.whl)** — bundled, installable build of your code
+- A **source tarball (.tar.gz)** — gzipped archive of the source code
+
+---
+
+### Local Installation
+
+Install the wheel into the project’s local virtual environment (not globally or in the user’s workspace `.venv`):
+
+```bash
+poetry run pip install dist/java_pkg_cli-1.0.0-py3-none-any.whl
+```
+
+---
+
+### Running
+
+Once installed, you can launch the CLI with:
+
+```bash
+poetry run python -m java_pkg_cli example_group:example_artifact i -1.2.3
+```
+
+### CLI Parameters
+
+- **library** — required, `group:artifact` format (1st positional argument)
+
+- **config type** — required, Gradle configuration type (2nd positional argument). Examples:
+
+  - `i` → implementation
+  - `tr` → testRuntimeOnly
+  - …more available via `-h`
+
+  ```bash
+  poetry run python -m java_pkg_cli -h
+  ```
+
+- **version** — optional argument. Defaults to empty (not added to `libs.versions.toml`).
+
+---
+
 ## 🪾 Branches & Commits
 
 When looking at the **Git history**, you’ll notice a recurring pattern where each entry shows the **branch name** followed by an arrow **=>** and then the **commit message**.
@@ -636,7 +604,7 @@ This is the convention I follow to make it obvious which branch the work came fr
 
 For clarity, I also configure Git to always create a **merge commit** (**no fast-forward** merges).
 This ensures that the history explicitly shows where a branch **forked off** and where it was **merged back in**.
-In my view, this makes the development process easier to follow because you can see the **“passages”** of **each feature** or fix across the **project timeline**
+This makes the development process easier to follow because you can see the **“passages”** of **each feature** or fix across the **project timeline**
 
 ---
 
