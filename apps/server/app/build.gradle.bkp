@@ -58,6 +58,7 @@ dependencies {
     testCompileOnly(libs.lombok)
     testAnnotationProcessor(libs.lombok)
     testImplementation(libs.datafaker)
+    implementation(libs.javaJwt)
 }
 //_e
 
