@@ -4,7 +4,6 @@ from tomlkit import TOMLDocument, parse
 
 from java_pkg_cli.lib.etc import are_args_ok, err
 from java_pkg_cli.lib.gradle_pkg.mng_gradle import add_gradle
-from java_pkg_cli.lib.reg import REG_LIB
 from java_pkg_cli.lib.toml_catalog.ctx_catalog import CtxCatalog
 from java_pkg_cli.lib.toml_catalog.mng_catalog import add_catalog
 from java_pkg_cli.lib.rules import build_parser
