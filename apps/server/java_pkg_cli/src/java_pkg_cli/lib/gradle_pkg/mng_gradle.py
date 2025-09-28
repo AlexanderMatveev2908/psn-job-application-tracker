@@ -1,9 +1,10 @@
 from argparse import Namespace
 from pathlib import Path
 import re
+import sys
 from typing import cast
 
-from java_pkg_cli.lib.etc import split_pkg, to_alias
+from java_pkg_cli.lib.etc import err, split_pkg, to_alias
 from java_pkg_cli.lib.gradle_pkg.conf_gradle import GradleConf
 
 
@@ -17,16 +18,16 @@ def add_gradle(p: Path, args: Namespace) -> None:
     match = pattern.search(content)
 
     if match is None:
-        raise Exception("markers _s or _e has not been found")
+        err("markers _s or _e has not been found")
 
     pkg = []
 
-    for l in match.group(1).split("\n"):
+    for l in cast(re.Match[str], match).group(1).split("\n"):
         stripped = l.strip()
         if stripped:
             pkg.append(stripped)
 
-    type_pkg = cast(GradleConf, args.config).value
+    type_pkg: str = GradleConf.from_short(args.config)
 
     *_, artifact = split_pkg(args)
     alias = to_alias(artifact)
@@ -40,3 +41,5 @@ def add_gradle(p: Path, args: Namespace) -> None:
     )
 
     p.write_text(new_content)
+
+    print("🛠️ gradle updated")

@@ -12,7 +12,7 @@ class GradleConf(Enum):
     API = "api"
 
     @classmethod
-    def from_short(cls, short: str) -> "GradleConf":
+    def from_short(cls, short: str) -> str:
         mapping = {
             "i": cls.I,
             "c": cls.C,
@@ -23,4 +23,5 @@ class GradleConf(Enum):
             "tr": cls.TR,
             "api": cls.API,
         }
-        return mapping[short]
+
+        return mapping[short].value
