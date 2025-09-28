@@ -21,6 +21,5 @@ def build_parser() -> argparse.ArgumentParser:
         default="i",
         help="gradle conf (short form => i, c, r, ti, tc, tr, a, api)",
     )
-    parser.add_argument("-v", "--version", help="version", required=False)
 
     return parser

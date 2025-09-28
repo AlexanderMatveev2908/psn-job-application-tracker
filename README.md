@@ -569,14 +569,14 @@ poetry run pip install dist/java_pkg_cli-1.0.0-py3-none-any.whl
 Once installed, you can launch the CLI with:
 
 ```bash
-poetry run python -m java_pkg_cli example_group:example_artifact i -1.2.3
+poetry run python -m java_pkg_cli example_group:example_artifact:1.2.3-cool_version_released i
 ```
 
 ### CLI Parameters
 
 - **library** — required, `group:artifact` format (1st positional argument)
 
-- **config type** — required, Gradle configuration type (2nd positional argument). Examples:
+- **config type** — optional with **i(implementation)** as default, Gradle configuration type (2nd positional argument). Examples:
 
   - `i` → implementation
   - `tr` → testRuntimeOnly
@@ -585,8 +585,6 @@ poetry run python -m java_pkg_cli example_group:example_artifact i -1.2.3
   ```bash
   poetry run python -m java_pkg_cli -h
   ```
-
-- **version** — optional argument. Defaults to empty (not added to `libs.versions.toml`).
 
 ---
 

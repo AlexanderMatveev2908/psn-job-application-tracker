@@ -1,19 +1,20 @@
 from argparse import Namespace
 from tomlkit import string, inline_table
 
+from java_pkg_cli.lib.reg import REG_VERSION
 from java_pkg_cli.lib.toml_catalog.ctx_catalog import CtxCatalog
-from java_pkg_cli.lib.etc import split_pkg, to_alias
+from java_pkg_cli.lib.etc import to_alias
 
 
 def add_catalog(args: Namespace, ctx: CtxCatalog) -> None:
-    group, artifact = split_pkg(args)
-    alias = to_alias(artifact)
+    splitted: list[str] = args.lib.split(":")
+    alias = to_alias(splitted[1])
 
     row = inline_table()
-    row["module"] = f"{group}:{artifact}"
+    row["module"] = f"{splitted[0]}:{splitted[1]}"
 
-    if args.version:
-        ctx.versions[alias] = string(args.version)
+    if len(splitted) > 2 and REG_VERSION.fullmatch(version := splitted[2]):
+        ctx.versions[alias] = string(version)
         row["version.ref"] = alias
 
     ctx.libs[alias] = row

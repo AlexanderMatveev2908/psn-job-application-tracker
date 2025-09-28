@@ -4,6 +4,7 @@ from tomlkit import TOMLDocument, parse
 
 from java_pkg_cli.lib.etc import are_args_ok, err
 from java_pkg_cli.lib.gradle_pkg.mng_gradle import add_gradle
+from java_pkg_cli.lib.reg import REG_LIB
 from java_pkg_cli.lib.toml_catalog.ctx_catalog import CtxCatalog
 from java_pkg_cli.lib.toml_catalog.mng_catalog import add_catalog
 from java_pkg_cli.lib.rules import build_parser
@@ -19,6 +20,7 @@ if not toml_pkg.is_file():
 
 if not gradle_pkg.is_file():
     err(f"missing {gradle_pkg}")
+
 
 # ? base shape document needed to work
 doc: TOMLDocument = parse(toml_pkg.read_text())
