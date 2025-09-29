@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.auth.paperwork.RegisterForm;
+import server.lib.jwt.MyJwt;
 import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
@@ -20,6 +21,7 @@ import server.models.user.svc.UserSvc;
 public class PostAuthCtrl {
 
     private final UserSvc userSvc;
+    private final MyJwt myJwt;
 
     public Mono<ResponseEntity<ResAPI>> register(Api api) {
         RegisterForm form = api.getMappedData();
@@ -28,7 +30,10 @@ public class PostAuthCtrl {
         return us.hashPwd().flatMap(hash -> {
             return userSvc.insert(us);
         }).flatMap(saved -> {
-            return ResAPI.ok201("user created", Map.of("user", saved));
+
+            String accessToken = myJwt.create(saved.getId());
+
+            return ResAPI.ok201("user created", Map.of("user", saved, "accessToken", accessToken));
         });
     }
 }
