@@ -11,11 +11,13 @@ import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
 import reactor.core.publisher.Mono;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 
+@SuppressFBWarnings({ "EI" })
 @Data
 @JsonSerialize(using = ResApiJson.class)
 public final class ResAPI {
