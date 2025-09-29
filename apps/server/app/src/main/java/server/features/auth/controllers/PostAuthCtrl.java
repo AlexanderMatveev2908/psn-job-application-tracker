@@ -41,8 +41,9 @@ public class PostAuthCtrl {
                     .maxAge(Duration.ofMinutes(15))
                     .build();
 
-            return ResAPI.ok201("user created",
-                    Map.of("user", tpl.getT1(), "accessToken", tpl.getT3()));
+            return new ResAPI(201).msg("user created")
+                    .data(Map.of("user", tpl.getT1(), "accessToken", tpl.getT3())).cookie(refreshCookie).build();
+
         });
     }
 }

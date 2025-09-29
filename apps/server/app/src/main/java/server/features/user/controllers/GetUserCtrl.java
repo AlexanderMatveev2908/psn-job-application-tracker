@@ -11,6 +11,6 @@ import server.decorators.flow.ResAPI;
 public class GetUserCtrl {
 
     public Mono<ResponseEntity<ResAPI>> getUser(Api api) {
-        return ResAPI.ok204();
+        return new ResAPI(204).build();
     }
 }

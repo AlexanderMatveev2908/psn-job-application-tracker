@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -20,23 +19,22 @@ import server.decorators.messages.MapperMsg;
 @Data
 @JsonSerialize(using = ResApiJson.class)
 public final class ResAPI {
-    private final String msg;
-    private final Integer status;
-    private final Map<String, Object> data;
-    private final List<ResponseCookie> cookies;
+    private String msg;
+    private Integer status;
+    private Map<String, Object> data;
+    private final List<ResponseCookie> cookies = new ArrayList<>();
 
-    public ResAPI(String msg, Integer status, Map<String, Object> data, List<ResponseCookie> cookies) {
-        this.msg = msg;
+    public ResAPI(int status, String msg, Map<String, Object> data) {
         this.status = status;
+        this.msg = msg;
         this.data = (data == null) ? null : Map.copyOf(data);
-        this.cookies = cookies;
     }
 
-    public ResAPI(String msg, Integer status, Map<String, Object> data) {
-        this.msg = msg;
+    public ResAPI(int status) {
         this.status = status;
-        this.data = (data == null) ? null : Map.copyOf(data);
-        this.cookies = null;
+    }
+
+    public ResAPI() {
     }
 
     private static String prependEmj(String msg, ActT act) {
@@ -57,117 +55,38 @@ public final class ResAPI {
         return data == null ? null : Map.copyOf(data);
     }
 
-    public static class Builder {
-        private int code = 200;
-        private String msg;
-        private Map<String, Object> data;
-        private final List<ResponseCookie> cookies = new ArrayList<>();
-
-        public Builder status(int code) {
-            this.code = code;
-            return this;
-        }
-
-        public Builder msg(String msg) {
-            this.msg = msg;
-            return this;
-        }
-
-        public Builder data(Map<String, Object> data) {
-            this.data = data;
-            return this;
-        }
-
-        public Builder cookie(ResponseCookie cookie) {
-            this.cookies.add(cookie);
-            return this;
-        }
-
-        public Mono<ResponseEntity<ResAPI>> build() {
-            String safeMsg = (msg == null) ? MapperMsg.fromCode(code).getMsg() : msg;
-            ActT act = (code >= 200 && code < 300) ? ActT.OK : ActT.ERR;
-
-            ResponseEntity.BodyBuilder builder = ResponseEntity.status(code);
-            for (ResponseCookie cookie : cookies)
-                builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
-
-            return Mono.just(builder.body(new ResAPI(prependEmj(safeMsg, act), code, data)));
-        }
+    public ResAPI status(int status) {
+        this.status = status;
+        return this;
     }
 
-    public static Mono<ResponseEntity<ResAPI>> of(int code, String msg, Map<String, Object> data,
-            List<ResponseCookie> cookies) {
-        String safeMsg = (msg == null) ? MapperMsg.fromCode(code).getMsg() : msg;
-        ActT act = (code >= 200 && code < 300) ? ActT.OK : ActT.ERR;
-
-        BodyBuilder builder = ResponseEntity.status(code);
-
-        if (cookies != null)
-            for (ResponseCookie cookie : cookies)
-                builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        return Mono.just(
-                builder
-                        .body(new ResAPI(prependEmj(safeMsg, act), code, data, cookies)));
+    public ResAPI msg(String msg) {
+        this.msg = msg;
+        return this;
     }
 
-    public static Mono<ResponseEntity<ResAPI>> of(int code, String msg, Map<String, Object> data) {
-        return of(code, msg, data);
+    public ResAPI data(Map<String, Object> data) {
+        this.data = data;
+        return this;
     }
 
-    public static Mono<ResponseEntity<ResAPI>> ok200(String msg, Map<String, Object> data) {
-        return of(200, msg, data);
+    public ResAPI cookie(ResponseCookie cookie) {
+        this.cookies.add(cookie);
+        return this;
     }
 
-    public static Mono<ResponseEntity<ResAPI>> ok200(Map<String, Object> data) {
-        return of(200, null, data);
-    }
+    public Mono<ResponseEntity<ResAPI>> build() {
+        String safeMsg = (msg == null) ? MapperMsg.fromCode(status).getMsg() : msg;
+        ActT act = (status >= 200 && status < 300) ? ActT.OK : ActT.ERR;
 
-    public static Mono<ResponseEntity<ResAPI>> ok200(String msg) {
-        return of(200, msg, null);
-    }
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(status);
+        for (ResponseCookie cookie : cookies)
+            builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
 
-    public static Mono<ResponseEntity<ResAPI>> ok201(String msg, Map<String, Object> data) {
-        return of(201, msg, data);
+        return Mono.just(builder.body(
+                new ResAPI()
+                        .status(status)
+                        .msg(prependEmj(safeMsg, act))
+                        .data(data)));
     }
-
-    public static Mono<ResponseEntity<ResAPI>> ok201(Map<String, Object> data) {
-        return ok201(null, data);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> ok204() {
-        return Mono.fromSupplier(() -> ResponseEntity.status(204).build());
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err400(String msg) {
-        return of(400, msg, null);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err401(String msg) {
-        return of(401, msg, null);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err403(String msg) {
-        return of(403, msg, null);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err404(String msg) {
-        return of(404, msg, null);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err409(String msg) {
-        return of(409, msg, null);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err422(String msg) {
-        return of(422, msg, null);
-    }
-
-    public static Mono<ResponseEntity<ResAPI>> err500() {
-        return of(
-                500,
-                "❌ A wild slime appeared! Server takes damage of 500 hp ⚔️",
-                null);
-    }
-
 }
