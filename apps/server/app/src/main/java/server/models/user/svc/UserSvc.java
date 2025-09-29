@@ -47,7 +47,7 @@ public class UserSvc {
                         new ErrAPI("an account with this email already exists", 409)))
                 .switchIfEmpty(
                         Mono.defer(() -> userRepo
-                                .insert(us.getFirstName(), us.getLastName(), us.getEmail(), us.getPassword())
+                                .insert(us)
                                 .flatMap(dbUser -> {
 
                                     RecJwe rec = myJwe.create(dbUser.getId());
