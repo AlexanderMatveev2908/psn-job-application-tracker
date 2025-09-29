@@ -11,14 +11,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.Data;
+import lombok.Getter;
 import reactor.core.publisher.Mono;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 
-@SuppressFBWarnings({ "EI" })
-@Data
+@Getter
 @JsonSerialize(using = ResApiJson.class)
 public final class ResAPI {
     private String msg;
@@ -57,6 +55,10 @@ public final class ResAPI {
         return data == null ? null : Map.copyOf(data);
     }
 
+    public List<ResponseCookie> getCookies() {
+        return List.copyOf(cookies);
+    }
+
     public ResAPI status(int status) {
         this.status = status;
         return this;
@@ -68,7 +70,7 @@ public final class ResAPI {
     }
 
     public ResAPI data(Map<String, Object> data) {
-        this.data = data;
+        this.data = (data == null) ? null : Map.copyOf(data);
         return this;
     }
 
