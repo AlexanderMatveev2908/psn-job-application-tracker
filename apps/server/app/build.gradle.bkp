@@ -48,7 +48,7 @@ dependencies {
     // ? hash
     implementation(libs.argon2)
     // ? checkers
-    compileOnly(libs.spotbugs.annotations)
+    compileOnly(libs.spotbugsAnnotations)
     // ? tests
     testImplementation(libs.spring.boot.starter.test) {
     exclude(group = "org.junit.vintage")
@@ -60,6 +60,7 @@ dependencies {
     testImplementation(libs.datafaker)
     implementation(libs.javaJwt)
     implementation(libs.nimbusJoseJwt)
+    testImplementation(libs.spotbugsAnnotations)
 }
 //_e
 

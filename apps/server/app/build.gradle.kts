@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.javaJwt)
     implementation(libs.nimbusJoseJwt)
     testImplementation(libs.spotbugsAnnotations)
+    implementation(libs.jacksonDatatypeJdk8)
 }
 //_e
 

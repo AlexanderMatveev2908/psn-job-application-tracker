@@ -11,12 +11,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.jwe.MyJwe;
+import server.lib.security.jwe.RecJwe;
+import server.lib.security.jwt.MyJwt;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.MyToken;
+import server.models.token.etc.AlgT;
+import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.etc.UserPop;
@@ -31,15 +38,32 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
+    private final MyJwe myJwe;
+    private final MyJwt myJwt;
 
-    public Mono<User> insert(User us) {
+    public Mono<Tuple3<User, MyToken, String>> insert(User us) {
         return findByEmail(us.getEmail())
-                .flatMap(existing -> Mono.<User>error(
+                .flatMap(existing -> Mono.<Tuple3<User, MyToken, String>>error(
                         new ErrAPI("an account with this email already exists", 409)))
                 .switchIfEmpty(
                         Mono.defer(() -> userRepo
                                 .insert(us.getFirstName(), us.getLastName(), us.getEmail(), us.getPassword())
-                                .flatMap(saved -> userRepo.findById(saved.getId()))));
+                                .flatMap(dbUser -> {
+
+                                    RecJwe rec = myJwe.create(dbUser.getId());
+
+                                    return tokensRepo.insert(
+                                            dbUser.getId(),
+                                            TokenT.REFRESH,
+                                            AlgT.RSA_OAEP256_A256GCM,
+                                            rec.token(),
+                                            rec.exp())
+                                            .map(dbJwe -> {
+                                                String jwt = myJwt.create(dbUser.getId());
+
+                                                return Tuples.of(dbUser, dbJwe, jwt);
+                                            });
+                                })));
     }
 
     public Mono<User> findByEmail(String email) {

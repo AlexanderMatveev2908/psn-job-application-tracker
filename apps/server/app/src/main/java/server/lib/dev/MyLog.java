@@ -124,7 +124,6 @@ public final class MyLog {
                 bw.write(json);
                 bw.newLine();
             } catch (IOException err) {
-
                 System.out.println("❌ err writing log.json file");
 
             }

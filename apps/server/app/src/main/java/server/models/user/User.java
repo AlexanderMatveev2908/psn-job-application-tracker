@@ -48,9 +48,12 @@ public class User extends RootTable {
         return reflectiveToString();
     }
 
-    public Mono<String> hashPwd() {
+    public Mono<User> hashPwd() {
         return MyHasher.rctHash(password)
-                .doOnNext(this::setPassword);
+                .map(hash -> {
+                    setPassword(hash);
+                    return this;
+                });
     }
 
 }

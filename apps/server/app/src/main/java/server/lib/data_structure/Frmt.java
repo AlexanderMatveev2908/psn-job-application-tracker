@@ -7,10 +7,12 @@ import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 public final class Frmt {
 
-    private final static ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private final static ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+            .registerModule(new Jdk8Module());
 
     @SuppressWarnings({ "unused", "UseSpecificCatch" })
     public static String toJson(Object obj) {

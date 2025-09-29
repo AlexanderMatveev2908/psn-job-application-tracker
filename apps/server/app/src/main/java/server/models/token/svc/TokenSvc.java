@@ -28,14 +28,11 @@ public class TokenSvc {
             long exp) {
         return repo
                 .insert(
-
                         userId,
                         tokenType,
                         algType,
                         hashed,
-                        exp
-
-                )
+                        exp)
                 .flatMap(saved -> repo.findById(saved.getId()));
     }
 
