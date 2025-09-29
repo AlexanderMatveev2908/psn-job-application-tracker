@@ -51,16 +51,14 @@ public class UserSvc {
                                 .flatMap(dbUser -> {
 
                                     RecJwe rec = myJwe.create(dbUser.getId());
+                                    MyToken refreshTk = new MyToken(dbUser.getId(),
+                                            TokenT.REFRESH,
+                                            AlgT.RSA_OAEP256_A256GCM, rec);
 
                                     return tokensRepo.insert(
-                                            dbUser.getId(),
-                                            TokenT.REFRESH,
-                                            AlgT.RSA_OAEP256_A256GCM,
-                                            rec.token(),
-                                            rec.exp())
+                                            refreshTk)
                                             .map(dbJwe -> {
                                                 String jwt = myJwt.create(dbUser.getId());
-
                                                 return Tuples.of(dbUser, dbJwe, jwt);
                                             });
                                 })));

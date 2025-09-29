@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.token.MyToken;
-import server.models.token.etc.AlgT;
-import server.models.token.etc.TokenT;
 
 @Service
 @Transactional
@@ -21,19 +19,11 @@ public class TokenSvc {
 
     private final TokenRepo repo;
 
-    public Mono<MyToken> createToken(UUID userId,
-            TokenT tokenType,
-            AlgT algType,
-            String hashed,
-            long exp) {
+    public Mono<MyToken> insert(
+            MyToken arg) {
         return repo
                 .insert(
-                        userId,
-                        tokenType,
-                        algType,
-                        hashed,
-                        exp)
-                .flatMap(saved -> repo.findById(saved.getId()));
+                        arg);
     }
 
     public Flux<MyToken> findByUserId(UUID userId) {
