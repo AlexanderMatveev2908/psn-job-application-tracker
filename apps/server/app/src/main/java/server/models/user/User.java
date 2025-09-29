@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import reactor.core.publisher.Mono;
-import server.lib.hash.MyHasher;
+import server.lib.security.hash.MyHasher;
 import server.models.RootTable;
 
 @Data

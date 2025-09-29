@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.auth.paperwork.RegisterForm;
-import server.lib.jwt.MyJwt;
+import server.lib.security.jwt.MyJwt;
 import server.models.user.User;
 import server.models.user.svc.UserSvc;
 

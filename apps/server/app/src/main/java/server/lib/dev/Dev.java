@@ -16,7 +16,7 @@ import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
 import server.conf.mail.MailSvc;
 import server.decorators.flow.ErrAPI;
-import server.lib.jwt.MyJwt;
+import server.lib.security.jwt.MyJwt;
 import server.models.applications.etc.JobApplStatusT;
 import server.models.applications.svc.JobApplRepo;
 // import server.conf.db.remote_dictionary.RdCmd;

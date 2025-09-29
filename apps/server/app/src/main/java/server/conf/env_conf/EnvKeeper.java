@@ -78,6 +78,12 @@ public final class EnvKeeper {
     @NotBlank
     @Resolved
     private String jwtSecret;
+    @NotBlank
+    @Resolved
+    private String jwePrivate;
+    @NotBlank
+    @Resolved
+    private String jwePublic;
 
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);

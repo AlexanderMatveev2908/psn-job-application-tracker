@@ -1,4 +1,4 @@
-package server.lib.jwt;
+package server.lib.security.jwt;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
