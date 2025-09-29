@@ -14,7 +14,6 @@ import server.lib.dev.MyLog;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @RequiredArgsConstructor
-
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;
@@ -23,9 +22,7 @@ public class ServerApplication {
     public static void main(String[] args) {
 
         try {
-
             SpringApplication.run(ServerApplication.class, args);
-
         } catch (Exception err) {
             MyLog.logErr(err);
         }
@@ -37,8 +34,7 @@ public class ServerApplication {
 
             lifeSpawn.lifeCheck(e);
 
-            // dev.dropAll();
-
+            // dev.doJwtStuff();
         };
     }
 
