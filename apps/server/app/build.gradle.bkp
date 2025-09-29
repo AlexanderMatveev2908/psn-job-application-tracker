@@ -59,6 +59,7 @@ dependencies {
     testAnnotationProcessor(libs.lombok)
     testImplementation(libs.datafaker)
     implementation(libs.javaJwt)
+    implementation(libs.nimbusJoseJwt)
 }
 //_e
 

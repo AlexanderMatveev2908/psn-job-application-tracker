@@ -25,8 +25,8 @@ import server.conf.Reg;
 @AutoConfigureWebTestClient
 public class RegisterTest {
 
+        private final static MyPayloads payloads = new MyPayloads();
         private final static String URL = "/api/v1/auth/register";
-        public static MyPayloads payloads = new MyPayloads();
 
         @Autowired
         private WebTestClient web;

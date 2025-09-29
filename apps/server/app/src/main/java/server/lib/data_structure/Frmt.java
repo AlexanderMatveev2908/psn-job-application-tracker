@@ -1,5 +1,7 @@
 package server.lib.data_structure;
 
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,5 +38,10 @@ public final class Frmt {
 
             return null;
         }
+    }
+
+    public static String HexToUtf8(String txtHex) {
+        byte[] utf8Bytes = HexFormat.of().parseHex(txtHex);
+        return new String(utf8Bytes, StandardCharsets.UTF_8);
     }
 }

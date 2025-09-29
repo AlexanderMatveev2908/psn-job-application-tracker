@@ -16,6 +16,7 @@ import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
 import server.conf.mail.MailSvc;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.jwe.MyJwe;
 import server.lib.security.jwt.MyJwt;
 import server.models.applications.etc.JobApplStatusT;
 import server.models.applications.svc.JobApplRepo;
@@ -40,6 +41,7 @@ public class Dev {
     private final JobApplRepo jobApplRepo;
     private final MailSvc mailSvc;
     private final MyJwt myJwt;
+    private final MyJwe myJwe;
 
     // @Bean
     // public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
@@ -119,6 +121,15 @@ public class Dev {
 
             var res = myJwt.check(token);
             System.out.println(res.getSubject());
+        } catch (Exception err) {
+            MyLog.logErr(err);
+        }
+    }
+
+    public void doJweStuff() {
+        try {
+            var token = myJwe.create(UUID.randomUUID());
+            myJwe.check(token);
         } catch (Exception err) {
             MyLog.logErr(err);
         }

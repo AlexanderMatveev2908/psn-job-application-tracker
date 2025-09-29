@@ -11,8 +11,11 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.util.MultiValueMap;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Data
 @AllArgsConstructor
+@SuppressFBWarnings({ "EI" })
 public class ResT implements RootCls {
 
     private final int status;
