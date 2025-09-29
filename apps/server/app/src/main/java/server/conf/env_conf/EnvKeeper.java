@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import server.conf.env_conf.etc.Resolved;
 
 @Getter
 @RequiredArgsConstructor
@@ -32,34 +33,51 @@ enum EnvMode {
 public final class EnvKeeper {
 
     @NotBlank
+    @Resolved
     private String appName;
 
     @NotBlank
+    @Resolved
     private String nextPblEnv;
     @NotBlank
+    @Resolved
     private String nextPblBackUrl;
     @NotBlank
+    @Resolved
     private String nextPblBackUrlDev;
     @NotBlank
+    @Resolved
     private String nextPblBackUrlTest;
     @NotBlank
+    @Resolved
     private String nextPblFrontUrl;
     @NotBlank
+    @Resolved
     private String nextPblFrontUrlDev;
     @NotBlank
+    @Resolved
     private String nextPblFrontUrlTest;
     @NotBlank
+    @Resolved
     private String nextPblSmptFrom;
 
     @NotBlank
+    @Resolved
     private String cloudName;
     @NotBlank
+    @Resolved
     private String cloudKey;
     @NotBlank
+    @Resolved
     private String cloudSecret;
 
     @NotBlank
+    @Resolved
     private String redisUrl;
+
+    @NotBlank
+    @Resolved
+    private String jwtSecret;
 
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);
@@ -80,4 +98,5 @@ public final class EnvKeeper {
             case PROD -> nextPblBackUrl;
         };
     }
+
 }

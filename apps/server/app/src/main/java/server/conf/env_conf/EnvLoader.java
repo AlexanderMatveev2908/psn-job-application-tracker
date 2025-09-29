@@ -16,6 +16,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvEntry;
 import server.decorators.flow.ErrAPI;
 import server.lib.paths.Hiker;
 
@@ -34,7 +35,9 @@ public final class EnvLoader implements EnvironmentPostProcessor {
                     .load();
 
             Properties props = new Properties();
-            dotenv.entries().forEach(entr -> props.put(entr.getKey(), entr.getValue()));
+            var existingVars = dotenv.entries();
+            for (DotenvEntry pair : existingVars)
+                props.put(pair.getKey(), pair.getValue());
 
             String dbUrl = dotenv.get("DB_URL");
             String dbUs = dotenv.get("DB_US");
