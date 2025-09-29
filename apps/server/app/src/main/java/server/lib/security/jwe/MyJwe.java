@@ -19,11 +19,13 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSADecrypter;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
 
+@SuppressFBWarnings({ "EI2" })
 @Service
 @RequiredArgsConstructor
 public class MyJwe {
@@ -37,7 +39,7 @@ public class MyJwe {
     }
 
     private RSAPrivateKey getPrivateKey() throws Exception {
-        String privKeyPem = Frmt.HexToUtf8(envKeeper.getJwePrivate());
+        String privKeyPem = Frmt.hexToUtf8(envKeeper.getJwePrivate());
         String base64Key = stripKey(privKeyPem, "PRIVATE");
 
         byte[] decoded = Base64.getDecoder().decode(base64Key);
@@ -48,7 +50,7 @@ public class MyJwe {
     }
 
     private RSAPublicKey getPublicKey() throws Exception {
-        String pubKeyPem = Frmt.HexToUtf8(envKeeper.getJwePublic());
+        String pubKeyPem = Frmt.hexToUtf8(envKeeper.getJwePublic());
         pubKeyPem = stripKey(pubKeyPem, "PUBLIC");
 
         byte[] decoded = Base64.getDecoder().decode(pubKeyPem);
@@ -58,7 +60,7 @@ public class MyJwe {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    public String create(UUID userId) {
+    public RecJwe create(UUID userId) {
         try {
             JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256,
                     EncryptionMethod.A256GCM)
@@ -77,7 +79,7 @@ public class MyJwe {
 
             String refreshToken = jwe.serialize();
 
-            return refreshToken;
+            return new RecJwe(refreshToken, exp);
         } catch (Exception err) {
             throw new ErrAPI("err creating jwe");
         }
@@ -92,7 +94,7 @@ public class MyJwe {
 
             Map<String, Object> payload = jwe.getPayload().toJSONObject();
 
-            if ((int) payload.get("exp") < System.currentTimeMillis() / 1000L)
+            if ((long) payload.get("exp") < System.currentTimeMillis() / 1000L)
                 throw new ErrAPI("jwe_expired", 401);
 
             return payload;

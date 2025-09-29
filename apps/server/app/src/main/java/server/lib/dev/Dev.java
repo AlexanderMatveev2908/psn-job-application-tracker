@@ -17,6 +17,7 @@ import server.conf.db.remote_dictionary.RdCmd;
 import server.conf.mail.MailSvc;
 import server.decorators.flow.ErrAPI;
 import server.lib.security.jwe.MyJwe;
+import server.lib.security.jwe.RecJwe;
 import server.lib.security.jwt.MyJwt;
 import server.models.applications.etc.JobApplStatusT;
 import server.models.applications.svc.JobApplRepo;
@@ -128,8 +129,8 @@ public class Dev {
 
     public void doJweStuff() {
         try {
-            var token = myJwe.create(UUID.randomUUID());
-            myJwe.check(token);
+            RecJwe rec = myJwe.create(UUID.randomUUID());
+            myJwe.check(rec.token());
         } catch (Exception err) {
             MyLog.logErr(err);
         }

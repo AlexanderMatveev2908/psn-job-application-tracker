@@ -20,8 +20,8 @@ import server.models.user.svc.UserSvc;
 @SuppressFBWarnings({ "EI2" })
 public class PostAuthCtrl {
 
-    private final UserSvc userSvc;
     private final MyJwt myJwt;
+    private final UserSvc userSvc;
 
     public Mono<ResponseEntity<ResAPI>> register(Api api) {
         RegisterForm form = api.getMappedData();
@@ -33,7 +33,8 @@ public class PostAuthCtrl {
 
             String accessToken = myJwt.create(saved.getId());
 
-            return ResAPI.ok201("user created", Map.of("user", saved, "accessToken", accessToken));
+            return ResAPI.ok201("user created", Map.of("user", saved, "accessToken",
+                    accessToken));
         });
     }
 }
