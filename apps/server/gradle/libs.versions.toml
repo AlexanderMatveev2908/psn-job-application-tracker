@@ -26,6 +26,7 @@ pmd = "7.0.0"
 spotbugs = "4.8.6"
 spotbugs-gradle = "6.0.23" 
 java_jwt = "4.4.0"
+nimbus_jose_jwt = "10.5"
 
 
 
@@ -58,6 +59,7 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 datafaker = { group = "net.datafaker", name = "datafaker", version.ref = "datafaker" }
 javaJwt = {module = "com.auth0:java-jwt", version.ref = "java_jwt"}
+nimbusJoseJwt = {module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus_jose_jwt"}
 
 
 
