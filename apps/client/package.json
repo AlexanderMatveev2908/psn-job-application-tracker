@@ -7,8 +7,8 @@
     "dev": "sass --watch src/styles/globals.scss src/styles/globals.css --no-source-map & next dev --turbopack -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "check": "eslint . && tsc --noEmit",
-    "test": "yarn vitest run --reporter=verbose & yarn playwright test"
+    "check": "bash -e -c '( eslint . & pid1=$!; tsc --noEmit & pid2=$!; wait $pid1 || exit 1; wait $pid2 || exit 1 ) && echo \"🟦 TypeScript check passed 🎉\"'",
+    "test": "bash -e -c '( yarn vitest run --reporter=verbose & pid1=$!; yarn playwright test & pid2=$!; wait $pid1 || exit 1; wait $pid2 || exit 1 ) && echo \"🟦 TypeScript tests passed 🎉\"'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
