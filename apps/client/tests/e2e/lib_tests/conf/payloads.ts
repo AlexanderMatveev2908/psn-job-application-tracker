@@ -4,11 +4,11 @@ import { ApplicationStatusT } from "@/features/jobApplications/types";
 import { faker } from "@faker-js/faker";
 
 export interface PayloadRegisterT {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
-  confirm_password: string;
+  confirmPassword: string;
   terms: boolean;
 }
 
@@ -16,11 +16,11 @@ export const genRegisterPayload = (): PayloadRegisterT => {
   const pwd = genPwd();
 
   return {
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     email: faker.internet.email(),
     password: pwd,
-    confirm_password: pwd,
+    confirmPassword: pwd,
     terms: true,
   };
 };

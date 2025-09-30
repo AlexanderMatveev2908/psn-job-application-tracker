@@ -37,7 +37,7 @@ const Page: FC = () => {
   const { loginUser } = useUser();
   const nav = useRouter();
 
-  const kwargs: Path<RegisterFormT>[] = ["first_name", "password"];
+  const kwargs: Path<RegisterFormT>[] = ["firstName", "password"];
 
   const { startSwap, swapState, lockFocusRef } = useSwap();
 
@@ -74,8 +74,8 @@ const Page: FC = () => {
       const res = swapOnErr({
         errs,
         kwargs: [
-          ["first_name", "last_name", "email"],
-          ["password", "confirm_password", "terms"],
+          ["firstName", "lastName", "email"],
+          ["password", "confirmPassword", "terms"],
         ],
       });
 

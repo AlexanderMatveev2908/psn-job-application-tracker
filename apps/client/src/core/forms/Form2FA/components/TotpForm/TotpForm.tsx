@@ -38,9 +38,9 @@ const TotpForm: FC<PropsType> = ({
     trigger,
   } = formCtx;
 
-  useFocus("totp_code.0", { setFocus });
+  useFocus("totpCode.0", { setFocus });
   useFocusMultiForm<ToptFormT>({
-    keyField: "totp_code.0",
+    keyField: "totpCode.0",
     setFocus,
     swapState,
     targetSwap: 0,
@@ -51,7 +51,7 @@ const TotpForm: FC<PropsType> = ({
   const { ctrlPressed, setCtrlPressed, setCurrFocus } = useSideStuffTotpForm({
     setFocus,
     setValue,
-    totp_code: codeForm.totp_code,
+    totpCode: codeForm.totpCode,
     trigger,
     isCurr,
   });
@@ -83,25 +83,25 @@ const TotpForm: FC<PropsType> = ({
             {ids[idx + 1].map((id, innerIdx) => (
               <Controller
                 key={id}
-                name={`totp_code.${innerIdx + idx * 3}`}
+                name={`totpCode.${innerIdx + idx * 3}`}
                 control={control}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="text"
-                    data-testid={`totp_code.${innerIdx + idx * 3}`}
+                    data-testid={`totpCode.${innerIdx + idx * 3}`}
                     value={field.value ?? ""}
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     onChange={({ target: { value: v } }) => {
                       // if (v.length > 1) {
                       //   if (!v.at(-1)?.trim()) return;
                       //   field.onChange(v.at(-1));
-                      //   setFocus(`totp_code.${realLength}`);
+                      //   setFocus(`totpCode.${realLength}`);
                       //   return;
                       // }
                       // if (!REG_INT.test(v)) return;
                       // field.onChange(v);
-                      // setFocus(`totp_code.${realLength + 1}`);
+                      // setFocus(`totpCode.${realLength + 1}`);
                     }}
                     onFocus={() => {
                       setCurrFocus(innerIdx + idx * 3);
@@ -125,7 +125,7 @@ const TotpForm: FC<PropsType> = ({
               <Portal>
                 <ErrField
                   {...{
-                    msg: errors?.totp_code?.root?.message,
+                    msg: errors?.totpCode?.root?.message,
                     $ctmCSS: css`
                       top: ${coords.top}px;
                       right: ${coords.right}px;

@@ -9,12 +9,12 @@ import {
 
 export const registerSchema = emailSchema
   .extend({
-    first_name: z
+    firstName: z
       .string()
       .min(1, "First Name is required")
       .max(100, "Max length exceeded")
       .regex(REG_NAME, "Invalid characters"),
-    last_name: z
+    lastName: z
       .string()
       .min(1, "Last Name is required")
       .max(100, "Max length exceeded")
@@ -29,20 +29,20 @@ export const registerSchema = emailSchema
 export type RegisterFormT = z.infer<typeof registerSchema>;
 
 export const resetValsRegister: RegisterFormT = {
-  first_name: "",
-  last_name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
-  confirm_password: "",
+  confirmPassword: "",
   terms: false,
 };
 
 export const getDefValsRegister = (): RegisterFormT =>
   wrapGetValsFormManualTest(resetValsRegister, {
-    first_name: "Alex",
-    last_name: "Matveev",
+    firstName: "Alex",
+    lastName: "Matveev",
     email: myMail,
     password: myPwd,
-    confirm_password: myPwd,
+    confirmPassword: myPwd,
     terms: true,
   });

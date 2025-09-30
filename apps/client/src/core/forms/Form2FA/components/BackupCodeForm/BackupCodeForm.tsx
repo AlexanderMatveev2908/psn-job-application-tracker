@@ -30,7 +30,7 @@ const BackupCodeForm: FC<PropsType> = ({
   const { handlePwdClick, isPwdShw } = useTogglePwd();
 
   useFocusMultiForm<BackupCodeFormT>({
-    keyField: "backup_code",
+    keyField: "backupCode",
     setFocus,
     swapState,
     targetSwap: 1,
@@ -51,7 +51,7 @@ const BackupCodeForm: FC<PropsType> = ({
         {...{
           control,
           el: new FormFieldGen<BackupCodeFormT>().txtField({
-            name: "backup_code",
+            name: "backupCode",
           }),
           isPwdShw,
           handleSvgClick: handlePwdClick,

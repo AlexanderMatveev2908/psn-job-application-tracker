@@ -37,7 +37,7 @@ const FooterSwapSetup2FA: FC<PropsType> = ({
           }}
         />
       ) : (
-        !user?.use_2FA && (
+        !user?.use2FA && (
           <BtnShadow
             {...{
               el: {

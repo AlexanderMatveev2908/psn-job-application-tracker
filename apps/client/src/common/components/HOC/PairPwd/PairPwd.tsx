@@ -58,7 +58,7 @@ const PairPwd: FC<PropsType> = ({
         {...{
           el: pwdFields.password,
           control,
-          cbChange: () => trigger("confirm_password"),
+          cbChange: () => trigger("confirmPassword"),
           cbFocus: () => setIsFocus(true),
           cbBlur: () => setIsFocus(false),
           isPwdShw: isPwdShw,
@@ -72,7 +72,7 @@ const PairPwd: FC<PropsType> = ({
 
       <FormFieldPwd
         {...{
-          el: pwdFields.confirm_password,
+          el: pwdFields.confirmPassword,
           control,
           cbChange: () => trigger("password"),
           isPwdShw: isConfPwdShw,

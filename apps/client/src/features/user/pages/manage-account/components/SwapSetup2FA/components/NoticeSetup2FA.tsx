@@ -11,16 +11,16 @@ type PropsType = {
 };
 
 const NoticeSetup2FA: FC<PropsType> = ({ user }) => {
-  const Svg = user?.use_2FA
+  const Svg = user?.use2FA
     ? CircleCheckBig
-    : user?.is_verified
+    : user?.isVerified
     ? FaCircleQuestion
     : CircleAlert;
   const $baseTwd = "w-[150px] h-[150px]";
 
-  const msg = user?.use_2FA
+  const msg = user?.use2FA
     ? "User has 2FA activated"
-    : user?.is_verified
+    : user?.isVerified
     ? "Setup 2FA with TOTP code"
     : "User need to confirm account before setup 2FA";
 
@@ -28,9 +28,9 @@ const NoticeSetup2FA: FC<PropsType> = ({ user }) => {
     <div className="cont__grid__lg justify-items-center">
       <Svg
         className={`${$baseTwd} ${
-          user?.use_2FA
+          user?.use2FA
             ? "text-green-600"
-            : user?.is_verified
+            : user?.isVerified
             ? "text-blue-600"
             : "text-red-600"
         }`}

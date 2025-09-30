@@ -68,7 +68,7 @@ const SwapSetup2FA: FC<FormManageAccPropsType & { user: UserT | null }> = ({
         />
       )}
 
-      {user?.is_verified && (!user?.use_2FA || res2FA) && (
+      {user?.isVerified && (!user?.use2FA || res2FA) && (
         <FooterSwapSetup2FA
           {...{
             handleClick,

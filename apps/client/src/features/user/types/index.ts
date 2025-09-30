@@ -2,17 +2,17 @@ import { SqlTableRoot } from "@/common/types/db";
 
 export interface BackupCodeT extends SqlTableRoot {
   code: string;
-  user_id: string;
+  userId: string;
 }
 
 export interface UserT extends SqlTableRoot {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   terms: boolean;
-  use_2FA: boolean;
-  is_verified: boolean;
+  use2FA: boolean;
+  isVerified: boolean;
 
   password?: string;
-  totp_secret?: boolean;
+  totpSecret?: boolean;
 }

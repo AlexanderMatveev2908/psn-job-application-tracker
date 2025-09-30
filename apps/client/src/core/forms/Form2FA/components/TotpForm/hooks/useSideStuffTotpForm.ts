@@ -11,7 +11,7 @@ type Params = {
   setValue: UseFormSetValue<ToptFormT>;
   setFocus: UseFormSetFocus<ToptFormT>;
   trigger: UseFormTrigger<ToptFormT>;
-  totp_code: string[];
+  totpCode: string[];
   isCurr: boolean;
 };
 
@@ -19,7 +19,7 @@ export const useSideStuffTotpForm = ({
   setValue,
   setFocus,
   trigger,
-  totp_code,
+  totpCode,
   isCurr,
 }: Params) => {
   const [ctrlPressed, setCtrlPressed] = useState<boolean>();
@@ -33,7 +33,7 @@ export const useSideStuffTotpForm = ({
       const pasted = e.clipboardData?.getData("text") ?? "";
       const parsed = pasted.split("").slice(0, 6);
 
-      setValue("totp_code", parsed, { shouldValidate: true });
+      setValue("totpCode", parsed, { shouldValidate: true });
     };
 
     window.addEventListener("paste", handlePaste);
@@ -58,44 +58,44 @@ export const useSideStuffTotpForm = ({
         const possibleVal = e.key.trim();
 
         if (e.key === "Backspace" || !possibleVal) {
-          setValue("totp_code", defVals, { shouldValidate: true });
+          setValue("totpCode", defVals, { shouldValidate: true });
         } else {
-          setValue("totp_code", [possibleVal, ...Array(5).fill("")], {
+          setValue("totpCode", [possibleVal, ...Array(5).fill("")], {
             shouldValidate: true,
           });
         }
 
         setCtrlPressed(false);
-        setFocus("totp_code.0");
+        setFocus("totpCode.0");
         trigger();
         return;
       }
 
       if (e.key === "Backspace" && typeof currFocus === "number") {
         setValue(
-          "totp_code",
-          totp_code.map((v, idx) => (idx === currFocus ? "" : v)),
+          "totpCode",
+          totpCode.map((v, idx) => (idx === currFocus ? "" : v)),
           { shouldValidate: true }
         );
-        setFocus(`totp_code.${currFocus - 1 >= 0 ? currFocus - 1 : 0}`);
+        setFocus(`totpCode.${currFocus - 1 >= 0 ? currFocus - 1 : 0}`);
         trigger();
         return;
       }
 
       if (REG_INT.test(e.key) && typeof currFocus === "number") {
         setValue(
-          "totp_code",
-          totp_code.map((v, idx) => (idx === currFocus ? e.key : v)),
+          "totpCode",
+          totpCode.map((v, idx) => (idx === currFocus ? e.key : v)),
           { shouldValidate: true }
         );
-        setFocus(`totp_code.${Math.min(currFocus + 1, 5)}`);
+        setFocus(`totpCode.${Math.min(currFocus + 1, 5)}`);
         trigger();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [ctrlPressed, currFocus, totp_code, setValue, setFocus, trigger, isCurr]);
+  }, [ctrlPressed, currFocus, totpCode, setValue, setFocus, trigger, isCurr]);
 
   return {
     ctrlPressed,

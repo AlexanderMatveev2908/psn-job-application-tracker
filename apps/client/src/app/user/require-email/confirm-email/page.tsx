@@ -15,7 +15,7 @@ const Page: FC = () => {
     msgNotice: "to confirm the account",
   });
 
-  const isVerified = useGetUserState().user?.is_verified;
+  const isVerified = useGetUserState().user?.isVerified;
   const nav = useRouter();
 
   useEffect(() => {

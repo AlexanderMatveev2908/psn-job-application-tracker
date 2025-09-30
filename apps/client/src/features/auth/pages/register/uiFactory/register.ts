@@ -6,10 +6,10 @@ const gen = new FormFieldGen<RegisterFormT>();
 
 export const registerSwap_0: FormFieldTxtT<RegisterFormT>[] = [
   gen.txtField({
-    name: "first_name",
+    name: "firstName",
   }),
   gen.txtField({
-    name: "last_name",
+    name: "lastName",
   }),
   gen.txtField({
     name: "email",
