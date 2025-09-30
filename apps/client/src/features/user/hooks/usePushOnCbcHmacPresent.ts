@@ -11,19 +11,19 @@ type Params = {
 export const usePushOnCbcHmacPresent = ({ tokenType }: Params) => {
   const {
     delCbcHmac,
-    userState: { cbc_hmac_token, pendingActionCbcHmac },
+    userState: { cbcHmacToken, pendingActionCbcHmac },
   } = useUser();
 
   const nav = useRouter();
 
   useEffect(() => {
     if (
-      extractAadFromCbcHmac(cbc_hmac_token)?.token_t !== tokenType ||
+      extractAadFromCbcHmac(cbcHmacToken)?.tokenT !== tokenType ||
       pendingActionCbcHmac
     )
       return;
 
     delCbcHmac();
     nav.replace("/");
-  }, [cbc_hmac_token, delCbcHmac, nav, pendingActionCbcHmac, tokenType]);
+  }, [cbcHmacToken, delCbcHmac, nav, pendingActionCbcHmac, tokenType]);
 };

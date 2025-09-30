@@ -11,15 +11,15 @@ import {
 export const genPairsMainCardInfo = (jobAppl: JobApplicationT) =>
   [
     {
-      key: "company_name",
+      key: "companyName",
       Svg: FaBuilding,
     },
     {
-      key: "position_name",
+      key: "positionName",
       Svg: MdWork,
     },
     {
-      key: "applied_at",
+      key: "appliedAt",
       Svg: FaPenFancy,
     },
   ].map((el) => {
@@ -28,7 +28,7 @@ export const genPairsMainCardInfo = (jobAppl: JobApplicationT) =>
     return {
       ...el,
       label: parseDevValUsFriendly(el.key, { titleCase: true }),
-      val: el.key !== "applied_at" ? v : formatDate(v as number),
+      val: el.key !== "appliedAt" ? v : formatDate(v as number),
     };
   });
 

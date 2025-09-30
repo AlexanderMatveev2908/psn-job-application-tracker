@@ -25,11 +25,11 @@ const SwapSetup2FA: FC<FormManageAccPropsType & { user: UserT | null }> = ({
   const [mutate, { isLoading }] = userSliceAPI.useSetup2FAMutation();
 
   const { wrapAPI } = useKitHooks();
-  const { cbc_hmac_token } = useGetUserState();
+  const { cbcHmacToken } = useGetUserState();
 
   const handleClick = async () => {
     const res = await wrapAPI<Setup2FAReturnT>({
-      cbAPI: () => mutate({ cbc_hmac_token }),
+      cbAPI: () => mutate({ cbcHmacToken }),
       pushNotice: [401],
     });
 
@@ -68,7 +68,7 @@ const SwapSetup2FA: FC<FormManageAccPropsType & { user: UserT | null }> = ({
         />
       )}
 
-      {user?.is_verified && (!user?.use_2FA || res2FA) && (
+      {user?.isVerified && (!user?.use2FA || res2FA) && (
         <FooterSwapSetup2FA
           {...{
             handleClick,

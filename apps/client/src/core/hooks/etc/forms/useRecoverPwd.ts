@@ -23,14 +23,13 @@ export const useRecoverPwd = ({ strategy_2FA }: Params) => {
 
   const handleSave = handleSubmit(async (data) => {
     const res = await wrapAPI({
-      cbAPI: () =>
-        mutate({ ...data, cbc_hmac_token: userState.cbc_hmac_token }),
+      cbAPI: () => mutate({ ...data, cbcHmacToken: userState.cbcHmacToken }),
     });
 
     if (!res) return;
 
-    if (res?.access_token) {
-      loginUser(res.access_token);
+    if (res?.accessToken) {
+      loginUser(res.accessToken);
       delCbcHmac();
 
       nav.replace("/");

@@ -2,7 +2,7 @@
   "name": "server",
   "scripts": {
     "dev": "find app/src/main/java app/src/main/resources -type f | entr -r ./gradlew bootRun",
-    "check": "bash -e -c './gradlew clean && ( ./gradlew checkstyleMain & pid1=$!; ./gradlew pmdMain & pid2=$!; ./gradlew spotbugsMain & pid3=$!; wait $pid1 || exit 1; wait $pid2 || exit 1; wait $pid3 || exit 1 ) && echo \"🎉 java check passed 🎉\"'",
+    "check": "bash -e -c './gradlew clean && ( ./gradlew checkstyleMain & pid1=$!; ./gradlew pmdMain & pid2=$!; ./gradlew spotbugsMain & pid3=$!; wait $pid1 || exit 1; wait $pid2 || exit 1; wait $pid3 || exit 1 ) && echo \"☕ java check passed 🎉\"'",
     "build": "./gradlew bootJar",
     "start": "java -jar app/build/libs/server-1.0.0.jar",
     "test": "./gradlew test && echo \"☕ java tests passed 🎉\"",

@@ -19,12 +19,12 @@ export const hexToDict = (hex: string) =>
   JSON.parse(new TextDecoder().decode(hexToBytes(hex)));
 
 export const extractAadFromCbcHmac = (
-  cbc_hmac_token?: string | null
+  cbcHmacToken?: string | null
 ): AadCbcHmacT | null => {
   let aad: AadCbcHmacT | null = null;
   try {
-    if (cbc_hmac_token && REG_CBC_HMAC.test(cbc_hmac_token))
-      aad = hexToDict(cbc_hmac_token!.split(".")[0]!);
+    if (cbcHmacToken && REG_CBC_HMAC.test(cbcHmacToken))
+      aad = hexToDict(cbcHmacToken!.split(".")[0]!);
   } catch {
     aad = null;
   }

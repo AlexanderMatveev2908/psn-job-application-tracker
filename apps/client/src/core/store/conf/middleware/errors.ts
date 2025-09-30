@@ -19,12 +19,12 @@ export const handleErrorsActions =
         return next(action);
 
       const isLogged = REG_JWT.test(
-        (store.getState() as StoreStateT).user.access_token
+        (store.getState() as StoreStateT).user.accessToken
       );
 
       if (payload?.refreshed && !isLogged) {
         store.dispatch(
-          userSlice.actions.login({ access_token: payload.access_token })
+          userSlice.actions.login({ accessToken: payload.accessToken })
         );
         payload.restoredSession = true;
       } else if (payload?.refreshFailed && isLogged) {

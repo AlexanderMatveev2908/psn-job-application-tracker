@@ -21,7 +21,7 @@ const Page: FC = () => {
 
   const successCb = useCallback(
     async (res: UnwrappedResApiT<GainAccessManageAccReturnT>) => {
-      saveCbcHmac(res.cbc_hmac_token);
+      saveCbcHmac(res.cbcHmacToken);
 
       nav.replace("/user/manage-account");
     },

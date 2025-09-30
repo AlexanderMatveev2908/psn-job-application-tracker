@@ -41,11 +41,11 @@ export const useJobApplForm = <T extends Record<string, any>>({
     if (!application) return;
 
     reset({
-      company_name: application.company_name,
-      position_name: application.position_name,
+      companyName: application.companyName,
+      positionName: application.positionName,
       status: application.status,
       notes: application.notes ?? "",
-      applied_at: new Date(application.applied_at).toISOString().split("T")[0],
+      appliedAt: new Date(application.appliedAt).toISOString().split("T")[0],
     });
   }, [application, reset]);
 
@@ -69,10 +69,10 @@ export const useJobApplForm = <T extends Record<string, any>>({
       if (!(getValuesRead("txtFields") ?? []).some((el) => el.name === f.name))
         appendReadForm({ ...f, val: "" });
 
-    formCtxRead.setValue("txtFields.0.val", res.job_application.company_name, {
+    formCtxRead.setValue("txtFields.0.val", res.job_application.companyName, {
       shouldValidate: true,
     });
-    formCtxRead.setValue("txtFields.1.val", res.job_application.position_name, {
+    formCtxRead.setValue("txtFields.1.val", res.job_application.positionName, {
       shouldValidate: true,
     });
 

@@ -46,7 +46,7 @@ export const sortersSearchJobs: SorterSearchBarT[] = [
     name: "updated_at",
   },
   {
-    name: "applied_at",
+    name: "appliedAt",
   },
 ].map((el) => ({
   name: el.name + "_sort",

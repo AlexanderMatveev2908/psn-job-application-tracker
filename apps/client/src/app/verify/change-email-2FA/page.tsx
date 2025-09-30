@@ -17,7 +17,7 @@ const Page: FC = () => {
 
   const successCb = useCallback(
     async (res: UnwrappedResApiT<JwtReturnT>) => {
-      loginUser(res.access_token);
+      loginUser(res.accessToken);
       nav.replace("/");
     },
     [loginUser, nav]

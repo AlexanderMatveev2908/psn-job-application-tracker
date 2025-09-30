@@ -4,8 +4,8 @@ import { ApplicationStatusT } from "../types";
 
 const gen = new FormFieldGen();
 
-export const companyNameField = gen.txtField({ name: "company_name" });
-export const positionNameField = gen.txtField({ name: "position_name" });
+export const companyNameField = gen.txtField({ name: "companyName" });
+export const positionNameField = gen.txtField({ name: "positionName" });
 
 export const applicationStatusChoices = Object.values(ApplicationStatusT).map(
   (v) => ({

@@ -10,10 +10,10 @@ export enum ApplicationStatusT {
 }
 
 export interface JobApplicationT extends SqlTableRoot {
-  company_name: string;
-  user_id: string;
-  position_name: string;
+  companyName: string;
+  userId: string;
+  positionName: string;
   status: ApplicationStatusT;
-  applied_at: number;
+  appliedAt: number;
   notes?: string;
 }

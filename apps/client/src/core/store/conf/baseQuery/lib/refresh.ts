@@ -10,16 +10,16 @@ import { isStr } from "@/core/lib/dataStructure/ect";
 
 const getFreshAccessToken = async (): Promise<string> => {
   const { data } = await instanceAxs.get("/auth/refresh");
-  const access_token = data?.access_token;
+  const accessToken = data?.accessToken;
 
-  if (!isStr(access_token)) throw new Error("refresh_failed");
+  if (!isStr(accessToken)) throw new Error("refresh_failed");
 
-  saveStorage(access_token, { key: "access_token" });
+  saveStorage(accessToken, { key: "accessToken" });
   instanceAxs.defaults.headers.common[
     "Authorization"
-  ] = `Bearer ${access_token}`;
+  ] = `Bearer ${accessToken}`;
 
-  return access_token;
+  return accessToken;
 };
 
 export const refreshToken = async ({
@@ -30,9 +30,9 @@ export const refreshToken = async ({
   responseType,
   conf,
 }: BaseQueryArgT & { conf: Partial<ConfApiT> }) => {
-  const access_token = await getFreshAccessToken();
+  const accessToken = await getFreshAccessToken();
 
-  if (!isStr(access_token)) throw new Error("refresh_failed");
+  if (!isStr(accessToken)) throw new Error("refresh_failed");
 
   const {
     data: dataRetry,
@@ -58,7 +58,7 @@ export const refreshToken = async ({
       conf: confWithHeaders,
       status,
       refreshed: true,
-      access_token: access_token,
+      accessToken: accessToken,
     },
   };
 

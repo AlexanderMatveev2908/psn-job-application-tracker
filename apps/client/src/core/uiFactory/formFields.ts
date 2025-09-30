@@ -9,11 +9,11 @@ export const pwdField = gen.txtField({
   name: "password",
 });
 
-export type PwdT = "password" | "confirm_password";
+export type PwdT = "password" | "confirmPassword";
 
 export const pwdFields: Record<PwdT, FormFieldTxtT<any>> = {
   password: gen.txtField({ name: "password" }),
-  confirm_password: gen.txtField({ name: "confirm_password" }),
+  confirmPassword: gen.txtField({ name: "confirmPassword" }),
 };
 
 export const emailField = gen.txtField({

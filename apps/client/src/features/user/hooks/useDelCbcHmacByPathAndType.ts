@@ -29,23 +29,23 @@ export const useDelCbcHmacByPathAndType = () => {
 
   useEffect(() => {
     const cb = async () => {
-      if (!userState.cbc_hmac_token || userState.pendingActionCbcHmac) return;
-      const aad = extractAadFromCbcHmac(userState.cbc_hmac_token);
+      if (!userState.cbcHmacToken || userState.pendingActionCbcHmac) return;
+      const aad = extractAadFromCbcHmac(userState.cbcHmacToken);
       if (!aad) return;
 
-      const { token_t } = aad;
+      const { tokenT } = aad;
 
       if (
-        (Array.isArray(mapper[token_t]) &&
-          mapper[token_t].some((allowed) => p.startsWith(allowed))) ||
-        (typeof mapper[token_t] === "string" && p.startsWith(mapper[token_t]))
+        (Array.isArray(mapper[tokenT]) &&
+          mapper[tokenT].some((allowed) => p.startsWith(allowed))) ||
+        (typeof mapper[tokenT] === "string" && p.startsWith(mapper[tokenT]))
       )
         return;
 
       delCbcHmac();
 
       await wrapAPI({
-        cbAPI: () => mutate(userState.cbc_hmac_token),
+        cbAPI: () => mutate(userState.cbcHmacToken),
         showToast: false,
         hideErr: true,
       });
@@ -53,7 +53,7 @@ export const useDelCbcHmacByPathAndType = () => {
 
     cb();
   }, [
-    userState.cbc_hmac_token,
+    userState.cbcHmacToken,
     delCbcHmac,
     p,
     wrapAPI,

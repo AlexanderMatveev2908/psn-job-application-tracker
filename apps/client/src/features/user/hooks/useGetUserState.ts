@@ -8,8 +8,8 @@ export const useGetUserState = () => {
   const userState = useSelector(getUserState);
 
   const isLogged = useMemo(
-    () => REG_JWT.test(userState.access_token),
-    [userState.access_token]
+    () => REG_JWT.test(userState.accessToken),
+    [userState.accessToken]
   );
   const canPushNonLogged = useMemo(
     () =>

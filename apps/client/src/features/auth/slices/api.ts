@@ -7,8 +7,8 @@ import { ParamsAPI2FA } from "@/core/paperwork";
 const BASE = "/auth";
 
 export type LoginUserReturnT = {
-  access_token?: string;
-  cbc_hmac_token?: string;
+  accessToken?: string;
+  cbcHmacToken?: string;
 };
 
 export const authSliceAPI = apiSlice.injectEndpoints({
@@ -40,7 +40,7 @@ export const authSliceAPI = apiSlice.injectEndpoints({
 
     recoverPwdAuth: builder.mutation<
       ResApiT<JwtReturnT>,
-      { cbc_hmac_token: string; password: string }
+      { cbcHmacToken: string; password: string }
     >({
       query: (data) => ({
         url: `${BASE}/recover-pwd`,
@@ -61,7 +61,7 @@ export const authSliceAPI = apiSlice.injectEndpoints({
 
     recoverPwdAuthReset2FA: builder.mutation<
       ResApiT<JwtReturnT>,
-      { cbc_hmac_token: string; password: string }
+      { cbcHmacToken: string; password: string }
     >({
       query: (data) => ({
         url: `${BASE}/recover-pwd-2FA`,

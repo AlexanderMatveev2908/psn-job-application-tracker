@@ -8,11 +8,11 @@ import { ApplicationStatusT } from "../../../types";
 import { isStr } from "@/core/lib/dataStructure/ect";
 
 const mapper: MapperArrayFieldsT = {
-  company_name: {
+  companyName: {
     reg: REG_JOB_NAME,
     max: 100,
   },
-  position_name: {
+  positionName: {
     reg: REG_JOB_NAME,
     max: 100,
   },
@@ -26,7 +26,7 @@ export const searchJobsSchema = z
 
     created_at_sort: z.string(),
     updated_at_sort: z.string(),
-    applied_at_sort: z.string(),
+    appliedAt_sort: z.string(),
   })
   .superRefine((data, ctx) => {
     let i = 0;
@@ -74,5 +74,5 @@ export const resetValsSearchJobs: SearchJobsFormT = {
 
   created_at_sort: "",
   updated_at_sort: "",
-  applied_at_sort: "",
+  appliedAt_sort: "",
 };

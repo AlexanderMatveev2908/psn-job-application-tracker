@@ -102,7 +102,7 @@ const SearchJobs = <K extends any[]>({ hook, schema }: PropsType<K>) => {
         <div className="mt-5"></div>
         <Txt
           {...{
-            txt: `Delete application for ${applicationTarget?.company_name}?`,
+            txt: `Delete application for ${applicationTarget?.companyName}?`,
             $justify: "center",
             $size: "xl",
           }}

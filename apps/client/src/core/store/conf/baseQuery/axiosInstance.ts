@@ -9,10 +9,10 @@ export const instanceAxs = axios.create({
 });
 
 instanceAxs.interceptors.request.use((config) => {
-  const access_token = getStorage("access_token");
+  const accessToken = getStorage("accessToken");
 
-  if (isStr(access_token))
-    config.headers["Authorization"] = `Bearer ${access_token}`;
+  if (isStr(accessToken))
+    config.headers["Authorization"] = `Bearer ${accessToken}`;
 
   config.headers["Content-Type"] =
     config.data instanceof FormData

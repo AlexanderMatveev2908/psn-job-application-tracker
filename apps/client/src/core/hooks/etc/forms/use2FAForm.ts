@@ -56,17 +56,17 @@ export const use2FAForm = <T>({
 
   const mainCb = useCallback(
     async ({
-      totp_code,
+      totpCode,
       backup_code,
     }: {
-      totp_code?: string;
+      totpCode?: string;
       backup_code?: string;
     }) => {
       const res = await wrapAPI({
         cbAPI: () =>
           mutationTrigger({
-            cbc_hmac_token: userState.cbc_hmac_token,
-            ...(totp_code ? { totp_code } : { backup_code }),
+            cbcHmacToken: userState.cbcHmacToken,
+            ...(totpCode ? { totpCode } : { backup_code }),
           }),
         pushNotice: [401],
       });
@@ -81,7 +81,7 @@ export const use2FAForm = <T>({
       successCb(res);
     },
     [
-      userState.cbc_hmac_token,
+      userState.cbcHmacToken,
       wrapAPI,
       delCbcHmac,
       mutationTrigger,
@@ -98,13 +98,13 @@ export const use2FAForm = <T>({
 
   const handleSaveBackupCode = submitBackupCode(async (data) => {
     await mainCb({
-      backup_code: data.backup_code,
+      backup_code: data.backupCode,
     });
   }, logFormErrs);
 
   const handleSaveTotp = submitTotp(async (data) => {
     await mainCb({
-      totp_code: data.totp_code.join(""),
+      totpCode: data.totpCode.join(""),
     });
   }, logFormErrs);
 

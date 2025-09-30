@@ -10,8 +10,8 @@ import { apiSlice } from "@/core/store/api";
 const BASE = "/verify";
 
 export type VerifyCbcHmacReturnT = {
-  cbc_hmac_token?: string;
-  access_token?: string;
+  cbcHmacToken?: string;
+  accessToken?: string;
   strategy_2FA?: boolean;
 };
 
@@ -22,7 +22,7 @@ export type VerifyCbcHmacEndpointT =
 
 export type VerifyCbcHmacArgT = {
   endpoint: VerifyCbcHmacEndpointT;
-  cbc_hmac_token: string;
+  cbcHmacToken: string;
 };
 
 export const verifySliceAPI = apiSlice.injectEndpoints({
@@ -32,7 +32,7 @@ export const verifySliceAPI = apiSlice.injectEndpoints({
       VerifyCbcHmacArgT
     >({
       query: (data) => ({
-        url: `${BASE}/${data.endpoint}?cbc_hmac_token=${data.cbc_hmac_token}`,
+        url: `${BASE}/${data.endpoint}?cbcHmacToken=${data.cbcHmacToken}`,
         method: "GET",
       }),
     }),

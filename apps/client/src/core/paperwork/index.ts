@@ -30,13 +30,13 @@ export const resetValsPwdForm: PwdFormT = {
 
 export const pwdsSchema = z
   .object({
-    confirm_password: z
+    confirmPassword: z
       .string({ error: "You must confirm password" })
       .min(1, "You must confirm password"),
   })
   .and(pwdSchema)
-  .refine((d) => d.password === d.confirm_password, {
-    path: ["confirm_password"],
+  .refine((d) => d.password === d.confirmPassword, {
+    path: ["confirmPassword"],
     message: "Passwords do not match",
   });
 
@@ -44,26 +44,26 @@ export type PwdsFormT = z.infer<typeof pwdsSchema>;
 
 export const resetValsPwdsForm: PwdsFormT = {
   password: "",
-  confirm_password: "",
+  confirmPassword: "",
 };
 
 export const schemaTotpCode = z
   .object({
-    totp_code: z.array(z.string()).length(6, "Invalid Totp code length"),
+    totpCode: z.array(z.string()).length(6, "Invalid Totp code length"),
   })
-  .refine((data) => REG_TOTP_CODE.test(data.totp_code.join("")), {
+  .refine((data) => REG_TOTP_CODE.test(data.totpCode.join("")), {
     message: "Invalid Totp Code",
-    path: ["totp_code"],
+    path: ["totpCode"],
   });
 
 export type ToptFormT = z.infer<typeof schemaTotpCode>;
 
 export const resetValsTotpForm: ToptFormT = {
-  totp_code: Array.from({ length: 6 }, () => ""),
+  totpCode: Array.from({ length: 6 }, () => ""),
 };
 
 export const schemaBackupForm = z.object({
-  backup_code: z
+  backupCode: z
     .string()
     .min(1, "Backup code required")
     .regex(REG_BACKUP_CODE, "Invalid backup code"),
@@ -72,13 +72,13 @@ export const schemaBackupForm = z.object({
 export type BackupCodeFormT = z.infer<typeof schemaBackupForm>;
 
 export const resetValsBackupForm: BackupCodeFormT = {
-  backup_code: "",
+  backupCode: "",
 };
 
 export type ParamsAPI2FA = {
-  cbc_hmac_token: string;
-  totp_code?: string;
-  backup_code?: string;
+  cbcHmacToken: string;
+  totpCode?: string;
+  backupCode?: string;
 };
 
 export const txtFieldSchema = z.object({

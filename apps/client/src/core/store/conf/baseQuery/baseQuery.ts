@@ -25,7 +25,7 @@ export const baseQueryAxs: BaseQueryFn<
     params,
     responseType,
     reqData: serialize(originalDataRequest),
-    jwt: getStorage("access_token") as string,
+    jwt: getStorage("accessToken") as string,
     method,
   };
 

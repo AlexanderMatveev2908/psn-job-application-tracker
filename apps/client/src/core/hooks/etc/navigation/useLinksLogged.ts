@@ -8,7 +8,7 @@ export const useLinksLogged = () => {
   const linksLoggedFiltered = useMemo(
     () =>
       linksLoggedAccount.filter((lk) =>
-        user?.is_verified ? lk.label.toLowerCase() !== "confirm email" : lk
+        user?.isVerified ? lk.label.toLowerCase() !== "confirm email" : lk
       ),
     [user]
   );

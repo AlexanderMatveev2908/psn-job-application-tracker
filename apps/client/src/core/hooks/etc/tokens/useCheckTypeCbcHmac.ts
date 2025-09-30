@@ -10,12 +10,12 @@ type Params = {
 };
 
 export const useCheckTypeCbcHmac = ({ tokenType, pathPush }: Params) => {
-  const { cbc_hmac_token } = useGetUserState();
+  const { cbcHmacToken } = useGetUserState();
   const { checkCbcHmac } = useCheckCbcHmac();
 
   const checkCb = useCallback(() => {
-    checkCbcHmac({ cbc_hmac_token, tokenType, pathPush });
-  }, [checkCbcHmac, cbc_hmac_token, tokenType, pathPush]);
+    checkCbcHmac({ cbcHmacToken, tokenType, pathPush });
+  }, [checkCbcHmac, cbcHmacToken, tokenType, pathPush]);
 
   useRunOnHydrate({ cb: checkCb });
 };
