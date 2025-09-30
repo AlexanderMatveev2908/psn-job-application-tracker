@@ -109,7 +109,7 @@ public class CloudSvc {
                 .bodyToMono(String.class)
                 .flatMap(str -> {
 
-                    Map<String, Object> parsed = Frmt.toMap(str);
+                    Map<String, Object> parsed = Frmt.jsonToMap(str);
 
                     var asset = new CloudAsset((String) parsed.get("public_id"),
                             (String) parsed.get("secure_url"), (String) parsed.get("resource_type"));
@@ -139,7 +139,7 @@ public class CloudSvc {
                 .retrieve()
                 .bodyToMono(String.class)
                 .flatMap(response -> {
-                    Map<String, Object> parsed = Frmt.toMap(response);
+                    Map<String, Object> parsed = Frmt.jsonToMap(response);
 
                     String result = parsed.get("result").toString();
                     int count = "ok".equals(result) ? 1 : 0;

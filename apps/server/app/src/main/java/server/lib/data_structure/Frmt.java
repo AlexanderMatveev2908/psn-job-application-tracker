@@ -29,7 +29,7 @@ public final class Frmt {
         }
     }
 
-    public static Map<String, Object> toMap(String txt) {
+    public static Map<String, Object> jsonToMap(String txt) {
 
         try {
             return jack.readValue(txt, new TypeReference<Map<String, Object>>() {
@@ -46,4 +46,13 @@ public final class Frmt {
         byte[] utf8Bytes = HexFormat.of().parseHex(txtHex);
         return new String(utf8Bytes, StandardCharsets.UTF_8);
     }
+
+    public static String binaryToHex(byte[] arg) {
+        return HexFormat.of().formatHex(arg);
+    }
+
+    public static byte[] hexToBinary(String arg) {
+        return HexFormat.of().parseHex(arg);
+    }
+
 }

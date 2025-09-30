@@ -3,7 +3,6 @@ package server.lib.security.cbc_hmac;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,7 +10,6 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
@@ -32,17 +30,13 @@ public class CbcHmac {
     private final Hkdf hkdf;
     private final ExpMng expMng;
 
-    public RecCbcHmacKeys deriveKeys(RecAad rec) {
+    private RecCbcHmacKeys deriveKeys(RecAad rec) {
         byte[] okm = hkdf.derive(rec, 64);
 
         byte[] aesKey = Arrays.copyOfRange(okm, 0, 32);
         byte[] hmacKey = Arrays.copyOfRange(okm, 32, 64);
 
         return new RecCbcHmacKeys(aesKey, hmacKey);
-    }
-
-    private String encode(byte[] arg) {
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(arg);
     }
 
     private IvParameterSpec genIv() {
@@ -53,7 +47,7 @@ public class CbcHmac {
         return ivSpec;
     }
 
-    private byte[] encrypt(byte[] plain, SecretKey aesKey, IvParameterSpec ivSpec) {
+    private byte[] encrypt(SecretKey aesKey, IvParameterSpec ivSpec, byte[] plain) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, aesKey, ivSpec);
@@ -61,7 +55,19 @@ public class CbcHmac {
 
             return ciphertext;
         } catch (Exception err) {
-            throw new ErrAPI("err aes encryption");
+            throw new ErrAPI("err encryption aes");
+        }
+    }
+
+    private Map<String, Object> decrypt(SecretKey aesKey, byte[] iv, byte[] ciphertext) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, aesKey, new IvParameterSpec(iv));
+            byte[] plain = cipher.doFinal(ciphertext);
+
+            return Frmt.jsonToMap(new String(plain, StandardCharsets.UTF_8));
+        } catch (Exception err) {
+            throw new ErrAPI("cbc_hmac_invalid", 401);
         }
     }
 
@@ -86,20 +92,42 @@ public class CbcHmac {
 
         RecCbcHmacKeys keys = deriveKeys(aad);
 
-        SecretKey aesKey = new SecretKeySpec(keys.aesKey(), "AES");
-        SecretKey hmacKey = new SecretKeySpec(keys.hmacKey(), "HmacSHA512");
-
-        byte[] plain = Frmt.toJson(Map.of("userId", userId)).getBytes(StandardCharsets.UTF_8);
+        long exp = expMng.cbcHmac();
+        byte[] plain = Frmt.toJson(Map.of("userId", userId, "exp", exp)).getBytes(StandardCharsets.UTF_8);
 
         IvParameterSpec ivSpec = genIv();
 
-        byte[] ciphertext = encrypt(plain, aesKey, ivSpec);
+        byte[] ciphertext = encrypt(keys.getAesSpec(), ivSpec, plain);
 
-        byte[] tag = hash(hmacKey, aad, ivSpec.getIV(), ciphertext);
+        byte[] tag = hash(keys.getHmacSpec(), aad, ivSpec.getIV(), ciphertext);
 
-        String clientToken = encode(ivSpec.getIV()) + "." + encode(ciphertext) + "." + encode(tag);
+        String clientToken = Frmt.binaryToHex(ivSpec.getIV()) + "." + Frmt.binaryToHex(ciphertext) + "."
+                + Frmt.binaryToHex(tag);
 
-        return new MyToken(userId, tokenT, algT, clientToken, expMng.cbcHmac());
+        return new MyToken(userId, algT, tokenT, clientToken, exp);
+    }
+
+    public Map<String, Object> check(String clientToken, AlgT algT, TokenT tokenT, UUID userId) {
+
+        String[] parts = clientToken.split("\\.");
+        if (parts.length != 3)
+            throw new ErrAPI("cbc_hmac_invalid", 401);
+
+        byte[] iv = Frmt.hexToBinary(parts[0]);
+        byte[] cyphertext = Frmt.hexToBinary(parts[1]);
+        byte[] tag = Frmt.hexToBinary(parts[2]);
+
+        RecAad aad = new RecAad(algT, tokenT, userId);
+        RecCbcHmacKeys keys = deriveKeys(aad);
+
+        byte[] recomputed = hash(keys.getHmacSpec(), aad, iv, cyphertext);
+
+        if (!Arrays.equals(tag, recomputed))
+            throw new ErrAPI("cbc_hmac_invalid", 401);
+
+        Map<String, Object> payload = decrypt(keys.getAesSpec(), iv, cyphertext);
+
+        return payload;
     }
 
 }

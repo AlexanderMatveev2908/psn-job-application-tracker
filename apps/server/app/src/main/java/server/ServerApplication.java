@@ -35,6 +35,7 @@ public class ServerApplication {
         return e -> {
 
             try {
+                dev.doAesHmacStuff();
 
                 lifeSpawn.lifeCheck(e);
 

@@ -52,8 +52,8 @@ public class UserSvc {
 
                             MyToken refreshTk = new MyToken(
                                     dbUser.getId(),
-                                    TokenT.REFRESH,
                                     AlgT.RSA_OAEP256_A256GCM,
+                                    TokenT.REFRESH,
                                     recSession.recJwe());
 
                             return tokensRepo.insert(refreshTk)
