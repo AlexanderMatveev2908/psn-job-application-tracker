@@ -1,7 +1,6 @@
 package server.middleware.security;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.core.annotation.Order;
@@ -66,22 +65,12 @@ public class CorsMdw implements WebFilter {
     }
 
     private void setCorsHeaders(org.springframework.http.server.reactive.ServerHttpResponse res, String allowed) {
-        String[] hdr = {
-                HttpHeaders.ORIGIN,
-                HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.ACCEPT,
-                HttpHeaders.AUTHORIZATION
-        };
-
-        String allowedHdr = String.join(", ", hdr) + ", " +
-                String.join(", ", Arrays.stream(hdr)
-                        .map(String::toLowerCase)
-                        .toArray(String[]::new));
+        String allowedHdr = "Origin, Content-Type, Accept, Authorization";
 
         var resHdr = res.getHeaders();
-        resHdr.set("Access-Control-Allow-Headers", allowedHdr);
-        resHdr.set("Access-Control-Allow-Origin", allowed);
-        resHdr.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        resHdr.set("Access-Control-Allow-Credentials", "true");
+        resHdr.set(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, allowedHdr);
+        resHdr.set(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, allowed);
+        resHdr.set(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT, DELETE, OPTIONS");
+        resHdr.set(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
     }
 }

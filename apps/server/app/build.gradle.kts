@@ -119,14 +119,14 @@ tasks.named("check") {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-    testLogging {
-        events("passed", "skipped", "failed")
-        exceptionFormat = TestExceptionFormat.SHORT
-        // showExceptions = false
-        // showCauses = false
-        // showStackTraces = false
-        showStandardStreams = true
-    }
+    // testLogging {
+    //     events("passed", "skipped","failed")
+    //     exceptionFormat = TestExceptionFormat.SHORT
+    //     showExceptions = false
+    //     showCauses = false
+    //     showStackTraces = false
+    //     showStandardStreams = false
+    // }
 
     // ? silence CDS warnings
     jvmArgs("-Xshare:off")
@@ -135,10 +135,14 @@ tasks.named<Test>("test") {
 }
 
 testlogger {
-    theme = ThemeType.MOCHA
-    showPassed = true
-    showSkipped = true
-    showFailed = true
+     theme = ThemeType.MOCHA
+    showPassed = false   
+    showSkipped = false
+    showFailed = true    
+    showExceptions = false
+    showCauses = false
+    showStackTraces = false
+    showStandardStreams = true
 }
 
 tasks.named<BootJar>("bootJar") {

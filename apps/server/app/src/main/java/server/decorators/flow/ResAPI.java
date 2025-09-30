@@ -80,17 +80,23 @@ public final class ResAPI {
     }
 
     public Mono<ResponseEntity<ResAPI>> build() {
-        String safeMsg = (msg == null) ? MapperMsg.fromCode(status).getMsg() : msg;
+        String safeMsg = status == 204 ? null : msg != null ? msg : MapperMsg.fromCode(status).getMsg();
         ActT act = (status >= 200 && status < 300) ? ActT.OK : ActT.ERR;
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.status(status);
         for (ResponseCookie cookie : cookies)
             builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return Mono.just(builder.body(
-                new ResAPI()
-                        .status(status)
-                        .msg(prependEmj(safeMsg, act))
-                        .data(data)));
+        if (status == 204)
+            return Mono.just(builder.build());
+
+        var myRes = new ResAPI()
+                .status(status)
+                .msg(prependEmj(safeMsg, act))
+                .data(data);
+
+        return Mono.just(
+                builder.body(
+                        myRes));
     }
 }
