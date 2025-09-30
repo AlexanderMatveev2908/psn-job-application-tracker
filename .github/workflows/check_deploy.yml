@@ -87,13 +87,18 @@ jobs:
         run: |
           set -euo pipefail
           yarn start &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           yarn dlx wait-on \
-            --timeout 30000 \
+            --timeout $((1000 * 30)) \
             http-get://localhost:3000/api/v1/test \
             http-get://localhost:3001
 
       - name: 💻 run test client
         run: yarn workspace client test
+
+      - name: 🛑 stop server
+        run: kill $SERVER_PID || true
 
       - name: ☕ run test server
         run: yarn workspace server test
