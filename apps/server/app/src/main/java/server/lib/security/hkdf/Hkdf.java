@@ -21,15 +21,13 @@ public class Hkdf {
         this.envKeeper = envKeeper;
     }
 
-    public byte[] derive(RecAad rec, int len) {
+    public byte[] derive(RecAad aad, int len) {
         byte[] ikm = envKeeper.getHkdfMaster().getBytes(StandardCharsets.UTF_8);
 
-        byte[] salt = envKeeper.getHkdfSalt().getBytes(StandardCharsets.UTF_8);
-
-        byte[] info = rec.toBinary();
+        byte[] aadBinary = aad.toBinary();
 
         HKDFBytesGenerator hkdf = new HKDFBytesGenerator(digest);
-        hkdf.init(new HKDFParameters(ikm, salt, info));
+        hkdf.init(new HKDFParameters(ikm, aad.getSalt(), aadBinary));
 
         byte[] okm = new byte[len];
         hkdf.generateBytes(okm, 0, len);

@@ -101,7 +101,8 @@ public class CbcHmac {
 
         byte[] tag = hash(keys.getHmacSpec(), aad, ivSpec.getIV(), ciphertext);
 
-        String clientToken = Frmt.binaryToHex(ivSpec.getIV()) + "." + Frmt.binaryToHex(ciphertext) + "."
+        String clientToken = Frmt.binaryToHex(aad.toBinary()) + "." + Frmt.binaryToHex(ivSpec.getIV()) + "."
+                + Frmt.binaryToHex(ciphertext) + "."
                 + Frmt.binaryToHex(tag);
 
         return new MyToken(userId, algT, tokenT, clientToken, exp);
@@ -110,14 +111,15 @@ public class CbcHmac {
     public Map<String, Object> check(String clientToken, AlgT algT, TokenT tokenT, UUID userId) {
 
         String[] parts = clientToken.split("\\.");
-        if (parts.length != 3)
+        if (parts.length != 4)
             throw new ErrAPI("cbc_hmac_invalid", 401);
 
-        byte[] iv = Frmt.hexToBinary(parts[0]);
-        byte[] cyphertext = Frmt.hexToBinary(parts[1]);
-        byte[] tag = Frmt.hexToBinary(parts[2]);
+        RecAad aad = new RecAad(parts[0]);
 
-        RecAad aad = new RecAad(algT, tokenT, userId);
+        byte[] iv = Frmt.hexToBinary(parts[1]);
+        byte[] cyphertext = Frmt.hexToBinary(parts[2]);
+        byte[] tag = Frmt.hexToBinary(parts[3]);
+
         RecCbcHmacKeys keys = deriveKeys(aad);
 
         byte[] recomputed = hash(keys.getHmacSpec(), aad, iv, cyphertext);
