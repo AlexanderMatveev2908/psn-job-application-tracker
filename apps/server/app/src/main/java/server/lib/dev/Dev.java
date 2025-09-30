@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
 import server.lib.security.cbc_hmac.CbcHmac;
-import server.lib.security.hkdf.Hkdf;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 
@@ -40,11 +39,11 @@ public class Dev {
     public void doAesHmacStuff() {
 
         var usId = UUID.randomUUID();
-        var token = cbcHmac.create(AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
+        var rec = cbcHmac.create(AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
 
-        System.out.println(token);
+        System.out.println(rec.token());
 
-        var res = cbcHmac.check(token.getHashed(), AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
+        var res = cbcHmac.check(rec.clientToken(), AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
 
         System.out.println(res);
     }

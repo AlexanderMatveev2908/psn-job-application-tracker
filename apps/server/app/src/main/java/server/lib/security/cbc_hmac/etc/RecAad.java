@@ -14,11 +14,13 @@ import server.models.token.etc.TokenT;
 
 @Getter
 public class RecAad {
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     private final AlgT algT;
     private final TokenT tokenT;
     private final byte[] salt;
     private final UUID userId;
+    private final UUID tokenId;
 
     public RecAad(AlgT algT, TokenT tokenT, UUID userId) {
         this.algT = algT;
@@ -26,31 +28,39 @@ public class RecAad {
         this.userId = userId;
 
         byte[] salt = new byte[32];
-        new SecureRandom().nextBytes(salt);
+        secureRandom.nextBytes(salt);
         this.salt = salt;
+        this.tokenId = UUID.randomUUID();
     }
 
-    public RecAad(String part) {
+    private RecAad(AlgT algT, TokenT tokenT, byte[] salt, UUID userId, UUID tokenId) {
+        this.algT = algT;
+        this.tokenT = tokenT;
+        this.salt = salt;
+        this.userId = userId;
+        this.tokenId = tokenId;
+    }
+
+    public byte[] getSalt() {
+        return salt.clone();
+    }
+
+    public static RecAad fromPart(String part) {
         try {
             byte[] binary = Frmt.hexToBinary(part);
             String json = new String(binary, StandardCharsets.UTF_8);
             Map<String, Object> map = Frmt.jsonToMap(json);
 
-            this.algT = AlgT.valueOf((String) map.get("algT"));
-            this.tokenT = TokenT.valueOf((String) map.get("tokenT"));
-            this.salt = Frmt.hexToBinary((String) map.get("salt"));
-            this.userId = UUID.fromString((String) map.get("userId"));
+            AlgT algT = AlgT.valueOf((String) map.get("algT"));
+            TokenT tokenT = TokenT.valueOf((String) map.get("tokenT"));
+            byte[] salt = Frmt.hexToBinary((String) map.get("salt"));
+            UUID userId = UUID.fromString((String) map.get("userId"));
+            UUID tokenId = UUID.fromString((String) map.get("tokenId"));
 
+            return new RecAad(algT, tokenT, salt, userId, tokenId);
         } catch (Exception err) {
             throw new ErrAPI("cbc_hmac_invalid", 401);
         }
-    }
-
-    public RecAad(AlgT algT, TokenT tokenT, byte[] salt, UUID userId) {
-        this.algT = algT;
-        this.tokenT = tokenT;
-        this.userId = userId;
-        this.salt = salt;
     }
 
     public byte[] toBinary() {
@@ -59,8 +69,9 @@ public class RecAad {
         map.put("tokenT", tokenT.getValue());
         map.put("salt", Frmt.binaryToHex(salt));
         map.put("userId", userId.toString());
+        map.put("tokenId", tokenId.toString());
 
-        return Frmt.toJson(map).getBytes(StandardCharsets.UTF_8);
+        return Frmt.mapToBinary(map);
     }
 
 }

@@ -55,4 +55,12 @@ public final class Frmt {
         return HexFormat.of().parseHex(arg);
     }
 
+    public static byte[] utf8ToBinary(String arg) {
+        return arg.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public static byte[] mapToBinary(Map<String, Object> arg) {
+        return utf8ToBinary(toJson(arg));
+    }
+
 }

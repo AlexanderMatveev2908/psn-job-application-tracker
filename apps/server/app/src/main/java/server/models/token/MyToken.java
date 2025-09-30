@@ -32,7 +32,8 @@ public class MyToken extends RootTable {
     @Column("exp")
     private Long exp;
 
-    public MyToken(UUID userId, AlgT algType, TokenT tokenType, String hashed, Long exp) {
+    public MyToken(UUID id, UUID userId, AlgT algType, TokenT tokenType, String hashed, Long exp) {
+        this.id = id;
         this.userId = userId;
         this.tokenType = tokenType;
         this.algType = algType;

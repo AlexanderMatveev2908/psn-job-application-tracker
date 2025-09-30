@@ -71,6 +71,9 @@ public final class EnvKeeper {
     @NotBlank
     @Resolved
     private String hkdfSalt;
+    @NotBlank
+    @Resolved
+    private String dbHashKey;
 
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);

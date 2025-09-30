@@ -4,14 +4,15 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.conf.env_conf.EnvKeeper;
+import server.lib.data_structure.Frmt;
 import server.lib.security.cbc_hmac.etc.RecAad;
-
-import java.nio.charset.StandardCharsets;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 
+@SuppressFBWarnings({ "EI2" })
 @Service
 public class Hkdf {
     private final Digest digest = new SHA256Digest();
@@ -22,7 +23,7 @@ public class Hkdf {
     }
 
     public byte[] derive(RecAad aad, int len) {
-        byte[] ikm = envKeeper.getHkdfMaster().getBytes(StandardCharsets.UTF_8);
+        byte[] ikm = Frmt.utf8ToBinary(envKeeper.getHkdfMaster());
 
         byte[] aadBinary = aad.toBinary();
 

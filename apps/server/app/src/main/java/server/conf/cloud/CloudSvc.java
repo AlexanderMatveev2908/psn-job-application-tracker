@@ -1,6 +1,5 @@
 package server.conf.cloud;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class CloudSvc {
     private String sign(String stringToSign) {
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-            byte[] digest = sha1.digest(stringToSign.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = sha1.digest(Frmt.utf8ToBinary(stringToSign));
             String sig = HexFormat.of().formatHex(digest);
 
             return sig;

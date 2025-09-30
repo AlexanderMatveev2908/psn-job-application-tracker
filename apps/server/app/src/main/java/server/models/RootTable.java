@@ -13,16 +13,16 @@ import server.decorators.RootCls;
 @EqualsAndHashCode()
 public class RootTable implements RootCls {
     @Id
-    private UUID id;
+    protected UUID id;
 
     @Column("created_at")
-    private Long createdAt;
+    protected Long createdAt;
 
     @Column("updated_at")
-    private Long updatedAt;
+    protected Long updatedAt;
 
     @Column("deleted_at")
-    private Long deletedAt;
+    protected Long deletedAt;
 
     @Override
     public String toString() {

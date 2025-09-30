@@ -17,6 +17,7 @@ app:
   jwePublic: ${JWE_PUBLIC}
   hkdfMaster: ${HKDF_MASTER}
   hkdfSalt: ${HKDF_SALT}
+  dbHashKey: ${DB_HASH_KEY}
 
 server:
   address: 0.0.0.0

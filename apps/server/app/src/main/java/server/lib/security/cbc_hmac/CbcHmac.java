@@ -1,6 +1,8 @@
 package server.lib.security.cbc_hmac;
 
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Map;
@@ -13,12 +15,15 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
 import server.lib.security.cbc_hmac.etc.RecAad;
 import server.lib.security.cbc_hmac.etc.RecCbcHmacKeys;
+import server.lib.security.cbc_hmac.etc.RecCreateCbcHmac;
 import server.lib.security.expiry_mng.ExpMng;
+import server.lib.security.hash.DbHash;
 import server.lib.security.hkdf.Hkdf;
 import server.models.token.MyToken;
 import server.models.token.etc.AlgT;
@@ -26,9 +31,13 @@ import server.models.token.etc.TokenT;
 
 @Service
 @RequiredArgsConstructor
+@SuppressFBWarnings({ "REC" })
 public class CbcHmac {
+    private static final SecureRandom secureRandom = new SecureRandom();
+
     private final Hkdf hkdf;
     private final ExpMng expMng;
+    private final DbHash dbHash;
 
     private RecCbcHmacKeys deriveKeys(RecAad rec) {
         byte[] okm = hkdf.derive(rec, 64);
@@ -41,7 +50,7 @@ public class CbcHmac {
 
     private IvParameterSpec genIv() {
         byte[] iv = new byte[16];
-        new SecureRandom().nextBytes(iv);
+        secureRandom.nextBytes(iv);
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
         return ivSpec;
@@ -82,18 +91,18 @@ public class CbcHmac {
             byte[] tag = mac.doFinal();
 
             return tag;
-        } catch (Exception err) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException err) {
             throw new ErrAPI("err hmac hashing");
         }
     }
 
-    public MyToken create(AlgT algT, TokenT tokenT, UUID userId) {
+    public RecCreateCbcHmac create(AlgT algT, TokenT tokenT, UUID userId) {
         RecAad aad = new RecAad(algT, tokenT, userId);
 
         RecCbcHmacKeys keys = deriveKeys(aad);
 
         long exp = expMng.cbcHmac();
-        byte[] plain = Frmt.toJson(Map.of("userId", userId, "exp", exp)).getBytes(StandardCharsets.UTF_8);
+        byte[] plain = Frmt.mapToBinary(Map.of("userId", userId, "exp", exp));
 
         IvParameterSpec ivSpec = genIv();
 
@@ -105,7 +114,10 @@ public class CbcHmac {
                 + Frmt.binaryToHex(ciphertext) + "."
                 + Frmt.binaryToHex(tag);
 
-        return new MyToken(userId, algT, tokenT, clientToken, exp);
+        var newToken = new MyToken(aad.getTokenId(), userId, algT, tokenT, dbHash.hash(clientToken), exp);
+
+        return new RecCreateCbcHmac(newToken,
+                clientToken);
     }
 
     public Map<String, Object> check(String clientToken, AlgT algT, TokenT tokenT, UUID userId) {
@@ -114,7 +126,7 @@ public class CbcHmac {
         if (parts.length != 4)
             throw new ErrAPI("cbc_hmac_invalid", 401);
 
-        RecAad aad = new RecAad(parts[0]);
+        RecAad aad = RecAad.fromPart(parts[0]);
 
         byte[] iv = Frmt.hexToBinary(parts[1]);
         byte[] cyphertext = Frmt.hexToBinary(parts[2]);
