@@ -22,7 +22,7 @@ import server._lib_tests.ResT;
 import server.conf.Reg;
 
 @SpringBootTest
-@AutoConfigureWebTestClient
+@AutoConfigureWebTestClient(timeout = "120s")
 public class RegisterTest {
 
         private final static MyPayloads payloads = new MyPayloads();

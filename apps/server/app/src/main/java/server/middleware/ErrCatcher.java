@@ -30,6 +30,7 @@ public class ErrCatcher implements WebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exc, Throwable err) {
 
+        err.printStackTrace();
         MyLog.logErr(err);
 
         String msg = Optional.of(err.getMessage()).orElse("");

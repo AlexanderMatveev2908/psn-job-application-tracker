@@ -34,7 +34,12 @@ public class ServerApplication {
     ApplicationListener<WebServerInitializedEvent> startCheck() {
         return e -> {
 
-            lifeSpawn.lifeCheck(e);
+            try {
+
+                lifeSpawn.lifeCheck(e);
+            } catch (Exception err) {
+                MyLog.logErr(err);
+            }
 
         };
     }

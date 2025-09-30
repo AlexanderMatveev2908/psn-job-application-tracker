@@ -37,6 +37,12 @@ spring:
     url: 👻
     username: 👻
     password: 👻
+    pool:
+      enabled: true
+      initial-size: 0
+      max-size: 5
+      max-acquire-time: 120s
+      validation-query: SELECT 1
 
   main:
     banner-mode: off

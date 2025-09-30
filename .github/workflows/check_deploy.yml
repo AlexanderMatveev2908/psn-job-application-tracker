@@ -12,6 +12,7 @@ jobs:
   check:
     name: 🧪 check 🧪
     runs-on: ubuntu-latest
+
     env:
       PSN_JOB_APPLICATION_TRACKER_CLIENT: ${{secrets.PSN_JOB_APPLICATION_TRACKER_CLIENT}}
       PSN_JOB_APPLICATION_TRACKER_SERVER: ${{secrets.PSN_JOB_APPLICATION_TRACKER_SERVER}}
