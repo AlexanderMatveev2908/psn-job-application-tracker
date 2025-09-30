@@ -574,7 +574,7 @@ poetry run python -m java_pkg_cli example_group:example_artifact:1.2.3-cool_vers
 
 ### CLI Parameters
 
-- **library** — required, `group:artifact` format (1st positional argument)
+- **library** — required, `group:artifact:optional-version` format (1st positional argument)
 
 - **config type** — optional with **i(implementation)** as default, Gradle configuration type (2nd positional argument). Examples:
 

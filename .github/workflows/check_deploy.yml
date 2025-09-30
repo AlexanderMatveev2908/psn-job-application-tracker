@@ -33,6 +33,12 @@ jobs:
       BREVO_SMPT_PORT: ${{secrets.BREVO_SMPT_PORT}}
       BREVO_SMPT_USER: ${{secrets.BREVO_SMPT_USER}}
       BREVO_SMPT_PWD: ${{secrets.BREVO_SMPT_PWD}}
+      CLOUD_NAME: ${{secrets.CLOUD_NAME}}
+      CLOUD_API_KEY: ${{secrets.CLOUD_API_KEY}}
+      CLOUD_API_SECRET: ${{secrets.CLOUD_API_SECRET}}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
+      JWE_PRIVATE: ${{secrets.JWE_PRIVATE}}
+      JWE_PUBLIC: ${{secrets.JWE_PUBLIC}}
 
     steps:
       - name: 📂 clone code
