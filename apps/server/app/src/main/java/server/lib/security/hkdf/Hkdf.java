@@ -5,14 +5,9 @@ import org.bouncycastle.crypto.params.HKDFParameters;
 import org.springframework.stereotype.Service;
 
 import server.conf.env_conf.EnvKeeper;
-import server.lib.data_structure.Frmt;
-import server.models.token.etc.AlgT;
-import server.models.token.etc.TokenT;
+import server.lib.security.cbc_hmac.etc.RecAad;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HexFormat;
-import java.util.Map;
-import java.util.UUID;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -26,23 +21,19 @@ public class Hkdf {
         this.envKeeper = envKeeper;
     }
 
-    public String derive(AlgT algT, TokenT tokenT, UUID userId, int len) {
+    public byte[] derive(RecAad rec, int len) {
         byte[] ikm = envKeeper.getHkdfMaster().getBytes(StandardCharsets.UTF_8);
 
         byte[] salt = envKeeper.getHkdfSalt().getBytes(StandardCharsets.UTF_8);
 
-        byte[] info = Frmt.toJson(Map.of(
-                "algT", algT,
-                "tokenT", tokenT,
-                "userId", userId)).getBytes(StandardCharsets.UTF_8);
+        byte[] info = rec.toBinary();
 
         HKDFBytesGenerator hkdf = new HKDFBytesGenerator(digest);
-
         hkdf.init(new HKDFParameters(ikm, salt, info));
 
-        byte[] derived = new byte[len];
-        hkdf.generateBytes(derived, 0, len);
+        byte[] okm = new byte[len];
+        hkdf.generateBytes(okm, 0, len);
 
-        return HexFormat.of().formatHex(derived);
+        return okm;
     }
 }
