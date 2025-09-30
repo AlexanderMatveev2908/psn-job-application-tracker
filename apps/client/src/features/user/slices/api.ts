@@ -7,11 +7,11 @@ import { EmailFormT, ParamsAPI2FA, PwdFormT } from "@/core/paperwork";
 const BASE = "/user";
 
 export type GainAccessManageAccReturnT = {
-  cbc_hmac_token: string;
+  cbcHmacToken: string;
 };
 
 export type ManageAccFormT = {
-  cbc_hmac_token: string;
+  cbcHmacToken: string;
 };
 
 export type ChangeEmailFormT = ManageAccFormT & EmailFormT;
@@ -72,8 +72,8 @@ export const userSliceAPI = apiSlice.injectEndpoints({
     }),
 
     deleteAccount: builder.mutation<ResApiT<void>, string>({
-      query: (cbc_hmac_token) => ({
-        url: `${BASE}/delete-account?cbc_hmac_token=${cbc_hmac_token}`,
+      query: (cbcHmacToken) => ({
+        url: `${BASE}/delete-account?cbcHmacToken=${cbcHmacToken}`,
         method: "DELETE",
       }),
     }),

@@ -33,7 +33,7 @@ const JobApplicationForm: FC<PropsType> = ({ handleSave, propsCSR = {} }) => {
 
   const testID = "job_application";
 
-  useFocus("company_name", { setFocus });
+  useFocus("companyName", { setFocus });
 
   return (
     <WrapCSR {...propsCSR}>

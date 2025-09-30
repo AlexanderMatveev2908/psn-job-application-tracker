@@ -37,12 +37,12 @@ const Page: FC = () => {
 
     if (!res) return;
 
-    if (res?.access_token) loginUser(res.access_token);
-    else if (res?.cbc_hmac_token) saveCbcHmac(res.cbc_hmac_token);
+    if (res?.accessToken) loginUser(res.accessToken);
+    else if (res?.cbcHmacToken) saveCbcHmac(res.cbcHmacToken);
 
     reset(resetValsLogin);
 
-    nav.replace(res?.access_token ? "/" : "/auth/login-2FA");
+    nav.replace(res?.accessToken ? "/" : "/auth/login-2FA");
   }, logFormErrs);
 
   useFocus("email", { setFocus });

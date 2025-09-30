@@ -54,11 +54,11 @@ const Page: FC = () => {
         cbAPI: () => mutate(data),
       });
 
-      if (!res?.access_token) return;
+      if (!res?.accessToken) return;
 
       reset(resetValsRegister);
 
-      loginUser(res.access_token);
+      loginUser(res.accessToken);
 
       setNotice({
         msg: genMailNoticeMsg("to confirm the account"),

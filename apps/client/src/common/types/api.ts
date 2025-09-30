@@ -43,7 +43,7 @@ export type DataApiT = {
   refreshed?: boolean;
   refreshFailed?: boolean;
   restoredSession?: boolean;
-  access_token?: string;
+  accessToken?: string;
   blob?: Blob;
 };
 
@@ -58,9 +58,9 @@ export type TriggerApiT<T> = (arg: any) => {
 };
 
 export type JwtReturnT = {
-  access_token: string;
+  accessToken: string;
 };
 
 export type CbcHmacReturnT = {
-  cbc_hmac_token: string;
+  cbcHmacToken: string;
 };

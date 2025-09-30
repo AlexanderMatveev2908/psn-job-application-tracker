@@ -10,7 +10,7 @@ import { apiSlice } from "@/core/store/api";
 
 export type MapperVerifyT = Record<
   TokenT,
-  (cbc_hmac_token: string) => Promise<void>
+  (cbcHmacToken: string) => Promise<void>
 >;
 
 export const useVerify = () => {
@@ -35,8 +35,8 @@ export const useVerify = () => {
   );
 
   const loginCb = useCallback(
-    (access_token: string) => {
-      loginUser(access_token);
+    (accessToken: string) => {
+      loginUser(accessToken);
       dispatch(apiSlice.util.invalidateTags([TagAPI.USER]));
       nav.replace("/");
     },
@@ -45,27 +45,27 @@ export const useVerify = () => {
 
   const mapperVerify: MapperVerifyT = useMemo(
     () => ({
-      CONF_EMAIL: async (cbc_hmac_token: string) => {
+      CONF_EMAIL: async (cbcHmacToken: string) => {
         const res = await wrapMainCb({
-          cbc_hmac_token,
+          cbcHmacToken,
           endpoint: "confirm-email",
         });
 
         if (!res) return;
 
-        if (res?.access_token) {
-          loginCb(res.access_token);
+        if (res?.accessToken) {
+          loginCb(res.accessToken);
         }
       },
-      RECOVER_PWD: async (cbc_hmac_token: string) => {
+      RECOVER_PWD: async (cbcHmacToken: string) => {
         const res = await wrapMainCb({
-          cbc_hmac_token,
+          cbcHmacToken,
           endpoint: "recover-pwd",
         });
 
         if (!res) return;
 
-        saveCbcHmac(cbc_hmac_token);
+        saveCbcHmac(cbcHmacToken);
         nav.replace(
           res.strategy_2FA
             ? "/verify/recover-password-2FA"
@@ -73,18 +73,18 @@ export const useVerify = () => {
         );
       },
 
-      CHANGE_EMAIL: async (cbc_hmac_token: string) => {
+      CHANGE_EMAIL: async (cbcHmacToken: string) => {
         const res = await wrapMainCb({
-          cbc_hmac_token,
+          cbcHmacToken,
           endpoint: "new-email",
         });
 
         if (!res) return;
 
-        if (res?.access_token) {
-          loginCb(res.access_token);
-        } else if (res?.cbc_hmac_token) {
-          saveCbcHmac(res.cbc_hmac_token);
+        if (res?.accessToken) {
+          loginCb(res.accessToken);
+        } else if (res?.cbcHmacToken) {
+          saveCbcHmac(res.cbcHmacToken);
           nav.replace("/verify/change-email-2FA");
         }
       },

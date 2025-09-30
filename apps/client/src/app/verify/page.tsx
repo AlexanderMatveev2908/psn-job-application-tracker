@@ -9,17 +9,17 @@ import { useCallback, type FC } from "react";
 import WrapCSR from "@/common/components/wrappers/pages/WrapCSR";
 
 const Page: FC = () => {
-  const cbc_hmac_token = useSearchParams().get("cbc_hmac_token");
+  const cbcHmacToken = useSearchParams().get("cbcHmacToken");
 
   const { mapperVerify } = useVerify();
 
   const { checkCbcHmac } = useCheckCbcHmac();
 
   const cb = useCallback(async () => {
-    const aad = checkCbcHmac({ cbc_hmac_token });
+    const aad = checkCbcHmac({ cbcHmacToken });
 
-    if (aad) await mapperVerify[aad.token_t](cbc_hmac_token!);
-  }, [cbc_hmac_token, checkCbcHmac, mapperVerify]);
+    if (aad) await mapperVerify[aad.tokenT](cbcHmacToken!);
+  }, [cbcHmacToken, checkCbcHmac, mapperVerify]);
 
   useRunOnHydrate({ cb });
 

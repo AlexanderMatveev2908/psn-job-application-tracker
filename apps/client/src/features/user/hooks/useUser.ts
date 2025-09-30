@@ -19,9 +19,9 @@ export const useUser = () => {
     authSliceAPI.useLogoutAuthMutation();
 
   const loginUser = useCallback(
-    (access_token: string) => {
-      saveStorage(access_token, { key: "access_token" });
-      dispatch(userSlice.actions.login({ access_token }));
+    (accessToken: string) => {
+      saveStorage(accessToken, { key: "accessToken" });
+      dispatch(userSlice.actions.login({ accessToken }));
     },
     [dispatch]
   );
@@ -46,15 +46,15 @@ export const useUser = () => {
   }, [wrapAPI, mutate, commonLogoutActions, nav]);
 
   const saveCbcHmac = useCallback(
-    (cbc_hmac_token: string) => {
-      dispatch(userSlice.actions.setCbcHmac(cbc_hmac_token));
-      saveStorage(cbc_hmac_token, { key: "cbc_hmac_token" });
+    (cbcHmacToken: string) => {
+      dispatch(userSlice.actions.setCbcHmac(cbcHmacToken));
+      saveStorage(cbcHmacToken, { key: "cbcHmacToken" });
     },
     [dispatch]
   );
 
   const delCbcHmac = useCallback(() => {
-    delStorageItm("cbc_hmac_token");
+    delStorageItm("cbcHmacToken");
     dispatch(userSlice.actions.clearCbcHmac());
   }, [dispatch]);
 

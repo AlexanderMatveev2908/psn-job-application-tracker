@@ -19,7 +19,7 @@ const ChangePwdForm: FC<FormManageAccPropsType> = ({
   isCurr,
   swapState,
 }) => {
-  const { cbc_hmac_token } = useGetUserState();
+  const { cbcHmacToken } = useGetUserState();
   const { wrapAPI } = useKitHooks();
   const [mutate, { isLoading }] = userSliceAPI.useChangePwdUserMutation();
 
@@ -39,7 +39,7 @@ const ChangePwdForm: FC<FormManageAccPropsType> = ({
 
   const handleSave = handleSubmit(async (data) => {
     const res = await wrapAPI({
-      cbAPI: () => mutate({ ...data, cbc_hmac_token }),
+      cbAPI: () => mutate({ ...data, cbcHmacToken }),
       pushNotice: [401],
     });
 

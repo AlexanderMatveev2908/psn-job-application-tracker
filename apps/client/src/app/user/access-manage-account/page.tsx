@@ -41,9 +41,9 @@ const Page: FC = () => {
 
     if (!res) return;
 
-    const tokenType = extractAadFromCbcHmac(res.cbc_hmac_token)?.token_t;
+    const tokenType = extractAadFromCbcHmac(res.cbcHmacToken)?.tokenT;
 
-    saveCbcHmac(res.cbc_hmac_token);
+    saveCbcHmac(res.cbcHmacToken);
     reset(resetValsPwdForm);
 
     nav.replace(

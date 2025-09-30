@@ -11,22 +11,22 @@ export const useCheckCbcHmac = () => {
 
   const checkCbcHmac = useCallback(
     ({
-      cbc_hmac_token,
+      cbcHmacToken,
       tokenType,
       pathPush,
     }: {
-      cbc_hmac_token?: string | null;
+      cbcHmacToken?: string | null;
       tokenType?: TokenT | TokenT[];
       pathPush?: string;
     }) => {
-      const aad = extractAadFromCbcHmac(cbc_hmac_token);
+      const aad = extractAadFromCbcHmac(cbcHmacToken);
 
-      if (!aad || !Object.values(TokenT).includes(aad.token_t)) {
+      if (!aad || !Object.values(TokenT).includes(aad.tokenT)) {
         if (pathPush) {
           nav.replace(pathPush);
         } else {
           setNotice({
-            msg: cbc_hmac_token ? `Invalid token format` : "Token not provided",
+            msg: cbcHmacToken ? `Invalid token format` : "Token not provided",
             type: "ERR",
           });
           nav.replace("/notice");
@@ -37,8 +37,8 @@ export const useCheckCbcHmac = () => {
 
       if (
         tokenType &&
-        ((typeof tokenType === "string" && aad.token_t !== tokenType) ||
-          (Array.isArray(tokenType) && !tokenType.includes(aad.token_t)))
+        ((typeof tokenType === "string" && aad.tokenT !== tokenType) ||
+          (Array.isArray(tokenType) && !tokenType.includes(aad.tokenT)))
       ) {
         if (pathPush) {
           nav.replace(pathPush);

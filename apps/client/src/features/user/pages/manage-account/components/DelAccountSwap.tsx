@@ -20,7 +20,7 @@ const DelAccountSwap: FC<Omit<FormManageAccPropsType, "swapState">> = ({
 
   const { nav, wrapAPI, setNotice } = useKitHooks();
   const {
-    userState: { cbc_hmac_token },
+    userState: { cbcHmacToken },
     commonLogoutActions,
   } = useUser();
 
@@ -28,7 +28,7 @@ const DelAccountSwap: FC<Omit<FormManageAccPropsType, "swapState">> = ({
 
   const handleDelete = async () => {
     const res = await wrapAPI({
-      cbAPI: () => mutate(cbc_hmac_token),
+      cbAPI: () => mutate(cbcHmacToken),
       pushNotice: [401],
     });
 

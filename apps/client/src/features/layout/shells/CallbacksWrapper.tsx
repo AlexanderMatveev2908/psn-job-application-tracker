@@ -35,14 +35,14 @@ const CallbacksWrapper: FC<ChildrenT> = ({ children }) => {
   // ? storage stuff
   useEffect(() => {
     const cb = () => {
-      const access_token = (getStorage("access_token") ?? "") as string;
+      const accessToken = (getStorage("accessToken") ?? "") as string;
       const notice = getStorage("notice");
-      const cbc_hmac_token = (getStorage("cbc_hmac_token") ?? "") as string;
+      const cbcHmacToken = (getStorage("cbcHmacToken") ?? "") as string;
 
-      if (REG_JWT.test(access_token))
-        dispatch(userSlice.actions.setAccessToken({ access_token }));
-      if (REG_CBC_HMAC.test(cbc_hmac_token))
-        dispatch(userSlice.actions.setCbcHmac(cbc_hmac_token));
+      if (REG_JWT.test(accessToken))
+        dispatch(userSlice.actions.setAccessToken({ accessToken }));
+      if (REG_CBC_HMAC.test(cbcHmacToken))
+        dispatch(userSlice.actions.setCbcHmac(cbcHmacToken));
       if (isObjOk(notice)) dispatch(noticeSlice.actions.setNotice(notice!));
     };
 

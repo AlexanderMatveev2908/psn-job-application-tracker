@@ -65,7 +65,7 @@ export const use2FAForm = <T>({
       const res = await wrapAPI({
         cbAPI: () =>
           mutationTrigger({
-            cbc_hmac_token: userState.cbc_hmac_token,
+            cbcHmacToken: userState.cbcHmacToken,
             ...(totpCode ? { totpCode } : { backup_code }),
           }),
         pushNotice: [401],
@@ -81,7 +81,7 @@ export const use2FAForm = <T>({
       successCb(res);
     },
     [
-      userState.cbc_hmac_token,
+      userState.cbcHmacToken,
       wrapAPI,
       delCbcHmac,
       mutationTrigger,

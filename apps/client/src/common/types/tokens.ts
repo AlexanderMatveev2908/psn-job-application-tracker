@@ -13,8 +13,8 @@ export enum TokenT {
 
 export interface AadCbcHmacT {
   alg: string;
-  token_id: string;
-  token_t: TokenT;
+  tokenId: string;
+  tokenT: TokenT;
   salt: string;
-  user_id: string;
+  userId: string;
 }

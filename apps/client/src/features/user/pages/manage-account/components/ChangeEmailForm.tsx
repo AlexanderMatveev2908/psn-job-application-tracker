@@ -37,7 +37,7 @@ const ChangeEmailForm: FC<FormManageAccPropsType> = ({
   const { handleSubmit, setFocus, reset } = formCtx;
 
   const [mutate, { isLoading }] = userSliceAPI.useChangeEmailMutation();
-  const { cbc_hmac_token } = useGetUserState();
+  const { cbcHmacToken } = useGetUserState();
   const { setNotice, wrapAPI, nav } = useKitHooks();
 
   const handleSave = handleSubmit(async (data) => {
@@ -45,7 +45,7 @@ const ChangeEmailForm: FC<FormManageAccPropsType> = ({
       cbAPI: () =>
         mutate({
           ...data,
-          cbc_hmac_token,
+          cbcHmacToken,
         }),
       pushNotice: [401],
     });

@@ -7,16 +7,16 @@ export interface UserStateT {
   pendingActionSession: boolean;
   pendingActionCbcHmac: boolean;
   touchedServer: boolean;
-  access_token: string;
-  cbc_hmac_token: string;
+  accessToken: string;
+  cbcHmacToken: string;
   user: UserT | null;
 }
 
 const initState: UserStateT = {
   pendingActionSession: false,
   pendingActionCbcHmac: false,
-  access_token: "",
-  cbc_hmac_token: "",
+  accessToken: "",
+  cbcHmacToken: "",
   user: null,
   touchedServer: false,
 };
@@ -25,16 +25,13 @@ export const userSlice = createSlice({
   name: "user",
   initialState: initState,
   reducers: {
-    login: (state, action: PayloadAction<{ access_token: string }>) => {
+    login: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.pendingActionSession = true;
-      state.access_token = action.payload.access_token;
+      state.accessToken = action.payload.accessToken;
     },
 
-    setAccessToken: (
-      state,
-      action: PayloadAction<{ access_token: string }>
-    ) => {
-      state.access_token = action.payload.access_token;
+    setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
+      state.accessToken = action.payload.accessToken;
     },
 
     setUser: (state, action: PayloadAction<UserT | undefined | null>) => {
@@ -45,11 +42,11 @@ export const userSlice = createSlice({
     logout: () => ({ ...initState, pendingActionSession: true }),
 
     setCbcHmac: (state, action: PayloadAction<string>) => {
-      state.cbc_hmac_token = action.payload;
+      state.cbcHmacToken = action.payload;
       state.pendingActionCbcHmac = true;
     },
     clearCbcHmac: (state) => {
-      state.cbc_hmac_token = "";
+      state.cbcHmacToken = "";
     },
 
     endPendingActionSession: (state) => {

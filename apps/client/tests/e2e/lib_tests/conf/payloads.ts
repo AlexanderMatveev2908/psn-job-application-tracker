@@ -26,10 +26,10 @@ export const genRegisterPayload = (): PayloadRegisterT => {
 };
 
 export interface PayloadJobApplT {
-  company_name: string;
-  position_name: string;
+  companyName: string;
+  positionName: string;
   status: ApplicationStatusT;
-  applied_at: string;
+  appliedAt: string;
   notes?: string;
 }
 
@@ -43,9 +43,9 @@ const getRandomAppliedAtDate = () => {
 };
 
 export const genPayloadJobAppl = (): PayloadJobApplT => ({
-  company_name: faker.company.name(),
-  position_name: faker.person.jobTitle(),
-  applied_at: getRandomAppliedAtDate(),
+  companyName: faker.company.name(),
+  positionName: faker.person.jobTitle(),
+  appliedAt: getRandomAppliedAtDate(),
   status: pickRandom(Object.values(ApplicationStatusT)) as ApplicationStatusT,
   notes: genLorem(4),
 });
