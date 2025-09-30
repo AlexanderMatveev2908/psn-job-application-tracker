@@ -15,6 +15,8 @@ app:
   jwtSecret: ${JWT_SECRET}
   jwePrivate: ${JWE_PRIVATE}
   jwePublic: ${JWE_PUBLIC}
+  hkdfMaster: ${HKDF_MASTER}
+  hkdfSalt: ${HKDF_SALT}
 
 server:
   address: 0.0.0.0
@@ -40,7 +42,7 @@ spring:
     pool:
       enabled: true
       initial-size: 0
-      max-size: 5
+      max-size: 20
       max-acquire-time: 120s
       validation-query: SELECT 1
 
