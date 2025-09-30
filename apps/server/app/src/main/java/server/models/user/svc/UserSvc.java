@@ -13,6 +13,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
+import server.conf.mail.MailSvc;
+import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
 import server.lib.security.session_tokens.RecSessionTokens;
 import server.lib.security.session_tokens.SessionManager;
@@ -37,25 +39,28 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
-    private final SessionManager sessionMng;;
+    private final SessionManager sessionMng;
+    private final MailSvc mailSvc;
 
     public Mono<Tuple3<User, MyToken, String>> insert(User us) {
         return findByEmail(us.getEmail())
                 .flatMap(existing -> Mono.<Tuple3<User, MyToken, String>>error(
                         new ErrAPI("an account with this email already exists", 409)))
-                .switchIfEmpty(
-                        Mono.defer(() -> userRepo
-                                .insert(us)
-                                .flatMap(dbUser -> {
-                                    RecSessionTokens recSession = sessionMng.genSessionTokens(dbUser.getId());
+                .switchIfEmpty(Mono.defer(() -> userRepo.insert(us)
+                        .flatMap(dbUser -> {
+                            RecSessionTokens recSession = sessionMng.genSessionTokens(dbUser.getId());
 
-                                    MyToken refreshTk = new MyToken(dbUser.getId(),
-                                            TokenT.REFRESH,
-                                            AlgT.RSA_OAEP256_A256GCM, recSession.recJwe());
-                                    return tokensRepo.insert(
-                                            refreshTk)
-                                            .map(dbJwe -> Tuples.of(dbUser, dbJwe, recSession.jwt()));
-                                })));
+                            MyToken refreshTk = new MyToken(
+                                    dbUser.getId(),
+                                    TokenT.REFRESH,
+                                    AlgT.RSA_OAEP256_A256GCM,
+                                    recSession.recJwe());
+
+                            return tokensRepo.insert(refreshTk)
+                                    .flatMap(dbToken -> mailSvc
+                                            .sendRctHtmlMail(SubjEmailT.CONFIRM_EMAIL, dbUser)
+                                            .thenReturn(Tuples.of(dbUser, dbToken, recSession.jwt())));
+                        })));
     }
 
     public Mono<User> findByEmail(String email) {

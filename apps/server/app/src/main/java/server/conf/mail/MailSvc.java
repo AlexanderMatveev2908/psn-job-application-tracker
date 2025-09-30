@@ -11,8 +11,11 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import server.conf.env_conf.EnvKeeper;
+import server.conf.env_conf.etc.EnvMode;
 import server.conf.mail.etc.MailTmpl;
+import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
+import server.models.user.User;
 
 @Service
 @RequiredArgsConstructor
@@ -33,18 +36,20 @@ public class MailSvc {
         mailSender.send(msg);
     }
 
-    public void sendHtmlMail(String to, String subject, String firstName) {
+    public void sendHtmlMail(SubjEmailT subject, User user) {
         MimeMessage msg = mailSender.createMimeMessage();
 
         try {
+
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
 
             helper.setFrom(envKeeper.getNextPblSmptFrom());
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(mailTmpl.replacePlaceholder(firstName), true);
+            helper.setTo(user.getEmail());
+            helper.setSubject(subject.getValue());
+            helper.setText(mailTmpl.replacePlaceholder(user.getFirstName()), true);
 
-            mailSender.send(msg);
+            if (!envKeeper.getEnvMode().equals(EnvMode.TEST))
+                mailSender.send(msg);
 
         } catch (Exception err) {
             throw new ErrAPI(err.getMessage());
@@ -62,8 +67,8 @@ public class MailSvc {
                 }).then();
     }
 
-    public Mono<Void> sendRctHtmlMail(String to, String subject, String firstName) {
-        return Mono.fromRunnable(() -> sendHtmlMail(to, subject, firstName)).doOnSuccess((nl) -> {
+    public Mono<Void> sendRctHtmlMail(SubjEmailT subject, User user) {
+        return Mono.fromRunnable(() -> sendHtmlMail(subject, user)).doOnSuccess((nl) -> {
             System.out.println("📫 mail sent");
         }).onErrorResume((err) -> {
             System.out.println("❌ err sending mail");

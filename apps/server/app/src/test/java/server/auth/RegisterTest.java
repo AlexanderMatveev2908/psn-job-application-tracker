@@ -55,7 +55,6 @@ public class RegisterTest {
                                 .getOrDefault("user", Map.of());
 
                 String id = (String) user.get("id");
-                String refreshToken = res.getCk("refreshToken");
 
                 assertTrue(Reg.isUUID(id), MyAssrt.buildStr("valid UUID", id));
                 assertTrue(Reg.isJWT(res.getJwt()));
