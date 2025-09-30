@@ -26,6 +26,9 @@ pmd = "7.0.0"
 spotbugs = "4.8.6"
 spotbugs-gradle = "6.0.23" 
 java_jwt = "4.4.0"
+nimbus_jose_jwt = "10.5"
+spotbugs_annotations = "4.8.3"
+jackson_datatype_jdk8 = "2.17.2"
 
 
 
@@ -51,13 +54,15 @@ argon2 = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2" }
 
 checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
 spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
-spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotations", version.ref = "spotbugs" }
 
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 datafaker = { group = "net.datafaker", name = "datafaker", version.ref = "datafaker" }
 javaJwt = {module = "com.auth0:java-jwt", version.ref = "java_jwt"}
+nimbusJoseJwt = {module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus_jose_jwt"}
+spotbugsAnnotations = {module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs_annotations"}
+jacksonDatatypeJdk8 = {module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8", version.ref = "jackson_datatype_jdk8"}
 
 
 

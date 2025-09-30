@@ -11,8 +11,11 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.util.MultiValueMap;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Data
 @AllArgsConstructor
+@SuppressFBWarnings({ "EI" })
 public class ResT implements RootCls {
 
     private final int status;
@@ -37,11 +40,23 @@ public class ResT implements RootCls {
 
     public String getCk(String k) {
         var cksByKey = cks.get(k);
+        if (cksByKey != null && !cksByKey.isEmpty())
+            return cksByKey.get(0).getValue();
 
-        return (cksByKey == null || cksByKey.isEmpty()) ? null : cksByKey.get(0).getValue();
+        var setCookies = hdrs.get(HttpHeaders.SET_COOKIE);
+        if (setCookies != null)
+            for (String cookieStr : setCookies)
+                if (cookieStr.startsWith(k + "="))
+                    return cookieStr.split(";", 2)[0].substring(k.length() + 1);
+
+        return null;
     }
 
-    public String getJWE() {
+    public String getJwt() {
+        return (String) getBd().get("accessToken");
+    }
+
+    public String getJwe() {
         return getCk("refreshToken");
     }
 

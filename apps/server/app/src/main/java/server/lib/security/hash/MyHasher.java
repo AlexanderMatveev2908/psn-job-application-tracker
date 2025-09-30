@@ -1,4 +1,4 @@
-package server.lib.hash;
+package server.lib.security.hash;
 
 import java.util.Arrays;
 import java.util.concurrent.Executors;

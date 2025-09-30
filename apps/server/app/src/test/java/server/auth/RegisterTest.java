@@ -25,8 +25,8 @@ import server.conf.Reg;
 @AutoConfigureWebTestClient
 public class RegisterTest {
 
+        private final static MyPayloads payloads = new MyPayloads();
         private final static String URL = "/api/v1/auth/register";
-        public static MyPayloads payloads = new MyPayloads();
 
         @Autowired
         private WebTestClient web;
@@ -55,8 +55,11 @@ public class RegisterTest {
                                 .getOrDefault("user", Map.of());
 
                 String id = (String) user.get("id");
+                String refreshToken = res.getCk("refreshToken");
 
                 assertTrue(Reg.isUUID(id), MyAssrt.buildStr("valid UUID", id));
+                assertTrue(Reg.isJWT(res.getJwt()));
+                assertTrue(Reg.isJWE(res.getJwe()));
 
         }
 

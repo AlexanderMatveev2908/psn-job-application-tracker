@@ -11,12 +11,18 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.session_tokens.RecSessionTokens;
+import server.lib.security.session_tokens.SessionManager;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.MyToken;
+import server.models.token.etc.AlgT;
+import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.etc.UserPop;
@@ -31,15 +37,25 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
+    private final SessionManager sessionMng;;
 
-    public Mono<User> insert(User us) {
+    public Mono<Tuple3<User, MyToken, String>> insert(User us) {
         return findByEmail(us.getEmail())
-                .flatMap(existing -> Mono.<User>error(
+                .flatMap(existing -> Mono.<Tuple3<User, MyToken, String>>error(
                         new ErrAPI("an account with this email already exists", 409)))
                 .switchIfEmpty(
                         Mono.defer(() -> userRepo
-                                .insert(us.getFirstName(), us.getLastName(), us.getEmail(), us.getPassword())
-                                .flatMap(saved -> userRepo.findById(saved.getId()))));
+                                .insert(us)
+                                .flatMap(dbUser -> {
+                                    RecSessionTokens recSession = sessionMng.genSessionTokens(dbUser.getId());
+
+                                    MyToken refreshTk = new MyToken(dbUser.getId(),
+                                            TokenT.REFRESH,
+                                            AlgT.RSA_OAEP256_A256GCM, recSession.recJwe());
+                                    return tokensRepo.insert(
+                                            refreshTk)
+                                            .map(dbJwe -> Tuples.of(dbUser, dbJwe, recSession.jwt()));
+                                })));
     }
 
     public Mono<User> findByEmail(String email) {

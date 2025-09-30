@@ -17,13 +17,10 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
 
     @Query("""
                 INSERT INTO users (first_name, last_name, email, password)
-                VALUES (:firstName, :lastName, :email, :password)
+                VALUES (:#{#user.firstName}, :#{#user.lastName}, :#{#user.email}, :#{#user.password})
                 RETURNING *
             """)
-    Mono<User> insert(String firstName,
-            String lastName,
-            String email,
-            String password);
+    Mono<User> insert(User user);
 
     // @Query("""
     // SELECT

@@ -37,9 +37,9 @@ public class PostTestCtrl {
                     var msg = (String) bd.get("msg");
 
                     if (!ShapeCheck.isStr(msg))
-                        return ResAPI.err400("missing msg");
+                        return new ResAPI(400).msg("missing msg").build();
 
-                    return ResAPI.ok200("msg received", Map.of("clientMsg", msg));
+                    return new ResAPI(200).msg("msg received").data(Map.of("clientMsg", msg)).build();
                 });
     }
 
@@ -49,7 +49,7 @@ public class PostTestCtrl {
         var form = api.getParsedForm().orElse(null);
 
         if (form == null)
-            return ResAPI.err400("no form data");
+            return new ResAPI(400).msg("no form data").build();
 
         Set<String> assetKeys = Set.of("images", "videos");
 
@@ -82,9 +82,12 @@ public class PostTestCtrl {
                     List<CloudAsset> saved = tuple.getT1();
                     List<Integer> deleted = tuple.getT2();
 
-                    return ResAPI.ok200(
-                            "form parsed • processed • saved locally • uploaded on cloud • deleted locally • deleted from cloud",
-                            Map.of("saved", saved, "deleted", deleted.stream().reduce(0, (acc, curr) -> acc + curr)));
+                    return new ResAPI(200).msg(
+                            "form parsed • processed • saved locally • uploaded on cloud • deleted locally • deleted from cloud")
+                            .data(
+                                    Map.of("saved", saved, "deleted",
+                                            deleted.stream().reduce(0, (acc, curr) -> acc + curr)))
+                            .build();
                 });
 
     }

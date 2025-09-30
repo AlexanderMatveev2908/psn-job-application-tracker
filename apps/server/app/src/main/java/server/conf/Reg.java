@@ -8,12 +8,12 @@ public final class Reg {
         public static final String NAME = "^[\\p{L}\\s,`'\\-]*$";
         public static final String JOB_NAME = "^[\\p{L}\\s,`'/\\-]*$";
         public static final String PWD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])\\S{8,}$";
-        public static final String TXT = "^[\\p{L}\\d\\s\\-'\\" + '"' + "\\.,;!?]*$";
+        public static final String TXT = "^[\\p{L}\\d\\s\\-'\\\".,;!?]*$";
         public static final String INT = "^\\d+$";
         public static final String FLOAT = "^(?:\\d+(?:\\.\\d{1,2})?|\\.\\d{1,2})$";
         public static final String UUID = "^([a-f0-9]{8})-([a-f0-9]{4})-4[a-f0-9]{3}-([a-f0-9]{4})-([a-f0-9]{12})$";
-        public static final String JWT = "^(?=.{171}$)[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$";
-        public static final String JWE = "^[A-Fa-f0-9]{1004}$";
+        public static final String JWT = "^([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})$";
+        public static final String JWE = "^([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})$";
         public static final String CBC_HMAC = "^(?=.{600,}$)[A-Fa-f0-9]{400,}\\.[A-Fa-f0-9]{32}\\.[A-Fa-f0-9]{128}\\.[A-Fa-f0-9]{64}$";
         public static final String TOTP_SECRET = "^[A-Z2-7]{32}$";
         public static final String TOTP_CODE = "^\\d{6}$";

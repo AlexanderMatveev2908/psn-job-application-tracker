@@ -12,10 +12,10 @@ public class GetTestCtrl {
 
     public Mono<ResponseEntity<ResAPI>> getLimited(Api api) {
 
-        return ResAPI.ok200("get request limited 🚦", null);
+        return new ResAPI(200).msg("get request limited 🚦").build();
     }
 
     public Mono<ResponseEntity<ResAPI>> getTest(Api api) {
-        return ResAPI.ok200("get request received 👻", null);
+        return new ResAPI(200).msg("get request received 👻").build();
     }
 }

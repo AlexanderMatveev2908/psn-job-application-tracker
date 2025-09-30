@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 
 import net.datafaker.Faker;
 
-import lombok.Data;
-
-@Data
 public class MyPayloads {
     private final Faker faker = new Faker();
 

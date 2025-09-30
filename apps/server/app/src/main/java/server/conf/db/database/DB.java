@@ -17,29 +17,31 @@ import server.decorators.flow.ErrAPI;
 @Component
 public class DB {
 
-    private final R2dbcEntityTemplate db;
-    private final DatabaseClient dbRaw;
-    private final TransactionalOperator trx;
+    private final R2dbcEntityTemplate dbHigh;
+    private final DatabaseClient dbLow;
+    private final TransactionalOperator trxMng;
+    private final ConnectionFactory factory;
 
     public DB(ConnectionFactory factory) {
-        this.db = new R2dbcEntityTemplate(factory);
-        this.dbRaw = db.getDatabaseClient();
-        this.trx = TransactionalOperator.create(new R2dbcTransactionManager(factory));
+        this.factory = factory;
+        this.dbHigh = new R2dbcEntityTemplate(factory);
+        this.dbLow = dbHigh.getDatabaseClient();
+        this.trxMng = TransactionalOperator.create(new R2dbcTransactionManager(factory));
     }
 
     public <T> Mono<T> trxMono(Function<DatabaseClient, Mono<T>> cb) {
-        return cb.apply(dbRaw)
-                .as(trx::transactional)
-                .onErrorResume(err -> Mono.error(new ErrAPI("trx failed => " + err.getMessage())));
+        return cb.apply(dbLow)
+                .as(trxMng::transactional)
+                .onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
     public <T> Flux<T> trxFlux(Function<DatabaseClient, Flux<T>> cb) {
-        return cb.apply(dbRaw)
-                .as(trx::transactional)
-                .onErrorResume(err -> Flux.error(new ErrAPI("trx failed => " + err.getMessage())));
+        return cb.apply(dbLow)
+                .as(trxMng::transactional)
+                .onErrorResume(err -> Flux.error(new ErrAPI(err.getMessage())));
     }
 
-    public Mono<Void> trx(ConnectionFactory factory,
+    public Mono<Void> trxLow(
             Function<Connection, Mono<Void>> cb) {
         return Mono.usingWhen(
                 factory.create(),
@@ -51,6 +53,18 @@ public class DB {
                 cnt -> Mono.from(cnt.close()));
     }
 
+    public <T> Mono<T> trxMid(Function<DatabaseClient, Mono<T>> cb) {
+        return cb.apply(dbLow)
+                .as(trxMng::transactional)
+                .onErrorResume(err -> Mono.error(new ErrAPI("trx failed => " + err.getMessage())));
+    }
+
+    public <T> Mono<T> trxHigh(Function<R2dbcEntityTemplate, Mono<T>> cb) {
+        return cb.apply(dbHigh)
+                .as(trxMng::transactional)
+                .onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
+    }
+
     public Mono<Integer> truncateAll() {
         String sql = """
                     SELECT table_name
@@ -60,7 +74,7 @@ public class DB {
                       AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')
                 """;
 
-        return dbRaw.sql(sql)
+        return dbLow.sql(sql)
                 .map(row -> row.get("table_name", String.class))
                 .all()
                 .collectList()
@@ -70,7 +84,7 @@ public class DB {
 
                     String joined = String.join(", ", tables);
                     String truncateSql = "TRUNCATE TABLE " + joined + " RESTART IDENTITY CASCADE";
-                    return dbRaw.sql(truncateSql)
+                    return dbLow.sql(truncateSql)
                             .fetch()
                             .rowsUpdated()
                             .doOnNext((res) -> {
@@ -79,7 +93,7 @@ public class DB {
                             .thenReturn(tables.size());
                 })
                 .onErrorResume(err -> Mono.error(
-                        new ErrAPI("failed to truncate tables => " + err.getMessage())));
+                        new ErrAPI(err.getMessage())));
     }
 
 }

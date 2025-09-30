@@ -8,8 +8,6 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.token.MyToken;
-import server.models.token.etc.AlgT;
-import server.models.token.etc.TokenT;
 
 public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
 
@@ -17,23 +15,10 @@ public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
         Flux<MyToken> findByUserId(UUID userId);
 
         @Query("""
-                        INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
-                        VALUES (:userId, CAST(:tokenType AS token_t), CAST(:algType AS alg_t), :hashed, :exp)
-                        RETURNING *
+                            INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
+                            VALUES (:#{#token.userId}, CAST(:#{#token.tokenType} AS token_t), CAST(:#{#token.algType} AS alg_t), :#{#token.hashed}, :#{#token.exp})
+                            RETURNING *
                         """)
-        Mono<MyToken> insert(
-                        UUID userId,
-                        TokenT tokenType,
-                        AlgT algType,
-                        String hashed,
-                        long exp);
-
-        // @Query("""
-        // INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
-        // VALUES (:#{#arg.userId}, CAST(:#{#arg.tokenType} AS token_t),
-        // CAST(:#{#arg.algType} AS alg_t), :#{#arg.hashed}, :#{#arg.exp})
-        // RETURNING *
-        // """)
-        // Mono<MyToken> insert(MyToken arg);
+        Mono<MyToken> insert(MyToken token);
 
 }

@@ -12,6 +12,9 @@ app:
   cloudName: ${CLOUD_NAME}
   cloudKey: ${CLOUD_API_KEY}
   cloudSecret: ${CLOUD_API_SECRET}
+  jwtSecret: ${JWT_SECRET}
+  jwePrivate: ${JWE_PRIVATE}
+  jwePublic: ${JWE_PUBLIC}
 
 server:
   address: 0.0.0.0

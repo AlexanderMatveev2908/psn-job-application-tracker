@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS tokens (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     token_type token_t NOT NULL,
     alg_type alg_t NOT NULL,
-    hashed VARCHAR(255) NOT NULL,
+    hashed TEXT NOT NULL,
     exp BIGINT NOT NULL
 ) INHERITS (root_table);
 

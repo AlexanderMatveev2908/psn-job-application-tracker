@@ -48,7 +48,7 @@ dependencies {
     // ? hash
     implementation(libs.argon2)
     // ? checkers
-    compileOnly(libs.spotbugs.annotations)
+    compileOnly(libs.spotbugsAnnotations)
     // ? tests
     testImplementation(libs.spring.boot.starter.test) {
     exclude(group = "org.junit.vintage")
@@ -59,6 +59,9 @@ dependencies {
     testAnnotationProcessor(libs.lombok)
     testImplementation(libs.datafaker)
     implementation(libs.javaJwt)
+    implementation(libs.nimbusJoseJwt)
+    testImplementation(libs.spotbugsAnnotations)
+    implementation(libs.jacksonDatatypeJdk8)
 }
 //_e
 
@@ -116,14 +119,14 @@ tasks.named("check") {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-    testLogging {
-        events("passed", "skipped", "failed")
-        exceptionFormat = TestExceptionFormat.SHORT
-        // showExceptions = false
-        // showCauses = false
-        // showStackTraces = false
-        showStandardStreams = true
-    }
+    // testLogging {
+    //     events("passed", "skipped","failed")
+    //     exceptionFormat = TestExceptionFormat.SHORT
+    //     showExceptions = false
+    //     showCauses = false
+    //     showStackTraces = false
+    //     showStandardStreams = false
+    // }
 
     // ? silence CDS warnings
     jvmArgs("-Xshare:off")
@@ -132,10 +135,14 @@ tasks.named<Test>("test") {
 }
 
 testlogger {
-    theme = ThemeType.MOCHA
-    showPassed = true
-    showSkipped = true
-    showFailed = true
+     theme = ThemeType.MOCHA
+    showPassed = false   
+    showSkipped = false
+    showFailed = true    
+    showExceptions = false
+    showCauses = false
+    showStackTraces = false
+    showStandardStreams = true
 }
 
 tasks.named<BootJar>("bootJar") {

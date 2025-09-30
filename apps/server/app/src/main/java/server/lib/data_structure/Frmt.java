@@ -1,14 +1,18 @@
 package server.lib.data_structure;
 
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 public final class Frmt {
 
-    private final static ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private final static ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+            .registerModule(new Jdk8Module());
 
     @SuppressWarnings({ "unused", "UseSpecificCatch" })
     public static String toJson(Object obj) {
@@ -36,5 +40,10 @@ public final class Frmt {
 
             return null;
         }
+    }
+
+    public static String hexToUtf8(String txtHex) {
+        byte[] utf8Bytes = HexFormat.of().parseHex(txtHex);
+        return new String(utf8Bytes, StandardCharsets.UTF_8);
     }
 }

@@ -1,8 +1,5 @@
-package server.lib.jwt;
+package server.lib.security.jwt;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,28 +15,31 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
+import server.lib.security.expiry_mng.ExpMng;
+import server.lib.security.expiry_mng.etc.RecExpJwt;
 
 @Service
+
 public final class MyJwt {
     private final EnvKeeper envKeeper;
     private final Algorithm alg;
+    private final ExpMng expMng;
 
-    MyJwt(EnvKeeper envKeeper) {
+    MyJwt(EnvKeeper envKeeper, ExpMng expMng) {
         this.envKeeper = envKeeper;
         this.alg = Algorithm.HMAC256(envKeeper.getJwtSecret());
+        this.expMng = expMng;
     }
 
     public String create(UUID userId) {
 
-        Instant now = Instant.now();
-        Date issuedAt = Date.from(now);
-        Date expiresAt = Date.from(now.plus(15, ChronoUnit.MINUTES));
+        RecExpJwt rec = expMng.jwt();
 
         return JWT.create()
                 .withIssuer(envKeeper.getAppName())
                 .withSubject(Frmt.toJson(Map.of("userId", userId)))
-                .withIssuedAt(issuedAt)
-                .withExpiresAt(expiresAt)
+                .withIssuedAt(rec.now())
+                .withExpiresAt(rec.exp())
                 .sign(alg);
     }
 

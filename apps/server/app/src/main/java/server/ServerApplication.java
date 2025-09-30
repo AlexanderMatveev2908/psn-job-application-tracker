@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
 import server.decorators.LifeSpawn;
+import server.lib.dev.Dev;
 import server.lib.dev.MyLog;
 
 @SpringBootApplication
@@ -17,7 +18,8 @@ import server.lib.dev.MyLog;
 public class ServerApplication {
 
     private final LifeSpawn lifeSpawn;
-    // private final Dev dev;
+    @SuppressWarnings("unused")
+    private final Dev dev;
 
     public static void main(String[] args) {
 
@@ -34,7 +36,6 @@ public class ServerApplication {
 
             lifeSpawn.lifeCheck(e);
 
-            // dev.doJwtStuff();
         };
     }
 

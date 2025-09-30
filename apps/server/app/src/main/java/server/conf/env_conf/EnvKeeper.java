@@ -5,27 +5,8 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import server.conf.env_conf.etc.EnvMode;
 import server.conf.env_conf.etc.Resolved;
-
-@Getter
-@RequiredArgsConstructor
-enum EnvMode {
-    DEV("development"),
-    TEST("test"),
-    PROD("production");
-
-    private final String val;
-
-    public static EnvMode fromValue(String val) {
-        for (EnvMode mode : values())
-            if (mode.val.equalsIgnoreCase(val))
-                return mode;
-
-        throw new IllegalArgumentException("❌ unknown env mode => " + val);
-    }
-}
 
 @Data
 @Validated
@@ -78,6 +59,12 @@ public final class EnvKeeper {
     @NotBlank
     @Resolved
     private String jwtSecret;
+    @NotBlank
+    @Resolved
+    private String jwePrivate;
+    @NotBlank
+    @Resolved
+    private String jwePublic;
 
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);

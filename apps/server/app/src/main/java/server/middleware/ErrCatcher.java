@@ -46,7 +46,7 @@ public class ErrCatcher implements WebExceptionHandler {
         res.setStatusCode(HttpStatus.valueOf(status));
         res.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        var apiBody = new ResAPI(msg, status, data);
+        var apiBody = new ResAPI(status, msg, data);
 
         byte[] bytes;
         try {
