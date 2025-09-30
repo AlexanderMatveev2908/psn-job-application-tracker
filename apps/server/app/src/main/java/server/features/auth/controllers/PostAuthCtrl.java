@@ -1,6 +1,5 @@
 package server.features.auth.controllers;
 
-import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.http.ResponseCookie;
@@ -10,11 +9,10 @@ import org.springframework.stereotype.Component;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.conf.env_conf.EnvKeeper;
-import server.conf.env_conf.etc.EnvMode;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.auth.paperwork.RegisterForm;
+import server.lib.security.MyCookies.MyCookies;
 import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
@@ -24,7 +22,7 @@ import server.models.user.svc.UserSvc;
 public class PostAuthCtrl {
 
     private final UserSvc userSvc;
-    private final EnvKeeper envKeeper;
+    private final MyCookies myCookies;
 
     public Mono<ResponseEntity<ResAPI>> register(Api api) {
         RegisterForm form = api.getMappedData();
@@ -34,16 +32,10 @@ public class PostAuthCtrl {
             return userSvc.insert(hashedUser);
         }).flatMap(tpl -> {
 
-            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tpl.getT2().getHashed())
-                    .httpOnly(true)
-                    .secure(!envKeeper.getEnvMode().equals(EnvMode.TEST))
-                    .path("/")
-                    .maxAge(Duration.ofMinutes(15))
-                    .build();
+            ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT2().getHashed());
 
             return new ResAPI(201).msg("user created")
                     .data(Map.of("user", tpl.getT1(), "accessToken", tpl.getT3())).cookie(refreshCookie).build();
-
         });
     }
 }

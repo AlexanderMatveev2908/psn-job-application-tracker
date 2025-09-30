@@ -24,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
+import server.lib.security.expiry_mng.ExpMng;
+import server.lib.security.expiry_mng.etc.RecExpJwe;
+import server.lib.security.jwe.etc.RecResJwe;
 
 @SuppressFBWarnings({ "EI2" })
 @Service
@@ -31,6 +34,7 @@ import server.lib.data_structure.Frmt;
 public class MyJwe {
 
     private final EnvKeeper envKeeper;
+    private final ExpMng expMng;
 
     private String stripKey(String key, String type) {
         return key.replace(String.format("-----BEGIN %s KEY-----", type), "")
@@ -60,17 +64,17 @@ public class MyJwe {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    public RecJwe create(UUID userId) {
+    public RecResJwe create(UUID userId) {
         try {
             JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256,
                     EncryptionMethod.A256GCM)
                     .build();
 
-            long now = System.currentTimeMillis() / 1000L;
-            long exp = now + ((int) Math.pow(60, 2));
+            RecExpJwe rec = expMng.jwe();
+
             Map<String, Object> claims = Map.of(
-                    "userId", userId, "iat", now,
-                    "exp", exp);
+                    "userId", userId, "iat", rec.now(),
+                    "exp", rec.exp());
 
             JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));
 
@@ -79,7 +83,7 @@ public class MyJwe {
 
             String refreshToken = jwe.serialize();
 
-            return new RecJwe(refreshToken, exp);
+            return new RecResJwe(refreshToken, rec.exp());
         } catch (Exception err) {
             throw new ErrAPI("err creating jwe");
         }

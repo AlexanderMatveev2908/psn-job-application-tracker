@@ -14,9 +14,8 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.jwe.MyJwe;
-import server.lib.security.jwe.RecJwe;
-import server.lib.security.jwt.MyJwt;
+import server.lib.security.session_tokens.RecSessionTokens;
+import server.lib.security.session_tokens.SessionManager;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
@@ -38,8 +37,7 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
-    private final MyJwe myJwe;
-    private final MyJwt myJwt;
+    private final SessionManager sessionMng;;
 
     public Mono<Tuple3<User, MyToken, String>> insert(User us) {
         return findByEmail(us.getEmail())
@@ -49,18 +47,14 @@ public class UserSvc {
                         Mono.defer(() -> userRepo
                                 .insert(us)
                                 .flatMap(dbUser -> {
+                                    RecSessionTokens recSession = sessionMng.genSessionTokens(dbUser.getId());
 
-                                    RecJwe rec = myJwe.create(dbUser.getId());
                                     MyToken refreshTk = new MyToken(dbUser.getId(),
                                             TokenT.REFRESH,
-                                            AlgT.RSA_OAEP256_A256GCM, rec);
-
+                                            AlgT.RSA_OAEP256_A256GCM, recSession.recJwe());
                                     return tokensRepo.insert(
                                             refreshTk)
-                                            .map(dbJwe -> {
-                                                String jwt = myJwt.create(dbUser.getId());
-                                                return Tuples.of(dbUser, dbJwe, jwt);
-                                            });
+                                            .map(dbJwe -> Tuples.of(dbUser, dbJwe, recSession.jwt()));
                                 })));
     }
 
