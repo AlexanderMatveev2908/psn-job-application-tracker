@@ -33,7 +33,7 @@ import server.models.token.etc.TokenT;
 @Service
 @RequiredArgsConstructor
 @SuppressFBWarnings({ "REC" })
-public class CbcHmac {
+public class MyCbcHmac {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private final Hkdf hkdf;

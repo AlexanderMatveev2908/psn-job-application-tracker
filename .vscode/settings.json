@@ -3,6 +3,8 @@
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
   },
+  "java.format.settings.url": "file:///home/ninja/.config/Code/formatters/java-formatter.xml",
+  "java.format.settings.profile": "TwoSpaces",
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.import.gradle.wrapper.enabled": true,
   "java.configuration.annotationProcessing.enabled": true,

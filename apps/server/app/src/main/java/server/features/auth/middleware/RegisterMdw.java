@@ -1,4 +1,4 @@
-package server.features.auth.middleware.register;
+package server.features.auth.middleware;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.WebFilterChain;
@@ -20,7 +20,7 @@ public class RegisterMdw extends BaseMdw {
         return isTarget(api, chain, "/auth/register",
                 () -> {
                     return limitAndRef(api).flatMap(bd -> {
-                        RegisterForm form = RegisterForm.mapToForm(bd);
+                        RegisterForm form = RegisterForm.fromMap(bd);
 
                         return fCk.checkBdForm(api, form)
                                 .then(chain.filter(api));
