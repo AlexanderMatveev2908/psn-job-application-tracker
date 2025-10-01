@@ -14,10 +14,7 @@ public class GetUserInfoMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/profile", () -> {
-
-      checkJwtOptional(api);
-
-      return chain.filter(api);
+      return checkJwtOptional(api).then(chain.filter(api));
     });
   }
 }

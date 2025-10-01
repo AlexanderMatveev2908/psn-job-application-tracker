@@ -1,5 +1,7 @@
 package server.lib.security.hash;
 
+import java.security.MessageDigest;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -11,9 +13,7 @@ import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
 
-@SuppressFBWarnings({ "EI2", "REC" })
-@Service
-@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2", "REC" }) @Service @RequiredArgsConstructor
 public class DbHash {
     private final EnvKeeper envKeeper;
 
@@ -27,4 +27,16 @@ public class DbHash {
             throw new ErrAPI("err hashing db token");
         }
     }
+
+    public boolean check(String hashed, String clientToken) {
+        try {
+            String recomputed = hash(clientToken);
+
+            return MessageDigest.isEqual(Frmt.utf8ToBinary(hashed), Frmt.utf8ToBinary(recomputed));
+
+        } catch (Exception err) {
+            throw new ErrAPI("err checking db token");
+        }
+    }
+
 }

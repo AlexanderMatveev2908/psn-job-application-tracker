@@ -14,15 +14,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.mng_tokens.MyTkMng;
-import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
+import server.lib.security.mng_tokens.TkMng;
+import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.middleware.security.RateLimit;
+import server.models.user.User;
+import server.models.user.svc.UserSvc;
 
 public abstract class BaseMdw implements WebFilter {
     @Autowired
     private RateLimit rl;
     @Autowired
-    private MyTkMng tkMng;
+    private TkMng tkMng;
+    @Autowired
+    UserSvc userSvc;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -32,23 +36,28 @@ public abstract class BaseMdw implements WebFilter {
         return handle(api, chain);
     }
 
-    private void checkJwt(Api api, boolean throwIfMiss) {
+    private Mono<User> checkJwt(Api api, boolean throwIfMiss) {
         String token = api.getJwt(throwIfMiss);
 
         if (token.isBlank() && !throwIfMiss)
-            return;
+            return Mono.empty();
 
-        MyJwtPayload payload = tkMng.checkJwt(token);
+        MyTkPayload payload = tkMng.checkJwt(token);
 
-        api.setAttr("jwtPayload", payload);
+        return userSvc.findById(payload.userId()).switchIfEmpty(Mono.error(new ErrAPI("user not found", 404)))
+                .map(user -> {
+                    api.setAttr("user", user);
+                    return user;
+                });
+
     }
 
-    protected void checkJwtMandatory(Api api) {
-        checkJwt(api, true);
+    protected Mono<User> checkJwtMandatory(Api api) {
+        return checkJwt(api, true);
     }
 
-    protected void checkJwtOptional(Api api) {
-        checkJwt(api, false);
+    protected Mono<User> checkJwtOptional(Api api) {
+        return checkJwt(api, false);
     }
 
     protected Mono<Map<String, Object>> grabBody(Api api) {

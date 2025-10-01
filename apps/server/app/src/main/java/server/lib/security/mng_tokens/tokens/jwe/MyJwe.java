@@ -5,6 +5,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
 import server.lib.security.hash.DbHash;
+import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
 import server.lib.security.mng_tokens.tokens.jwe.etc.RecCreateJweReturnT;
@@ -32,9 +34,7 @@ import server.models.token.MyToken;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 
-@SuppressFBWarnings({ "EI2" })
-@Service
-@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @Service @RequiredArgsConstructor
 public class MyJwe {
 
     private final EnvKeeper envKeeper;
@@ -43,8 +43,7 @@ public class MyJwe {
 
     private String stripKey(String key, String type) {
         return key.replace(String.format("-----BEGIN %s KEY-----", type), "")
-                .replace(String.format("-----END %s KEY-----", type), "")
-                .replaceAll("\\s", "");
+                .replace(String.format("-----END %s KEY-----", type), "").replaceAll("\\s", "");
     }
 
     private RSAPrivateKey getPrivateKey() throws Exception {
@@ -71,15 +70,11 @@ public class MyJwe {
 
     public RecCreateJweReturnT create(UUID userId) {
         try {
-            JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256,
-                    EncryptionMethod.A256GCM)
-                    .build();
+            JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM).build();
 
             RecExpTplSec recExp = expMng.jwe();
 
-            Map<String, Object> claims = Map.of(
-                    "userId", userId, "iat", recExp.iat(),
-                    "exp", recExp.exp());
+            Map<String, Object> claims = Map.of("userId", userId, "iat", recExp.iat(), "exp", recExp.exp());
 
             JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));
 
@@ -97,16 +92,16 @@ public class MyJwe {
         }
     }
 
-    public Map<String, Object> check(String token) {
+    public MyTkPayload check(String token) {
         try {
             JWEObject jwe = JWEObject.parse(token);
 
             RSADecrypter decrypter = new RSADecrypter(getPrivateKey());
             jwe.decrypt(decrypter);
 
-            Map<String, Object> payload = jwe.getPayload().toJSONObject();
+            MyTkPayload payload = MyTkPayload.fromObj(jwe.getPayload().toJSONObject());
 
-            if ((long) payload.get("exp") < System.currentTimeMillis() / 1000L)
+            if (payload.exp() < Instant.now().getEpochSecond())
                 throw new ErrAPI("jwe_expired", 401);
 
             return payload;

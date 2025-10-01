@@ -21,7 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.conf.Reg;
-import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
+import server.lib.security.mng_tokens.etc.MyTkPayload;
+import server.models.user.User;
 
 @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
 public final class Api extends ServerWebExchangeDecorator {
@@ -106,8 +107,14 @@ public final class Api extends ServerWebExchangeDecorator {
         return Optional.ofNullable(token).orElse("");
     }
 
-    public MyJwtPayload getJwtPayload() {
-        return getAttribute("jwtPayload");
+    public String getJwe() {
+        String jwe = getCookie("refreshToken");
+
+        return jwe;
+    }
+
+    public User getUser() {
+        return getAttribute("user");
     }
 
     public Optional<Map<String, Object>> getParsedForm() {
