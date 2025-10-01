@@ -3,8 +3,10 @@ import { preAuthRegister } from "../../auth/register/pre";
 import { clickByID } from "../shortcuts/click";
 import { getByID, getByTxt } from "../shortcuts/get";
 import { waitURL } from "../shortcuts/wait";
-import { Browser } from "@playwright/test";
+import { Browser, expect, Page } from "@playwright/test";
 import { genRegisterPayload, PayloadRegisterT } from "../conf/payloads";
+import { genPwd } from "@/core/lib/pwd";
+import { REG_JWT } from "@/core/constants/regex";
 
 export const registerUserOk = async (
   browser: Browser,
@@ -40,4 +42,19 @@ export const registerUserOk = async (
   return {
     payload,
   };
+};
+
+export const recoverPwdOk = async (page: Page) => {
+  const form = await getByID(page, "recover_pwd__form");
+
+  const newPwd = genPwd();
+  await (await getByID(form, "password")).fill(newPwd);
+  await (await getByID(form, "confirmPassword")).fill(newPwd);
+
+  await clickByID(form, "recover_pwd__form__submit");
+
+  await waitURL(page, "/");
+
+  const jwt = await page.evaluate(() => sessionStorage.getItem("accessToken"));
+  await expect(REG_JWT.test(jwt ?? "")).toBeTruthy();
 };
