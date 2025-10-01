@@ -103,7 +103,7 @@ public final class Api extends ServerWebExchangeDecorator {
         if (!Reg.isJWT(token) && throwIfMiss)
             throw new ErrAPI("jwt_not_provided", 401);
 
-        return token;
+        return Optional.ofNullable(token).orElse("");
     }
 
     public MyJwtPayload getJwtPayload() {

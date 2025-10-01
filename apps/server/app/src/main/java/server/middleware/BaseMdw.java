@@ -34,6 +34,10 @@ public abstract class BaseMdw implements WebFilter {
 
     private void checkJwt(Api api, boolean throwIfMiss) {
         String token = api.getJwt(throwIfMiss);
+
+        if (token.isBlank() && !throwIfMiss)
+            return;
+
         MyJwtPayload payload = tkMng.checkJwt(token);
 
         api.setAttr("jwtPayload", payload);

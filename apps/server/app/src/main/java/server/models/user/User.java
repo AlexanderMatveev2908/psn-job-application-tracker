@@ -89,6 +89,8 @@ public class User extends RootTable {
             curr = curr.getSuperclass();
         }
 
+        data.put("use2FA", getTotpSecret() != null);
+
         return data;
     }
 
