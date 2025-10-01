@@ -16,6 +16,8 @@ import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
 import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.cbc_hmac.CbcHmac;
+import server.lib.security.cbc_hmac.etc.RecCreateCbcHmac;
 import server.lib.security.session_tokens.RecSessionTokens;
 import server.lib.security.session_tokens.SessionManager;
 import server.models.applications.JobAppl;
@@ -41,6 +43,7 @@ public class UserSvc {
     private final JobApplSvc jobApplSvc;
     private final SessionManager sessionMng;
     private final MailSvc mailSvc;
+    private final CbcHmac cbcHmac;
 
     public Mono<Tuple3<User, MyToken, String>> insert(User us) {
         return findByEmail(us.getEmail())
@@ -56,10 +59,22 @@ public class UserSvc {
                                     TokenT.REFRESH,
                                     recSession.recJwe());
 
-                            return tokensRepo.insert(refreshTk)
-                                    .flatMap(dbToken -> mailSvc
-                                            .sendRctHtmlMail(SubjEmailT.CONFIRM_EMAIL, dbUser)
-                                            .thenReturn(Tuples.of(dbUser, dbToken, recSession.jwt())));
+                            RecCreateCbcHmac recCreateCbcHmac = cbcHmac.create(
+                                    AlgT.AES_CBC_HMAC_SHA256,
+                                    TokenT.CONF_EMAIL,
+                                    dbUser.getId());
+
+                            return Mono.zip(
+                                    tokensRepo.insert(refreshTk),
+                                    tokensRepo.insert(recCreateCbcHmac.token())).flatMap(tpl -> {
+                                        MyToken dbToken = tpl.getT1();
+
+                                        return mailSvc.sendRctHtmlMail(
+                                                SubjEmailT.CONFIRM_EMAIL,
+                                                dbUser,
+                                                recCreateCbcHmac.clientToken())
+                                                .thenReturn(Tuples.of(dbUser, dbToken, recSession.jwt()));
+                                    });
                         })));
     }
 

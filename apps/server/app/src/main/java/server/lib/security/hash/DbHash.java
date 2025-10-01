@@ -17,12 +17,12 @@ import server.lib.data_structure.Frmt;
 public class DbHash {
     private final EnvKeeper envKeeper;
 
-    public String hash(String plain) {
+    public String hash(String arg) {
         try {
 
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(Frmt.utf8ToBinary(envKeeper.getDbHashKey()), "HmacSHA256"));
-            return Frmt.binaryToHex(mac.doFinal(Frmt.utf8ToBinary(plain)));
+            return Frmt.binaryToHex(mac.doFinal(Frmt.utf8ToBinary(arg)));
         } catch (Exception err) {
             throw new ErrAPI("err hashing db token");
         }

@@ -12,9 +12,9 @@ public final class Reg {
         public static final String INT = "^\\d+$";
         public static final String FLOAT = "^(?:\\d+(?:\\.\\d{1,2})?|\\.\\d{1,2})$";
         public static final String UUID = "^([a-f0-9]{8})-([a-f0-9]{4})-4[a-f0-9]{3}-([a-f0-9]{4})-([a-f0-9]{12})$";
-        public static final String JWT = "^([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})$";
-        public static final String JWE = "^([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})\\.([A-Za-z0-9_-]+={0,2})$";
-        public static final String CBC_HMAC = "^(?=.{600,}$)[A-Fa-f0-9]{400,}\\.[A-Fa-f0-9]{32}\\.[A-Fa-f0-9]{128}\\.[A-Fa-f0-9]{64}$";
+        public static final String JWT = "^(?:[A-Za-z0-9_-]+={0,2}\\.){2}[A-Za-z0-9_-]+={0,2}$";
+        public static final String JWE = "^(?:[A-Za-z0-9_-]+={0,2}\\.){4}[A-Za-z0-9_-]+={0,2}$";
+        public static final String CBC_HMAC = "^(?:[A-Fa-f0-9]+\\.){3}[A-Fa-f0-9]+$";
         public static final String TOTP_SECRET = "^[A-Z2-7]{32}$";
         public static final String TOTP_CODE = "^\\d{6}$";
         public static final String BKP_CODE = "^[A-F0-9]{4}-[A-F0-9]{4}$";

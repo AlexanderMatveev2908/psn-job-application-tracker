@@ -49,7 +49,7 @@ public class MailTmpl {
         }
     }
 
-    public String replacePlaceholder(String firstName) {
+    public String replacePlaceholder(String firstName, String clientToken) {
         String txt = readTmpl();
 
         StringBuffer buff = new StringBuffer();
@@ -57,7 +57,8 @@ public class MailTmpl {
         Pattern reg = Pattern.compile("\\$\\{(.*?)}");
         Matcher match = reg.matcher(txt);
 
-        Map<String, String> vals = Map.of("firstName", firstName, "url", envKeeper.getFrontUrl() + "/verify");
+        Map<String, String> vals = Map.of("firstName", firstName, "url",
+                envKeeper.getFrontUrl() + "/verify?cbcHmacToken=" + clientToken);
 
         while (match.find()) {
             String key = match.group(1);
