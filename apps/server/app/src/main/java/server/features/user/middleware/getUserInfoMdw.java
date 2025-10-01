@@ -17,7 +17,6 @@ public class getUserInfoMdw extends BaseMdw {
 
       checkJwtOptional(api);
 
-      System.out.println("run");
       return chain.filter(api);
     });
   }
