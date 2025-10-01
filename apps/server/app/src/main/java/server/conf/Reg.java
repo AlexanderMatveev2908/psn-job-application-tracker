@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 import server.decorators.flow.ErrAPI;
 
 public final class Reg {
-
         public static final String NAME = "^[\\p{L}\\s,`'\\-]*$";
         public static final String JOB_NAME = "^[\\p{L}\\s,`'/\\-]*$";
         public static final String PWD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])\\S{8,}$";
