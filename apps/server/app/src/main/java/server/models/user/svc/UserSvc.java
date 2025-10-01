@@ -18,7 +18,6 @@ import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
 import server.lib.security.mng_tokens.MyTkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
-import server.lib.security.mng_tokens.tokens.cbc_hmac.CbcHmac;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
@@ -41,9 +40,8 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
-    private final MyTkMng sessionMng;
+    private final MyTkMng tkMng;
     private final MailSvc mailSvc;
-    private final CbcHmac cbcHmac;
 
     public Mono<Tuple3<User, MyToken, String>> insert(User us) {
         return findByEmail(us.getEmail())
@@ -51,7 +49,7 @@ public class UserSvc {
                         new ErrAPI("an account with this email already exists", 409)))
                 .switchIfEmpty(Mono.defer(() -> userRepo.insert(us)
                         .flatMap(dbUser -> {
-                            RecSessionTokensReturnT recSession = sessionMng.genSessionTokens(dbUser.getId());
+                            RecSessionTokensReturnT recSession = tkMng.genSessionTokens(dbUser.getId());
 
                             MyToken refreshTk = new MyToken(
                                     dbUser.getId(),
@@ -59,7 +57,7 @@ public class UserSvc {
                                     TokenT.REFRESH,
                                     recSession.recJwe());
 
-                            RecCreateCbcHmacReturnT recCreateCbcHmac = cbcHmac.create(
+                            RecCreateCbcHmacReturnT recCreateCbcHmac = tkMng.genCbcHmac(
                                     TokenT.CONF_EMAIL,
                                     dbUser.getId());
 
