@@ -35,10 +35,10 @@ public class PostAuthCtrl {
             return registerSvc.register(hashedUser);
         }).flatMap(tpl -> {
 
-            ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT2());
+            ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());
 
             return new ResAPI(201).msg("user created")
-                    .data(Map.of("user", tpl.getT1(), "accessToken", tpl.getT3())).cookie(refreshCookie).build();
+                    .data(Map.of("accessToken", tpl.getT2())).cookie(refreshCookie).build();
         });
     }
 

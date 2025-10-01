@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple3;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
 import server.conf.mail.etc.SubjEmailT;
@@ -29,9 +29,9 @@ public class RegisterSvc {
         private final MyTkMng tkMng;
         private final MailSvc mailSvc;
 
-        public Mono<Tuple3<User, String, String>> register(User us) {
+        public Mono<Tuple2<String, String>> register(User us) {
                 return userRepo.findByEmail(us.getEmail())
-                                .flatMap(existing -> Mono.<Tuple3<User, String, String>>error(
+                                .flatMap(existing -> Mono.<Tuple2<String, String>>error(
                                                 new ErrAPI("an account with this email already exists", 409)))
                                 .switchIfEmpty(
                                                 userRepo.insert(us).flatMap(dbUser -> {
@@ -43,12 +43,12 @@ public class RegisterSvc {
                                                         return Mono.when(
                                                                         tokensRepo.insert(recSession.jwe().inst()),
                                                                         tokensRepo.insertWithId(recCbcHmac.inst()))
+
                                                                         .then(mailSvc.sendRctHtmlMail(
                                                                                         SubjEmailT.CONFIRM_EMAIL,
                                                                                         dbUser,
                                                                                         recCbcHmac.clientToken()))
                                                                         .thenReturn(Tuples.of(
-                                                                                        dbUser,
                                                                                         recSession.jwe().clientToken(),
                                                                                         recSession.jwt()));
                                                 }));

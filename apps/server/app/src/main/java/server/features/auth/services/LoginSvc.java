@@ -30,7 +30,7 @@ public class LoginSvc {
 
     MyArgonHash.rctCheck(user.getPassword(), form.getPassword()).flatMap(resCheck -> {
       if (!resCheck)
-        return Mono.<Tuple2<String, String>>error(new ErrAPI("invalid credentials", 401));
+        return Mono.<Tuple2<String, String>>error(new ErrAPI("invalid password", 401));
 
       RecSessionTokensReturnT rec = tkMng.genSessionTokens(user.getId());
 
