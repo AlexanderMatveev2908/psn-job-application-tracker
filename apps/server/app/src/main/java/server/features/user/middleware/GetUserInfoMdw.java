@@ -9,7 +9,7 @@ import server.decorators.flow.Api;
 import server.middleware.BaseMdw;
 
 @Component @RequiredArgsConstructor
-public class getUserInfoMdw extends BaseMdw {
+public class GetUserInfoMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
