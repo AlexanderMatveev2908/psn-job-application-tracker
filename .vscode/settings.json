@@ -3,10 +3,8 @@
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
   },
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true,
-  "java.format.enabled": true,
-  "java.format.settings.useEditorConfig": true,
+  "java.format.settings.url": "file:///home/ninja/.config/Code/formatters/java-formatter.xml",
+  "java.format.settings.profile": "TwoSpaces",
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.import.gradle.wrapper.enabled": true,
   "java.configuration.annotationProcessing.enabled": true,

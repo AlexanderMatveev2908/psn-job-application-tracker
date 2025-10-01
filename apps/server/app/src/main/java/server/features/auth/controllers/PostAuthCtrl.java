@@ -18,9 +18,7 @@ import server.features.auth.services.RegisterSvc;
 import server.lib.security.cookies.MyCookies;
 import server.models.user.User;
 
-@Component
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "EI2" })
+@Component @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class PostAuthCtrl {
 
     private final RegisterSvc registerSvc;
@@ -37,19 +35,18 @@ public class PostAuthCtrl {
 
             ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());
 
-            return new ResAPI(201).msg("user created")
-                    .data(Map.of("accessToken", tpl.getT2())).cookie(refreshCookie).build();
+            return new ResAPI(201).msg("user created").data(Map.of("accessToken", tpl.getT2())).cookie(refreshCookie)
+                    .build();
         });
     }
 
     public Mono<ResponseEntity<ResAPI>> login(Api api) {
-        return loginSvc.login((LoginForm) api.getMappedData())
-                .flatMap(tpl -> {
+        return loginSvc.login((LoginForm) api.getMappedData()).flatMap(tpl -> {
 
-                    ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());
+            ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());
 
-                    return new ResAPI(200).msg("user logged").cookie(refreshCookie)
-                            .data(Map.of("accessToken", tpl.getT2())).build();
-                });
+            return new ResAPI(200).msg("user logged").cookie(refreshCookie).data(Map.of("accessToken", tpl.getT2()))
+                    .build();
+        });
     }
 }

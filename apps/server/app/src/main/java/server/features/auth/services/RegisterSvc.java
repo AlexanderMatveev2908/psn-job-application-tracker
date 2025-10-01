@@ -19,39 +19,24 @@ import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.svc.UserRepo;
 
-@Service
-@Transactional
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "EI2" })
+@Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class RegisterSvc {
-        private final UserRepo userRepo;
-        private final TokenRepo tokensRepo;
-        private final MyTkMng tkMng;
-        private final MailSvc mailSvc;
+  private final UserRepo userRepo;
+  private final TokenRepo tokensRepo;
+  private final MyTkMng tkMng;
+  private final MailSvc mailSvc;
 
-        public Mono<Tuple2<String, String>> register(User us) {
-                return userRepo.findByEmail(us.getEmail())
-                                .flatMap(existing -> Mono.<Tuple2<String, String>>error(
-                                                new ErrAPI("an account with this email already exists", 409)))
-                                .switchIfEmpty(
-                                                userRepo.insert(us).flatMap(dbUser -> {
-                                                        RecSessionTokensReturnT recSession = tkMng
-                                                                        .genSessionTokens(dbUser.getId());
-                                                        RecCreateCbcHmacReturnT recCbcHmac = tkMng
-                                                                        .genCbcHmac(TokenT.CONF_EMAIL, dbUser.getId());
+  public Mono<Tuple2<String, String>> register(User us) {
+    return userRepo.findByEmail(us.getEmail()).flatMap(
+        existing -> Mono.<Tuple2<String, String>>error(new ErrAPI("an account with this email already exists", 409)))
+        .switchIfEmpty(userRepo.insert(us).flatMap(dbUser -> {
+          RecSessionTokensReturnT recSession = tkMng.genSessionTokens(dbUser.getId());
+          RecCreateCbcHmacReturnT recCbcHmac = tkMng.genCbcHmac(TokenT.CONF_EMAIL, dbUser.getId());
 
-                                                        return Mono.when(
-                                                                        tokensRepo.insert(recSession.jwe().inst()),
-                                                                        tokensRepo.insertWithId(recCbcHmac.inst()))
-
-                                                                        .then(mailSvc.sendRctHtmlMail(
-                                                                                        SubjEmailT.CONFIRM_EMAIL,
-                                                                                        dbUser,
-                                                                                        recCbcHmac.clientToken()))
-                                                                        .thenReturn(Tuples.of(
-                                                                                        recSession.jwe().clientToken(),
-                                                                                        recSession.jwt()));
-                                                }));
-        }
+          return Mono.when(tokensRepo.insert(recSession.jwe().inst()), tokensRepo.insertWithId(recCbcHmac.inst()))
+              .then(mailSvc.sendRctHtmlMail(SubjEmailT.CONFIRM_EMAIL, dbUser, recCbcHmac.clientToken()))
+              .thenReturn(Tuples.of(recSession.jwe().clientToken(), recSession.jwt()));
+        }));
+  }
 
 }
