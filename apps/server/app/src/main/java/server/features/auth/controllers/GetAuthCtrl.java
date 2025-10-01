@@ -19,6 +19,6 @@ public class GetAuthCtrl {
 
   public Mono<ResponseEntity<ResAPI>> refresh(Api api) {
 
-    return refreshSvc.refresh(api).flatMap(token -> new ResAPI(200).data(Map.of("token", token)).build());
+    return refreshSvc.refresh(api).flatMap(jwt -> new ResAPI(200).data(Map.of("accessToken", jwt)).build());
   }
 }

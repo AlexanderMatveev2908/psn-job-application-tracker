@@ -13,7 +13,6 @@ import server.decorators.flow.ErrAPI;
 import server.lib.security.hash.DbHash;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
-import server.models.token.MyToken;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
 
@@ -23,7 +22,7 @@ public class RefreshSvc {
   private final TokenRepo tokenRepo;
   private final DbHash dbHash;
 
-  public Mono<MyToken> refresh(Api api) {
+  public Mono<String> refresh(Api api) {
 
     String jwe = api.getJwe();
     MyTkPayload payload = tkMng.checkJwe(jwe);
@@ -36,7 +35,9 @@ public class RefreshSvc {
         return tokenRepo.deleteByUserIdAndTokenT(dbToken.getUserId(), TokenT.REFRESH)
             .then(Mono.error(new ErrAPI("jwe_expired", 401)));
 
-      return Mono.just(dbToken);
+      String freshJwt = tkMng.genJwt(payload.userId());
+
+      return Mono.just(freshJwt);
     });
 
   }
