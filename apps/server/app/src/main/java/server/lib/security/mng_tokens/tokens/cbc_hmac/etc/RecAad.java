@@ -1,4 +1,4 @@
-package server.lib.security.cbc_hmac.etc;
+package server.lib.security.mng_tokens.tokens.cbc_hmac.etc;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -22,8 +22,8 @@ public class RecAad {
     private final UUID userId;
     private final UUID tokenId;
 
-    public RecAad(AlgT algT, TokenT tokenT, UUID userId) {
-        this.algT = algT;
+    public RecAad(TokenT tokenT, UUID userId) {
+        this.algT = AlgT.AES_CBC_HMAC_SHA256;
         this.tokenT = tokenT;
         this.userId = userId;
 

@@ -1,4 +1,4 @@
-package server.lib.security.jwt;
+package server.lib.security.mng_tokens.tokens.jwt;
 
 import java.util.Map;
 import java.util.UUID;
@@ -15,8 +15,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
-import server.lib.security.expiry_mng.ExpMng;
-import server.lib.security.expiry_mng.etc.RecExpJwt;
+import server.lib.security.mng_tokens.expiry_mng.ExpMng;
+import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplDate;
 
 @Service
 
@@ -33,12 +33,12 @@ public final class MyJwt {
 
     public String create(UUID userId) {
 
-        RecExpJwt rec = expMng.jwt();
+        RecExpTplDate rec = expMng.jwt();
 
         return JWT.create()
                 .withIssuer(envKeeper.getAppName())
                 .withSubject(Frmt.toJson(Map.of("userId", userId)))
-                .withIssuedAt(rec.now())
+                .withIssuedAt(rec.iat())
                 .withExpiresAt(rec.exp())
                 .sign(alg);
     }

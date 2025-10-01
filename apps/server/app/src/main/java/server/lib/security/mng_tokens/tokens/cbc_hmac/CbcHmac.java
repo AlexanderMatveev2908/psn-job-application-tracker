@@ -1,4 +1,4 @@
-package server.lib.security.cbc_hmac;
+package server.lib.security.mng_tokens.tokens.cbc_hmac;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -19,12 +19,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
-import server.lib.security.cbc_hmac.etc.RecAad;
-import server.lib.security.cbc_hmac.etc.RecCbcHmacKeys;
-import server.lib.security.cbc_hmac.etc.RecCreateCbcHmac;
-import server.lib.security.expiry_mng.ExpMng;
 import server.lib.security.hash.DbHash;
 import server.lib.security.hkdf.Hkdf;
+import server.lib.security.mng_tokens.expiry_mng.ExpMng;
+import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecAad;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCbcHmacKeys;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.token.MyToken;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
@@ -96,13 +97,13 @@ public class CbcHmac {
         }
     }
 
-    public RecCreateCbcHmac create(AlgT algT, TokenT tokenT, UUID userId) {
-        RecAad aad = new RecAad(algT, tokenT, userId);
+    public RecCreateCbcHmacReturnT create(TokenT tokenT, UUID userId) {
+        RecAad aad = new RecAad(tokenT, userId);
 
         RecCbcHmacKeys keys = deriveKeys(aad);
 
-        long exp = expMng.cbcHmac();
-        byte[] plain = Frmt.mapToBinary(Map.of("userId", userId, "exp", exp));
+        RecExpTplSec recExp = expMng.cbcHmac();
+        byte[] plain = Frmt.mapToBinary(Map.of("userId", userId, "iat", recExp.iat(), "exp", recExp.exp()));
 
         IvParameterSpec ivSpec = genIv();
 
@@ -114,9 +115,10 @@ public class CbcHmac {
                 + Frmt.binaryToHex(ciphertext) + "."
                 + Frmt.binaryToHex(tag);
 
-        var newToken = new MyToken(aad.getTokenId(), userId, algT, tokenT, dbHash.hash(clientToken), exp);
+        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, dbHash.hash(clientToken),
+                recExp.exp());
 
-        return new RecCreateCbcHmac(newToken,
+        return new RecCreateCbcHmacReturnT(newToken,
                 clientToken);
     }
 

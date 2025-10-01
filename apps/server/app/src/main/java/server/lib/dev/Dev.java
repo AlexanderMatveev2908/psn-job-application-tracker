@@ -8,7 +8,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
-import server.lib.security.cbc_hmac.CbcHmac;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.CbcHmac;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 
@@ -39,7 +39,7 @@ public class Dev {
     public void doAesHmacStuff() {
 
         var usId = UUID.randomUUID();
-        var rec = cbcHmac.create(AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
+        var rec = cbcHmac.create(TokenT.CHANGE_EMAIL, usId);
 
         System.out.println(rec.token());
 

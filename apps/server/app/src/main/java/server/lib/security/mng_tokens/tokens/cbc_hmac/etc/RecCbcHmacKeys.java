@@ -1,4 +1,4 @@
-package server.lib.security.cbc_hmac.etc;
+package server.lib.security.mng_tokens.tokens.cbc_hmac.etc;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;

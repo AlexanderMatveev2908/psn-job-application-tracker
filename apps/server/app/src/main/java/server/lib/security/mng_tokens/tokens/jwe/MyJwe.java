@@ -1,4 +1,4 @@
-package server.lib.security.jwe;
+package server.lib.security.mng_tokens.tokens.jwe;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -24,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
-import server.lib.security.expiry_mng.ExpMng;
-import server.lib.security.expiry_mng.etc.RecExpJwe;
-import server.lib.security.jwe.etc.RecResJwe;
+import server.lib.security.mng_tokens.expiry_mng.ExpMng;
+import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
+import server.lib.security.mng_tokens.tokens.jwe.etc.RecResJwe;
 
 @SuppressFBWarnings({ "EI2" })
 @Service
@@ -70,10 +70,10 @@ public class MyJwe {
                     EncryptionMethod.A256GCM)
                     .build();
 
-            RecExpJwe rec = expMng.jwe();
+            RecExpTplSec rec = expMng.jwe();
 
             Map<String, Object> claims = Map.of(
-                    "userId", userId, "iat", rec.now(),
+                    "userId", userId, "iat", rec.iat(),
                     "exp", rec.exp());
 
             JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));

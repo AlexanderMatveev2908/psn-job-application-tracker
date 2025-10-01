@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.auth.paperwork.RegisterForm;
-import server.lib.security.MyCookies.MyCookies;
+import server.lib.security.cookies.MyCookies;
 import server.models.user.User;
 import server.models.user.svc.UserSvc;
 

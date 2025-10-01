@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import server.lib.security.jwe.etc.RecResJwe;
+import server.lib.security.mng_tokens.tokens.jwe.etc.RecResJwe;
 import server.models.RootTable;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;

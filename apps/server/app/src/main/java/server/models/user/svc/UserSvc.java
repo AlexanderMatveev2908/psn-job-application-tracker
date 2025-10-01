@@ -16,10 +16,10 @@ import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
 import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.cbc_hmac.CbcHmac;
-import server.lib.security.cbc_hmac.etc.RecCreateCbcHmac;
-import server.lib.security.session_tokens.RecSessionTokens;
-import server.lib.security.session_tokens.SessionManager;
+import server.lib.security.mng_tokens.MyTkMng;
+import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.CbcHmac;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
@@ -41,7 +41,7 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
-    private final SessionManager sessionMng;
+    private final MyTkMng sessionMng;
     private final MailSvc mailSvc;
     private final CbcHmac cbcHmac;
 
@@ -51,7 +51,7 @@ public class UserSvc {
                         new ErrAPI("an account with this email already exists", 409)))
                 .switchIfEmpty(Mono.defer(() -> userRepo.insert(us)
                         .flatMap(dbUser -> {
-                            RecSessionTokens recSession = sessionMng.genSessionTokens(dbUser.getId());
+                            RecSessionTokensReturnT recSession = sessionMng.genSessionTokens(dbUser.getId());
 
                             MyToken refreshTk = new MyToken(
                                     dbUser.getId(),
@@ -59,8 +59,7 @@ public class UserSvc {
                                     TokenT.REFRESH,
                                     recSession.recJwe());
 
-                            RecCreateCbcHmac recCreateCbcHmac = cbcHmac.create(
-                                    AlgT.AES_CBC_HMAC_SHA256,
+                            RecCreateCbcHmacReturnT recCreateCbcHmac = cbcHmac.create(
                                     TokenT.CONF_EMAIL,
                                     dbUser.getId());
 
