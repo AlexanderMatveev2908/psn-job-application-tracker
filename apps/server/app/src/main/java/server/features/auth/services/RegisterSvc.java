@@ -14,8 +14,6 @@ import server.decorators.flow.ErrAPI;
 import server.lib.security.mng_tokens.MyTkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
-import server.models.token.MyToken;
-import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
@@ -31,30 +29,29 @@ public class RegisterSvc {
         private final MyTkMng tkMng;
         private final MailSvc mailSvc;
 
-        public Mono<Tuple3<User, MyToken, String>> register(User us) {
+        public Mono<Tuple3<User, String, String>> register(User us) {
                 return userRepo.findByEmail(us.getEmail())
-                                .flatMap(existing -> Mono.<Tuple3<User, MyToken, String>>error(
+                                .flatMap(existing -> Mono.<Tuple3<User, String, String>>error(
                                                 new ErrAPI("an account with this email already exists", 409)))
-                                .switchIfEmpty(userRepo.insert(us).flatMap(dbUser -> {
-                                        RecSessionTokensReturnT recSession = tkMng.genSessionTokens(dbUser.getId());
+                                .switchIfEmpty(
+                                                userRepo.insert(us).flatMap(dbUser -> {
+                                                        RecSessionTokensReturnT recSession = tkMng
+                                                                        .genSessionTokens(dbUser.getId());
+                                                        RecCreateCbcHmacReturnT recCbcHmac = tkMng
+                                                                        .genCbcHmac(TokenT.CONF_EMAIL, dbUser.getId());
 
-                                        MyToken refreshTk = new MyToken(dbUser.getId(), AlgT.RSA_OAEP256_A256GCM,
-                                                        TokenT.REFRESH, recSession.recJwe());
-
-                                        RecCreateCbcHmacReturnT recCreateCbcHmac = tkMng.genCbcHmac(TokenT.CONF_EMAIL,
-                                                        dbUser.getId());
-
-                                        return Mono.zip(tokensRepo.insert(refreshTk),
-                                                        tokensRepo.insertWithId(recCreateCbcHmac.token()))
-                                                        .flatMap(tpl -> {
-                                                                MyToken dbToken = tpl.getT1();
-
-                                                                return mailSvc.sendRctHtmlMail(SubjEmailT.CONFIRM_EMAIL,
-                                                                                dbUser, recCreateCbcHmac.clientToken())
-                                                                                .thenReturn(Tuples.of(dbUser, dbToken,
-                                                                                                recSession.jwt()));
-                                                        });
-                                }));
+                                                        return Mono.when(
+                                                                        tokensRepo.insert(recSession.jwe().inst()),
+                                                                        tokensRepo.insertWithId(recCbcHmac.inst()))
+                                                                        .then(mailSvc.sendRctHtmlMail(
+                                                                                        SubjEmailT.CONFIRM_EMAIL,
+                                                                                        dbUser,
+                                                                                        recCbcHmac.clientToken()))
+                                                                        .thenReturn(Tuples.of(
+                                                                                        dbUser,
+                                                                                        recSession.jwe().clientToken(),
+                                                                                        recSession.jwt()));
+                                                }));
         }
 
 }

@@ -24,9 +24,13 @@ import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
+import server.lib.security.hash.DbHash;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
-import server.lib.security.mng_tokens.tokens.jwe.etc.RecResJwe;
+import server.lib.security.mng_tokens.tokens.jwe.etc.RecCreateJweReturnT;
+import server.models.token.MyToken;
+import server.models.token.etc.AlgT;
+import server.models.token.etc.TokenT;
 
 @SuppressFBWarnings({ "EI2" })
 @Service
@@ -35,6 +39,7 @@ public class MyJwe {
 
     private final EnvKeeper envKeeper;
     private final ExpMng expMng;
+    private final DbHash dbHash;
 
     private String stripKey(String key, String type) {
         return key.replace(String.format("-----BEGIN %s KEY-----", type), "")
@@ -64,17 +69,17 @@ public class MyJwe {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    public RecResJwe create(UUID userId) {
+    public RecCreateJweReturnT create(UUID userId) {
         try {
             JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256,
                     EncryptionMethod.A256GCM)
                     .build();
 
-            RecExpTplSec rec = expMng.jwe();
+            RecExpTplSec recExp = expMng.jwe();
 
             Map<String, Object> claims = Map.of(
-                    "userId", userId, "iat", rec.iat(),
-                    "exp", rec.exp());
+                    "userId", userId, "iat", recExp.iat(),
+                    "exp", recExp.exp());
 
             JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));
 
@@ -83,7 +88,10 @@ public class MyJwe {
 
             String refreshToken = jwe.serialize();
 
-            return new RecResJwe(refreshToken, rec.exp());
+            MyToken newToken = new MyToken(userId, AlgT.RSA_OAEP256_A256GCM, TokenT.REFRESH, dbHash.hash(refreshToken),
+                    recExp.exp());
+
+            return new RecCreateJweReturnT(newToken, refreshToken);
         } catch (Exception err) {
             throw new ErrAPI("err creating jwe");
         }

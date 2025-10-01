@@ -7,7 +7,6 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import server.lib.security.mng_tokens.tokens.jwe.etc.RecResJwe;
 import server.models.RootTable;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
@@ -41,12 +40,12 @@ public class MyToken extends RootTable {
         this.exp = exp;
     }
 
-    public MyToken(UUID userId, AlgT algType, TokenT tokenType, RecResJwe rec) {
+    public MyToken(UUID userId, AlgT algType, TokenT tokenType, String hashed, long exp) {
         this.userId = userId;
         this.tokenType = tokenType;
         this.algType = algType;
-        this.hashed = rec.token();
-        this.exp = rec.exp();
+        this.hashed = hashed;
+        this.exp = exp;
     }
 
     public MyToken() {

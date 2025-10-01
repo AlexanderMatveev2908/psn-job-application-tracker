@@ -4,5 +4,5 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.models.token.MyToken;
 
 @SuppressFBWarnings({ "EI2", "EI" })
-public record RecCreateCbcHmacReturnT(MyToken token, String clientToken) {
+public record RecCreateCbcHmacReturnT(MyToken inst, String clientToken) {
 }
