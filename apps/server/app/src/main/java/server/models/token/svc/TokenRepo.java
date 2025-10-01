@@ -15,10 +15,17 @@ public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
         Flux<MyToken> findByUserId(UUID userId);
 
         @Query("""
-                            INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
-                            VALUES (:#{#token.userId}, CAST(:#{#token.tokenType} AS token_t), CAST(:#{#token.algType} AS alg_t), :#{#token.hashed}, :#{#token.exp})
-                            RETURNING *
-                        """)
+                        INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
+                        VALUES (:#{#token.userId}, CAST(:#{#token.tokenType} AS token_t), CAST(:#{#token.algType} AS alg_t), :#{#token.hashed}, :#{#token.exp})
+                        RETURNING *
+                                """)
         Mono<MyToken> insert(MyToken token);
+
+        @Query("""
+                        INSERT INTO tokens (id, user_id, token_type, alg_type, hashed, exp)
+                        VALUES (:#{#token.id}, :#{#token.userId}, CAST(:#{#token.tokenType} AS token_t), CAST(:#{#token.algType} AS alg_t), :#{#token.hashed}, :#{#token.exp})
+                        RETURNING *
+                                """)
+        Mono<MyToken> insertWithId(MyToken token);
 
 }

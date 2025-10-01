@@ -63,7 +63,7 @@ public class UserSvc {
 
                             return Mono.zip(
                                     tokensRepo.insert(refreshTk),
-                                    tokensRepo.insert(recCreateCbcHmac.token())).flatMap(tpl -> {
+                                    tokensRepo.insertWithId(recCreateCbcHmac.token())).flatMap(tpl -> {
                                         MyToken dbToken = tpl.getT1();
 
                                         return mailSvc.sendRctHtmlMail(
