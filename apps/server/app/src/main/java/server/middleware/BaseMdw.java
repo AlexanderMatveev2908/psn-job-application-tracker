@@ -42,10 +42,7 @@ public abstract class BaseMdw implements WebFilter {
     }
 
     protected Mono<Map<String, Object>> limitAndRef(Api api) {
-        return rl.limit(api)
-                .then(api.getBd(new TypeReference<Map<String, Object>>() {
-                }))
-                .switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400)));
+        return limitAndRef(api, 5, 15);
     }
 
     protected Mono<Void> isTarget(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {

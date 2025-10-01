@@ -20,4 +20,8 @@ public class AuthRouter {
         return postCtrl.register(api);
     }
 
+    @PostMapping("/login")
+    public Mono<ResponseEntity<ResAPI>> login(Api api) {
+        return postCtrl.login(api);
+    }
 }

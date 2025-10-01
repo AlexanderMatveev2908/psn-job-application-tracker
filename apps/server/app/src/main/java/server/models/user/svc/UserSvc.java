@@ -11,21 +11,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple3;
-import reactor.util.function.Tuples;
-import server.conf.mail.MailSvc;
-import server.conf.mail.etc.SubjEmailT;
-import server.decorators.flow.ErrAPI;
-import server.lib.security.mng_tokens.MyTkMng;
-import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
-import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.applications.JobAppl;
-import server.models.applications.svc.JobApplSvc;
+import server.models.applications.svc.JobApplRepo;
 import server.models.backup_code.BkpCodes;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.MyToken;
-import server.models.token.etc.AlgT;
-import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.etc.UserPop;
@@ -39,41 +29,7 @@ public class UserSvc {
     private final UserRepo userRepo;
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
-    private final JobApplSvc jobApplSvc;
-    private final MyTkMng tkMng;
-    private final MailSvc mailSvc;
-
-    public Mono<Tuple3<User, MyToken, String>> insert(User us) {
-        return findByEmail(us.getEmail())
-                .flatMap(existing -> Mono.<Tuple3<User, MyToken, String>>error(
-                        new ErrAPI("an account with this email already exists", 409)))
-                .switchIfEmpty(Mono.defer(() -> userRepo.insert(us)
-                        .flatMap(dbUser -> {
-                            RecSessionTokensReturnT recSession = tkMng.genSessionTokens(dbUser.getId());
-
-                            MyToken refreshTk = new MyToken(
-                                    dbUser.getId(),
-                                    AlgT.RSA_OAEP256_A256GCM,
-                                    TokenT.REFRESH,
-                                    recSession.recJwe());
-
-                            RecCreateCbcHmacReturnT recCreateCbcHmac = tkMng.genCbcHmac(
-                                    TokenT.CONF_EMAIL,
-                                    dbUser.getId());
-
-                            return Mono.zip(
-                                    tokensRepo.insert(refreshTk),
-                                    tokensRepo.insertWithId(recCreateCbcHmac.token())).flatMap(tpl -> {
-                                        MyToken dbToken = tpl.getT1();
-
-                                        return mailSvc.sendRctHtmlMail(
-                                                SubjEmailT.CONFIRM_EMAIL,
-                                                dbUser,
-                                                recCreateCbcHmac.clientToken())
-                                                .thenReturn(Tuples.of(dbUser, dbToken, recSession.jwt()));
-                                    });
-                        })));
-    }
+    private final JobApplRepo jobApplRepo;
 
     public Mono<User> findByEmail(String email) {
         return userRepo.findByEmail(email);
@@ -87,7 +43,7 @@ public class UserSvc {
         Mono<User> userMono = userRepo.findById(userId);
         Mono<List<MyToken>> tokensMono = tokensRepo.findByUserId(userId).collectList();
         Mono<List<BkpCodes>> codesMono = bkpCodesRepo.findByUserId(userId).collectList();
-        Mono<List<JobAppl>> applMono = jobApplSvc.findByUserId(userId).collectList();
+        Mono<List<JobAppl>> applMono = jobApplRepo.findByUserId(userId).collectList();
 
         return Mono.zip(userMono, tokensMono, codesMono, applMono)
                 .map(tuple -> new UserPop(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4()));
