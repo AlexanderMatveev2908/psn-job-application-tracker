@@ -1,6 +1,5 @@
 package server.middleware.security;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.springframework.core.annotation.Order;
@@ -19,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.lib.combo.Kit;
+import server.lib.data_structure.Frmt;
 
 @Component
 @Order(10)
@@ -60,7 +60,7 @@ public class CorsMdw implements WebFilter {
             body = String.format("{ \"msg\": \"%s\", \"status\": 403 }", msg);
         }
 
-        var buff = res.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
+        var buff = res.bufferFactory().wrap(Frmt.utf8ToBinary(body));
         return res.writeWith(Mono.just(buff));
     }
 

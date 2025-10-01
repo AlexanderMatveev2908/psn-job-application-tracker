@@ -40,6 +40,9 @@ jobs:
       JWT_SECRET: ${{secrets.JWT_SECRET}}
       JWE_PRIVATE: ${{secrets.JWE_PRIVATE}}
       JWE_PUBLIC: ${{secrets.JWE_PUBLIC}}
+      HKDF_MASTER: ${{secrets.HKDF_MASTER}}
+      HKDF_SALT: ${{secrets.HKDF_SALT}}
+      DB_HASH_KEY: ${{secrets.DB_HASH_KEY}}
 
     steps:
       - name: 📂 clone code

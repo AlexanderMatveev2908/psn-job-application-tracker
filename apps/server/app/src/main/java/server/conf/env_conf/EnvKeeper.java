@@ -65,6 +65,15 @@ public final class EnvKeeper {
     @NotBlank
     @Resolved
     private String jwePublic;
+    @NotBlank
+    @Resolved
+    private String hkdfMaster;
+    @NotBlank
+    @Resolved
+    private String hkdfSalt;
+    @NotBlank
+    @Resolved
+    private String dbHashKey;
 
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);

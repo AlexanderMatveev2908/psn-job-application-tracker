@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import reactor.core.publisher.Mono;
-import server.lib.security.hash.MyHasher;
+import server.lib.security.hash.MyArgonHash;
 import server.models.RootTable;
 
 @Data
@@ -49,7 +49,7 @@ public class User extends RootTable {
     }
 
     public Mono<User> hashPwd() {
-        return MyHasher.rctHash(password)
+        return MyArgonHash.rctHash(password)
                 .map(hash -> {
                     setPassword(hash);
                     return this;

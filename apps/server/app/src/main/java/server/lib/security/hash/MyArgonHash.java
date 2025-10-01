@@ -10,14 +10,14 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import server.decorators.flow.ErrAPI;
 
-public final class MyHasher {
+public final class MyArgonHash {
     private static final int POOL_SIZE = Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
 
     private static final Scheduler hashPool = Schedulers.fromExecutor(Executors.newFixedThreadPool(POOL_SIZE));
 
     private static final Argon2 ARGON = Argon2Factory.create();
 
-    public MyHasher() {
+    public MyArgonHash() {
         throw new ErrAPI("MyHash should be a static lib only");
     }
 

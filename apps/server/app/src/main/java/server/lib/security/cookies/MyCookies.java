@@ -1,4 +1,4 @@
-package server.lib.security.MyCookies;
+package server.lib.security.cookies;
 
 import java.time.Duration;
 

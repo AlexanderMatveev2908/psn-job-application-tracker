@@ -1,6 +1,5 @@
 package server.middleware;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,6 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
+import server.lib.data_structure.Frmt;
 import server.lib.dev.MyLog;
 
 @Component
@@ -53,8 +53,8 @@ public class ErrCatcher implements WebExceptionHandler {
         try {
             bytes = mapper.writeValueAsBytes(apiBody);
         } catch (JacksonException e) {
-            bytes = ("{\"msg\":\"serialization failed\",\"status\":500,\"data\":null}")
-                    .getBytes(StandardCharsets.UTF_8);
+            bytes = Frmt.utf8ToBinary("{\"msg\":\"serialization failed\",\"status\":500,\"data\":null}");
+
         }
 
         return res.writeWith(Mono.just(res.bufferFactory().wrap(bytes)));

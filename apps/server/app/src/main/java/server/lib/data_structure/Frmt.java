@@ -17,27 +17,19 @@ public final class Frmt {
     @SuppressWarnings({ "unused", "UseSpecificCatch" })
     public static String toJson(Object obj) {
         try {
-
             return jack.writeValueAsString(obj);
-
         } catch (Exception err) {
-
             System.out.println("❌ err parsing arg to json");
-
             return null;
-
         }
     }
 
-    public static Map<String, Object> toMap(String txt) {
-
+    public static Map<String, Object> jsonToMap(String txt) {
         try {
             return jack.readValue(txt, new TypeReference<Map<String, Object>>() {
             });
         } catch (Exception err) {
-
             System.out.println("❌ err parsing arg to map");
-
             return null;
         }
     }
@@ -46,4 +38,21 @@ public final class Frmt {
         byte[] utf8Bytes = HexFormat.of().parseHex(txtHex);
         return new String(utf8Bytes, StandardCharsets.UTF_8);
     }
+
+    public static String binaryToHex(byte[] arg) {
+        return HexFormat.of().formatHex(arg);
+    }
+
+    public static byte[] hexToBinary(String arg) {
+        return HexFormat.of().parseHex(arg);
+    }
+
+    public static byte[] utf8ToBinary(String arg) {
+        return arg.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public static byte[] mapToBinary(Map<String, Object> arg) {
+        return utf8ToBinary(toJson(arg));
+    }
+
 }

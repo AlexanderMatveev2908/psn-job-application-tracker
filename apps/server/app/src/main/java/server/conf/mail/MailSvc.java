@@ -36,7 +36,7 @@ public class MailSvc {
         mailSender.send(msg);
     }
 
-    public void sendHtmlMail(SubjEmailT subject, User user) {
+    public void sendHtmlMail(SubjEmailT subject, User user, String clientToken) {
         MimeMessage msg = mailSender.createMimeMessage();
 
         try {
@@ -46,7 +46,7 @@ public class MailSvc {
             helper.setFrom(envKeeper.getNextPblSmptFrom());
             helper.setTo(user.getEmail());
             helper.setSubject(subject.getValue());
-            helper.setText(mailTmpl.replacePlaceholder(user.getFirstName()), true);
+            helper.setText(mailTmpl.replacePlaceholder(user.getFirstName(), clientToken), true);
 
             if (!envKeeper.getEnvMode().equals(EnvMode.TEST))
                 mailSender.send(msg);
@@ -67,8 +67,8 @@ public class MailSvc {
                 }).then();
     }
 
-    public Mono<Void> sendRctHtmlMail(SubjEmailT subject, User user) {
-        return Mono.fromRunnable(() -> sendHtmlMail(subject, user)).doOnSuccess((nl) -> {
+    public Mono<Void> sendRctHtmlMail(SubjEmailT subject, User user, String clientToken) {
+        return Mono.fromRunnable(() -> sendHtmlMail(subject, user, clientToken)).doOnSuccess((nl) -> {
             System.out.println("📫 mail sent");
         }).onErrorResume((err) -> {
             System.out.println("❌ err sending mail");

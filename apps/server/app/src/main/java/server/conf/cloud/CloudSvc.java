@@ -1,6 +1,5 @@
 package server.conf.cloud;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class CloudSvc {
     private String sign(String stringToSign) {
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-            byte[] digest = sha1.digest(stringToSign.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = sha1.digest(Frmt.utf8ToBinary(stringToSign));
             String sig = HexFormat.of().formatHex(digest);
 
             return sig;
@@ -109,7 +108,7 @@ public class CloudSvc {
                 .bodyToMono(String.class)
                 .flatMap(str -> {
 
-                    Map<String, Object> parsed = Frmt.toMap(str);
+                    Map<String, Object> parsed = Frmt.jsonToMap(str);
 
                     var asset = new CloudAsset((String) parsed.get("public_id"),
                             (String) parsed.get("secure_url"), (String) parsed.get("resource_type"));
@@ -139,7 +138,7 @@ public class CloudSvc {
                 .retrieve()
                 .bodyToMono(String.class)
                 .flatMap(response -> {
-                    Map<String, Object> parsed = Frmt.toMap(response);
+                    Map<String, Object> parsed = Frmt.jsonToMap(response);
 
                     String result = parsed.get("result").toString();
                     int count = "ok".equals(result) ? 1 : 0;

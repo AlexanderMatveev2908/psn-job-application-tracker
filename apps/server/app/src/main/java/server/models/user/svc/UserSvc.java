@@ -16,8 +16,9 @@ import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
 import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.session_tokens.RecSessionTokens;
-import server.lib.security.session_tokens.SessionManager;
+import server.lib.security.mng_tokens.MyTkMng;
+import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplSvc;
 import server.models.backup_code.BkpCodes;
@@ -39,7 +40,7 @@ public class UserSvc {
     private final TokenRepo tokensRepo;
     private final BkpCodesRepo bkpCodesRepo;
     private final JobApplSvc jobApplSvc;
-    private final SessionManager sessionMng;
+    private final MyTkMng tkMng;
     private final MailSvc mailSvc;
 
     public Mono<Tuple3<User, MyToken, String>> insert(User us) {
@@ -48,18 +49,29 @@ public class UserSvc {
                         new ErrAPI("an account with this email already exists", 409)))
                 .switchIfEmpty(Mono.defer(() -> userRepo.insert(us)
                         .flatMap(dbUser -> {
-                            RecSessionTokens recSession = sessionMng.genSessionTokens(dbUser.getId());
+                            RecSessionTokensReturnT recSession = tkMng.genSessionTokens(dbUser.getId());
 
                             MyToken refreshTk = new MyToken(
                                     dbUser.getId(),
-                                    TokenT.REFRESH,
                                     AlgT.RSA_OAEP256_A256GCM,
+                                    TokenT.REFRESH,
                                     recSession.recJwe());
 
-                            return tokensRepo.insert(refreshTk)
-                                    .flatMap(dbToken -> mailSvc
-                                            .sendRctHtmlMail(SubjEmailT.CONFIRM_EMAIL, dbUser)
-                                            .thenReturn(Tuples.of(dbUser, dbToken, recSession.jwt())));
+                            RecCreateCbcHmacReturnT recCreateCbcHmac = tkMng.genCbcHmac(
+                                    TokenT.CONF_EMAIL,
+                                    dbUser.getId());
+
+                            return Mono.zip(
+                                    tokensRepo.insert(refreshTk),
+                                    tokensRepo.insert(recCreateCbcHmac.token())).flatMap(tpl -> {
+                                        MyToken dbToken = tpl.getT1();
+
+                                        return mailSvc.sendRctHtmlMail(
+                                                SubjEmailT.CONFIRM_EMAIL,
+                                                dbUser,
+                                                recCreateCbcHmac.clientToken())
+                                                .thenReturn(Tuples.of(dbUser, dbToken, recSession.jwt()));
+                                    });
                         })));
     }
 
