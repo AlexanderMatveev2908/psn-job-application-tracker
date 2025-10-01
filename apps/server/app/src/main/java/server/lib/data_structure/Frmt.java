@@ -17,27 +17,19 @@ public final class Frmt {
     @SuppressWarnings({ "unused", "UseSpecificCatch" })
     public static String toJson(Object obj) {
         try {
-
             return jack.writeValueAsString(obj);
-
         } catch (Exception err) {
-
             System.out.println("❌ err parsing arg to json");
-
             return null;
-
         }
     }
 
     public static Map<String, Object> jsonToMap(String txt) {
-
         try {
             return jack.readValue(txt, new TypeReference<Map<String, Object>>() {
             });
         } catch (Exception err) {
-
             System.out.println("❌ err parsing arg to map");
-
             return null;
         }
     }
