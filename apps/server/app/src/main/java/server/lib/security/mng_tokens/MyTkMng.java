@@ -11,10 +11,10 @@ import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturn
 import server.lib.security.mng_tokens.tokens.jwe.MyJwe;
 import server.lib.security.mng_tokens.tokens.jwe.etc.RecCreateJweReturnT;
 import server.lib.security.mng_tokens.tokens.jwt.MyJwt;
+import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
 import server.models.token.etc.TokenT;
 
-@Service
-@RequiredArgsConstructor
+@Service @RequiredArgsConstructor
 public class MyTkMng {
     private final MyJwt myJwt;
     private final MyJwe myJwe;
@@ -22,11 +22,14 @@ public class MyTkMng {
 
     public String genJwt(UUID userId) {
         return myJwt.create(userId);
-
     }
 
     public RecCreateJweReturnT genJwe(UUID userId) {
         return myJwe.create(userId);
+    }
+
+    public MyJwtPayload checkJwt(String token) {
+        return myJwt.check(token);
     }
 
     public RecSessionTokensReturnT genSessionTokens(UUID userId) {

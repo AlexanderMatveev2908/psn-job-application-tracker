@@ -11,16 +11,18 @@ import org.springframework.web.server.WebFilterChain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.mng_tokens.MyTkMng;
+import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
 import server.middleware.security.RateLimit;
 
-@RequiredArgsConstructor
 public abstract class BaseMdw implements WebFilter {
     @Autowired
     private RateLimit rl;
+    @Autowired
+    private MyTkMng tkMng;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -30,15 +32,32 @@ public abstract class BaseMdw implements WebFilter {
         return handle(api, chain);
     }
 
+    private void checkJwt(Api api, boolean throwIfMiss) {
+        String token = api.getJwt(throwIfMiss);
+
+        if (token.isBlank() && !throwIfMiss)
+            return;
+
+        MyJwtPayload payload = tkMng.checkJwt(token);
+
+        api.setAttr("jwtPayload", payload);
+    }
+
+    protected void checkJwtMandatory(Api api) {
+        checkJwt(api, true);
+    }
+
+    protected void checkJwtOptional(Api api) {
+        checkJwt(api, false);
+    }
+
     protected Mono<Map<String, Object>> grabBody(Api api) {
         return api.getBd(new TypeReference<Map<String, Object>>() {
         }).switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400)));
     }
 
     protected Mono<Map<String, Object>> limitAndRef(Api api, int limit, int minutes) {
-        return rl.limit(api, limit, minutes)
-                .then(
-                        grabBody(api));
+        return rl.limit(api, limit, minutes).then(grabBody(api));
     }
 
     protected Mono<Map<String, Object>> limitAndRef(Api api) {

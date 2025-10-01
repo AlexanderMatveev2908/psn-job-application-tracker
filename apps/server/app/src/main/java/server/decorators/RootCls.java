@@ -10,10 +10,10 @@ public interface RootCls {
         StringBuilder sb = new StringBuilder(this.getClass().getSimpleName() + "{");
 
         try {
-            Class<?> current = this.getClass();
+            Class<?> curr = this.getClass();
 
-            while (current != null && !current.getName().startsWith("java.")) {
-                for (Field f : current.getDeclaredFields()) {
+            while (curr != null && !curr.getName().startsWith("java.")) {
+                for (Field f : curr.getDeclaredFields()) {
                     int mods = f.getModifiers();
                     if (Modifier.isStatic(mods))
                         continue;
@@ -21,12 +21,9 @@ public interface RootCls {
                         continue;
 
                     f.setAccessible(true);
-                    sb.append(f.getName())
-                            .append("=")
-                            .append(f.get(this))
-                            .append(", ");
+                    sb.append(f.getName()).append("=").append(f.get(this)).append(", ");
                 }
-                current = current.getSuperclass();
+                curr = curr.getSuperclass();
             }
 
         } catch (IllegalAccessException e) {

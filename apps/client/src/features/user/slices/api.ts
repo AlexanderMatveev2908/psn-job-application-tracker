@@ -26,14 +26,14 @@ export type Setup2FAReturnT = {
 
 export const userSliceAPI = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getProfile: builder.query<ResApiT<{ user: UserT }>, void>({
+    getProfile: builder.query<ResApiT<{ user: UserT }>, string>({
       query: () => ({
         url: `${BASE}/profile`,
         method: "GET",
       }),
       providesTags: [TagAPI.USER],
 
-      async onQueryStarted(_: undefined, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_: string, { dispatch, queryFulfilled }) {
         try {
           const res = await queryFulfilled;
 

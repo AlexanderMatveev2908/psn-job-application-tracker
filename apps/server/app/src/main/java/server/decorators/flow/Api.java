@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.conf.Reg;
+import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
 
 @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
 public final class Api extends ServerWebExchangeDecorator {
@@ -32,15 +34,12 @@ public final class Api extends ServerWebExchangeDecorator {
     public Api(ServerWebExchange exc) {
         super(exc);
 
-        this.cachedBody = DataBufferUtils.join(exc.getRequest().getBody())
-                .map(buf -> {
-                    byte[] bytes = new byte[buf.readableByteCount()];
-                    buf.read(bytes);
-                    DataBufferUtils.release(buf);
-                    return bytes;
-                })
-                .defaultIfEmpty(new byte[0])
-                .cache();
+        this.cachedBody = DataBufferUtils.join(exc.getRequest().getBody()).map(buf -> {
+            byte[] bytes = new byte[buf.readableByteCount()];
+            buf.read(bytes);
+            DataBufferUtils.release(buf);
+            return bytes;
+        }).defaultIfEmpty(new byte[0]).cache();
     }
 
     @Override
@@ -70,9 +69,7 @@ public final class Api extends ServerWebExchangeDecorator {
     }
 
     public String getContentType() {
-        return Optional.ofNullable(getRequest().getHeaders().getContentType())
-                .map(MediaType::toString)
-                .orElse("");
+        return Optional.ofNullable(getRequest().getHeaders().getContentType()).map(MediaType::toString).orElse("");
     }
 
     public String getHeader(String name) {
@@ -86,10 +83,8 @@ public final class Api extends ServerWebExchangeDecorator {
     public String getIp() {
         var req = getRequest();
 
-        return Optional.ofNullable(req.getRemoteAddress())
-                .map(addr -> addr.getAddress())
-                .map(inet -> inet.getHostAddress())
-                .orElse("unknown");
+        return Optional.ofNullable(req.getRemoteAddress()).map(addr -> addr.getAddress())
+                .map(inet -> inet.getHostAddress()).orElse("unknown");
     }
 
     public String getQuery() {
@@ -97,9 +92,22 @@ public final class Api extends ServerWebExchangeDecorator {
     }
 
     public String getCookie(String name) {
-        return Optional.ofNullable(getRequest().getCookies().getFirst(name))
-                .map(cookie -> cookie.getValue())
+        return Optional.ofNullable(getRequest().getCookies().getFirst(name)).map(cookie -> cookie.getValue())
                 .orElse("");
+    }
+
+    public String getJwt(boolean throwIfMiss) {
+        String auth = getHeader("authorization");
+        String token = auth.startsWith("Bearer ") ? auth.substring("Bearer ".length()) : null;
+
+        if (!Reg.isJWT(token) && throwIfMiss)
+            throw new ErrAPI("jwt_not_provided", 401);
+
+        return Optional.ofNullable(token).orElse("");
+    }
+
+    public MyJwtPayload getJwtPayload() {
+        return getAttribute("jwtPayload");
     }
 
     public Optional<Map<String, Object>> getParsedForm() {
@@ -124,8 +132,7 @@ public final class Api extends ServerWebExchangeDecorator {
             if (optBytes.length == 0)
                 return Mono.empty();
 
-            Charset charset = Optional.ofNullable(getRequest().getHeaders().getContentType())
-                    .map(MediaType::getCharset)
+            Charset charset = Optional.ofNullable(getRequest().getHeaders().getContentType()).map(MediaType::getCharset)
                     .orElse(StandardCharsets.UTF_8);
 
             return Mono.just(new String(optBytes, charset));

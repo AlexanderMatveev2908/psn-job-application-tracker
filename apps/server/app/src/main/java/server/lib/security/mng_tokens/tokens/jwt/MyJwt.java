@@ -1,6 +1,5 @@
 package server.lib.security.mng_tokens.tokens.jwt;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -14,9 +13,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Frmt;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplDate;
+import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
 
 @Service
 
@@ -35,24 +34,20 @@ public final class MyJwt {
 
         RecExpTplDate rec = expMng.jwt();
 
-        return JWT.create()
-                .withIssuer(envKeeper.getAppName())
-                .withSubject(Frmt.toJson(Map.of("userId", userId)))
-                .withIssuedAt(rec.iat())
-                .withExpiresAt(rec.exp())
-                .sign(alg);
+        return JWT.create().withIssuer(envKeeper.getAppName()).withSubject(MyJwtPayload.toString(userId))
+                .withIssuedAt(rec.iat()).withExpiresAt(rec.exp()).sign(alg);
     }
 
-    public DecodedJWT check(String token) {
+    public MyJwtPayload check(String token) {
 
         try {
-            JWTVerifier verifier = JWT.require(alg)
-                    .withIssuer(envKeeper.getAppName())
-                    .build();
+            JWTVerifier verifier = JWT.require(alg).withIssuer(envKeeper.getAppName()).build();
 
-            return verifier.verify(token);
+            DecodedJWT resCheck = verifier.verify(token);
 
-        } catch (TokenExpiredException ex) {
+            return MyJwtPayload.fromString(resCheck.getSubject());
+
+        } catch (TokenExpiredException err) {
             throw new ErrAPI("jwt_expired", 401);
         } catch (JWTVerificationException ex) {
             throw new ErrAPI("jwt_invalid", 401);

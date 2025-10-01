@@ -15,14 +15,18 @@ import { userSlice } from "@/features/user/slices/slice";
 import { useEffect, type FC } from "react";
 import { useDispatch } from "react-redux";
 import { isObjOk } from "@/core/lib/dataStructure/ect";
+import { useGetUserState } from "@/features/user/hooks/useGetUserState";
 
 const CallbacksWrapper: FC<ChildrenT> = ({ children }) => {
   // ? ui
   useScroll();
 
   // ? user profile
+  const usState = useGetUserState();
   useWrapQuery({
-    ...userSliceAPI.useGetProfileQuery(),
+    ...userSliceAPI.useGetProfileQuery(usState.accessToken, {
+      refetchOnMountOrArgChange: true,
+    }),
   });
 
   // ? auth mngmnt
