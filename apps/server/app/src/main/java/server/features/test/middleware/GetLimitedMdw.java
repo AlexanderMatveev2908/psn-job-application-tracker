@@ -6,7 +6,7 @@ import org.springframework.web.server.WebFilterChain;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
-import server.middleware._old_merged_base_mdw.BaseMdw;
+import server.middleware.BaseMdw;
 import server.middleware.security.RateLimit;
 
 @Component
