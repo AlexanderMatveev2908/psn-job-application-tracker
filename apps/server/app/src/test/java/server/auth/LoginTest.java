@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,7 +42,16 @@ public class LoginTest {
     req = ReqT.withUrl(web, URL).method(HttpMethod.POST);
   }
 
-  static Stream<Arguments> badCases() {
+  @Test
+  void ok() {
+    ResT res = req.body(MyPayloads.extractLoginForm(registerPayload)).send();
+
+    MyAssrt.assrt(res, "user logged", 200);
+
+    MyAssrt.assrtSessionTokens(res);
+  }
+
+  private static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("data not provided", 400, null),
         Arguments.of("wrong data format", 400, "server do not expect a string"),
         Arguments.of("email invalid", 422, MyPayloads.loginPatch(registerPayload, "email", "invalid email @<><><")),

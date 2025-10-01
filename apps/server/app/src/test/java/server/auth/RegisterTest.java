@@ -1,8 +1,5 @@
 package server.auth;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +16,6 @@ import server._lib_tests.MyAssrt;
 import server._lib_tests.MyPayloads;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
-import server.conf.Reg;
 
 @SpringBootTest @AutoConfigureWebTestClient()
 public class RegisterTest {
@@ -40,19 +36,14 @@ public class RegisterTest {
     return Stream.of(Arguments.of("user created", 201, MyPayloads.register()));
   }
 
-  @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch",
+  @SuppressWarnings({ "unused", "UseSpecificCatch",
       "CallToPrintStackTrace" }) @ParameterizedTest @MethodSource("okCases")
   void ok(String msg, int status, Object bd) {
     ResT res = req.method(HttpMethod.POST).body(bd).send();
 
     MyAssrt.assrt(res, msg, status);
 
-    Map<String, Object> user = (Map<String, Object>) res.getBd().getOrDefault("user", Map.of());
-
-    String id = (String) user.get("id");
-
-    assertTrue(Reg.isJWT(res.getJwt()));
-    assertTrue(Reg.isJWE(res.getJwe()));
+    MyAssrt.assrtSessionTokens(res);
 
   }
 
