@@ -11,6 +11,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
+import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
 import server.features.test.services.PostFormSvc;
 import server.lib.data_structure.ShapeCheck;
@@ -28,7 +29,7 @@ public class PostTestCtrl {
                 return new ResAPI(400).msg("missing msg").build();
 
             return new ResAPI(200).msg("msg received").data(Map.of("clientMsg", msg)).build();
-        });
+        }).switchIfEmpty(Mono.error(new ErrAPI("missing msg", 400)));
     }
 
     public Mono<ResponseEntity<ResAPI>> postFormData(Api api) {

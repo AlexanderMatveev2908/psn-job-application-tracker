@@ -1,6 +1,7 @@
 package server.lib.data_structure;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -57,6 +58,10 @@ public final class Prs {
         return arg.getBytes(StandardCharsets.UTF_8);
     }
 
+    public static String binaryToUtf8(byte[] arg) {
+        return new String(arg, StandardCharsets.UTF_8);
+    }
+
     public static byte[] mapToBinary(Map<String, Object> arg) {
         return utf8ToBinary(toJson(arg));
     }
@@ -84,5 +89,22 @@ public final class Prs {
             map.put((String) kvp[i], kvp[i + 1]);
 
         return map;
+    }
+
+    public static Map<String, Object> base64ToMap(String arg) {
+
+        byte[] binary = Base64.getDecoder().decode(arg);
+        String json = binaryToUtf8(binary);
+
+        return jsonToMap(json);
+    }
+
+    public static String mapToBase64(Map<String, Object> arg) {
+        String json = toJson(arg);
+        byte[] binary = utf8ToBinary(json);
+        byte[] binaryBase64 = Base64.getEncoder().encode(binary);
+
+        return binaryToUtf8(binaryBase64);
+
     }
 }

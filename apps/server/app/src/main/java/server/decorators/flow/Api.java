@@ -97,14 +97,11 @@ public final class Api extends ServerWebExchangeDecorator {
                 .orElse("");
     }
 
-    public String getJwt(boolean throwIfMiss) {
+    public String getJwt() {
         String auth = getHeader("authorization");
-        String token = auth.startsWith("Bearer ") ? auth.substring("Bearer ".length()) : null;
+        String token = auth.startsWith("Bearer ") ? auth.substring("Bearer ".length()) : "";
 
-        if (!Reg.isJWT(token) && throwIfMiss)
-            throw new ErrAPI("jwt_not_provided", 401);
-
-        return Optional.ofNullable(token).orElse("");
+        return token;
     }
 
     public String getJwe() {

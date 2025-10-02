@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
-import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
@@ -40,7 +39,7 @@ public class GetUserTestSvc {
     var us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
         "8cLS4XY!{2Wdvl4*l^4");
 
-    Map<String, Object> query = api.getParsedQuery().orElseThrow(() -> new ErrAPI("missing query params", 400));
+    Map<String, Object> query = api.getParsedQuery().orElse(Map.of("tokenT", "conf_email"));
 
     TokenT tokenT = TokenT.fromAny(query.get("tokenT"));
 

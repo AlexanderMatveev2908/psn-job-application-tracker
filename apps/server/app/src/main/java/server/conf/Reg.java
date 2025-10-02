@@ -17,6 +17,7 @@ public final class Reg {
         public static final String TOTP_SECRET = "^[A-Z2-7]{32}$";
         public static final String TOTP_CODE = "^\\d{6}$";
         public static final String BKP_CODE = "^[A-F0-9]{4}-[A-F0-9]{4}$";
+        public static final String BASE_64 = "^[A-Za-z0-9+/]*={0,2}$";
         public static final String DATE_PICKER = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$";
 
         private Reg() {
@@ -81,5 +82,9 @@ public final class Reg {
 
         public static boolean isDatePicker(String arg) {
                 return checkReg(arg, DATE_PICKER);
+        }
+
+        public static boolean isB64(String arg) {
+                return checkReg(arg, BASE_64);
         }
 }

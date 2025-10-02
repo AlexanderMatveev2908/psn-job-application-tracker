@@ -23,6 +23,11 @@ public class TestRouter {
         return getCtrl.getLimited(exc);
     }
 
+    @GetMapping("/protected")
+    public Mono<ResponseEntity<ResAPI>> getProtectedData(Api api) {
+        return getCtrl.getProtectedData(api);
+    }
+
     @GetMapping("/user")
     public Mono<ResponseEntity<ResAPI>> getUserTest(Api api) {
         return getCtrl.getUserTest(api);

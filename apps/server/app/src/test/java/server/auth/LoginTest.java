@@ -24,7 +24,7 @@ import server._lib_tests.ResT;
 
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LoginTest {
-  private final static String URL = "/api/v1/auth/login";
+  private final static String URL = "/auth/login";
   private final static Map<String, Object> registerPayload = MyPayloads.register();
 
   @Autowired
@@ -33,7 +33,7 @@ public class LoginTest {
 
   @BeforeAll
   void register() {
-    var resRegister = ReqT.withUrl(web, "/api/v1/auth/register").method(HttpMethod.POST).body(registerPayload).send();
+    var resRegister = ReqT.withUrl(web, "/auth/register").method(HttpMethod.POST).body(registerPayload).send();
     MyAssrt.assrt(resRegister, "user created", 201);
   }
 

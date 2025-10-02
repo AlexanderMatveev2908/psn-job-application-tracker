@@ -54,7 +54,7 @@ public final class ResAPI {
     }
 
     public Map<String, Object> getData() {
-        return data == null ? null : Map.copyOf(data);
+        return data == null ? null : new LinkedHashMap<>(data);
     }
 
     public List<ResponseCookie> getCookies() {

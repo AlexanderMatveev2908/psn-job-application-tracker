@@ -25,7 +25,7 @@ public class ReqT {
     }
 
     public static ReqT withUrl(WebTestClient web, String url) {
-        return new ReqT(web, url);
+        return new ReqT(web, "/api/v1" + url);
     }
 
     public ReqT method(HttpMethod method) {
@@ -43,6 +43,10 @@ public class ReqT {
         return this;
     }
 
+    public ReqT jwt(String token) {
+        return header("Authorization", "Bearer " + token);
+    }
+
     public ResT send() {
         RequestHeadersSpec<?> req = web.method(method).uri(url);
 
@@ -52,11 +56,8 @@ public class ReqT {
         if (body != null && req instanceof RequestBodySpec bodySpec)
             req = bodySpec.bodyValue(body);
 
-        var res = ResT.of(
-                req.exchange()
-                        .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
-                        })
-                        .returnResult());
+        var res = ResT.of(req.exchange().expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
+        }).returnResult());
 
         MyLog.logTtl(url, "🚦 " + res.getStatus(), "📜 " + res.getHdrs(), "🍪 " + res.getCks());
         res.getBd().forEach((k, v) -> MyLog.logKV(k, v));

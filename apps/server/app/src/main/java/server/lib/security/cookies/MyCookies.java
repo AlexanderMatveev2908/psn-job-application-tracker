@@ -17,8 +17,8 @@ public class MyCookies {
         this.isTest = envKeeper.getEnvMode().equals(EnvMode.TEST);
     }
 
-    public ResponseCookie jweCookie(String hashed) {
-        return ResponseCookie.from("refreshToken", hashed).httpOnly(true).secure(!isTest).path("/")
+    public ResponseCookie jweCookie(String clientToken) {
+        return ResponseCookie.from("refreshToken", clientToken).httpOnly(true).secure(!isTest).path("/")
                 .maxAge(Duration.ofMinutes(15)).sameSite(isTest ? "Lax" : "None").build();
     }
 
