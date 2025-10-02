@@ -34,14 +34,13 @@ public class Dev {
         }).subscribe();
     }
 
-    public void main() {
+    public void jwtStuff() {
         String jwt = tkMng.genJwt(UUID.randomUUID());
 
-        String[] parts = jwt.split("\\.");
-
-        for (String p : parts)
+        for (String p : jwt.split("\\."))
             if (Reg.isB64(p))
                 System.out.println(Prs.base64ToMap(p));
 
     }
+
 }

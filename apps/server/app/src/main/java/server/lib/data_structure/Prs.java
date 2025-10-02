@@ -54,6 +54,10 @@ public final class Prs {
         return HexFormat.of().parseHex(arg);
     }
 
+    public static Map<String, Object> hexToMap(String arg) {
+        return jsonToMap(hexToUtf8(arg));
+    }
+
     public static byte[] utf8ToBinary(String arg) {
         return arg.getBytes(StandardCharsets.UTF_8);
     }
@@ -91,11 +95,12 @@ public final class Prs {
         return map;
     }
 
+    public static String base64ToUtf8(String arg) {
+        return binaryToUtf8(Base64.getDecoder().decode(arg));
+    }
+
     public static Map<String, Object> base64ToMap(String arg) {
-
-        byte[] binary = Base64.getDecoder().decode(arg);
-        String json = binaryToUtf8(binary);
-
+        String json = base64ToUtf8(arg);
         return jsonToMap(json);
     }
 

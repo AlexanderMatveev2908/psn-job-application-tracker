@@ -37,9 +37,9 @@ public class RegisterTest {
   void ok() {
     ResT res = req.method(HttpMethod.POST).body(MyPayloads.register()).send();
 
-    MyAssrt.assrt(res, "user created", 201);
+    MyAssrt.base(res, "user created", 201);
 
-    MyAssrt.assrtSessionTokens(res);
+    MyAssrt.hasTokens(res);
 
   }
 
@@ -62,12 +62,12 @@ public class RegisterTest {
     ResT res = req.method(HttpMethod.POST).body(bd).send();
 
     if (!msg.contains("already exists")) {
-      MyAssrt.assrt(res, msg, status);
+      MyAssrt.base(res, msg, status);
       return;
     }
 
     ResT secondCall = req.method(HttpMethod.POST).body(bd).send();
-    MyAssrt.assrt(secondCall, msg, status);
+    MyAssrt.base(secondCall, msg, status);
 
   }
 }

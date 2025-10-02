@@ -26,7 +26,8 @@ public class GetAuthCtrl {
 
   public Mono<ResponseEntity<ResAPI>> refresh(Api api) {
 
-    return refreshSvc.refresh(api).flatMap(jwt -> new ResAPI(200).data(Map.of("accessToken", jwt)).build())
+    return refreshSvc.refresh(api)
+        .flatMap(jwt -> new ResAPI(200).msg("refreshed").data(Map.of("accessToken", jwt)).build())
         .onErrorResume(err -> {
           int status = 500;
           Map<String, Object> data = null;

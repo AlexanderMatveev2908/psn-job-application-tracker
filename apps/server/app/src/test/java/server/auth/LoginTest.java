@@ -34,7 +34,7 @@ public class LoginTest {
   @BeforeAll
   void register() {
     var resRegister = ReqT.withUrl(web, "/auth/register").method(HttpMethod.POST).body(registerPayload).send();
-    MyAssrt.assrt(resRegister, "user created", 201);
+    MyAssrt.base(resRegister, "user created", 201);
   }
 
   @BeforeEach
@@ -46,9 +46,9 @@ public class LoginTest {
   void ok() {
     ResT res = req.body(MyPayloads.extractLoginForm(registerPayload)).send();
 
-    MyAssrt.assrt(res, "user logged", 200);
+    MyAssrt.base(res, "user logged", 200);
 
-    MyAssrt.assrtSessionTokens(res);
+    MyAssrt.hasTokens(res);
   }
 
   private static Stream<Arguments> badCases() {
@@ -65,6 +65,6 @@ public class LoginTest {
 
     ResT res = req.body(bd).send();
 
-    MyAssrt.assrt(res, msg, status);
+    MyAssrt.base(res, msg, status);
   }
 }

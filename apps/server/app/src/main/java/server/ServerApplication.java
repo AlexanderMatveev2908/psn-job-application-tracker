@@ -33,7 +33,6 @@ public class ServerApplication {
         return e -> {
 
             try {
-                // dev.main();
 
                 lifeSpawn.lifeCheck(e);
 

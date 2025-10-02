@@ -41,7 +41,11 @@ public class GetUserTestSvc {
 
     Map<String, Object> query = api.getParsedQuery().orElse(Map.of("tokenT", "conf_email"));
 
-    TokenT tokenT = TokenT.fromAny(query.get("tokenT"));
+    TokenT tokenT;
+    if (query.get("tokenT") instanceof String str)
+      tokenT = TokenT.fromAny(str);
+    else
+      tokenT = TokenT.CONF_EMAIL;
 
     Set<String> expiredList = (query.get("expired") instanceof List<?> argExp)
         ? argExp.stream().map(Object::toString).collect(Collectors.toSet())

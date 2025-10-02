@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,9 +26,15 @@ import server.lib.data_structure.Prs;
 public class ProtectedTest {
 
   private final static String URL = "/test/user";
+  private ResT resTok;
 
   @Autowired
   private WebTestClient web;
+
+  @BeforeEach
+  void setup() {
+    resTok = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.GET).send();
+  }
 
   @Test
   void ok() {
@@ -35,7 +42,7 @@ public class ProtectedTest {
     ResT resTokens = ReqT.withUrl(web, URL).method(HttpMethod.GET).send();
     ResT resProtected = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET).jwt(resTokens.getJwt()).send();
 
-    MyAssrt.assrt(resProtected, "here you are protected data", 200);
+    MyAssrt.base(resProtected, "here you are protected data", 200);
   }
 
   static Stream<Arguments> badCases() {
@@ -45,15 +52,13 @@ public class ProtectedTest {
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
-    String query = "?tokenT=conf_email&expired[]=jwt";
-    ResT resTokens = ReqT.withUrl(web, "/test/user" + query).method(HttpMethod.GET).send();
 
     ReqT reqProtected = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET);
 
     if (msg.equals("jwt_expired")) {
-      reqProtected.jwt(resTokens.getJwt());
+      reqProtected.jwt(resTok.getJwt());
     } else if (msg.equals("jwt_invalid")) {
-      String[] parts = resTokens.getJwt().split("\\.");
+      String[] parts = resTok.getJwt().split("\\.");
       Map<String, Object> payload = Prs.base64ToMap(parts[1]);
 
       Map<String, Object> evilSub = Prs.jsonToMap((String) payload.get("sub"));
@@ -65,6 +70,6 @@ public class ProtectedTest {
 
     ResT resProtected = reqProtected.send();
 
-    MyAssrt.assrt(resProtected, msg, status);
+    MyAssrt.base(resProtected, msg, status);
   }
 }
