@@ -17,6 +17,8 @@ import server.features.auth.services.LoginSvc;
 import server.features.auth.services.RegisterSvc;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.hash.MyHashMng;
+import server.models.token.etc.TokenT;
+import server.models.token.svc.TokenSvc;
 import server.models.user.User;
 
 @Component @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
@@ -26,6 +28,7 @@ public class PostAuthCtrl {
     private final RegisterSvc registerSvc;
     private final LoginSvc loginSvc;
     private final MyCookies myCookies;
+    private final TokenSvc tokenSvc;
 
     public Mono<ResponseEntity<ResAPI>> register(Api api) {
         RegisterForm form = api.getMappedData();
@@ -51,5 +54,16 @@ public class PostAuthCtrl {
             return new ResAPI(200).msg("user logged").cookie(refreshCookie).data(Map.of("accessToken", tpl.getT2()))
                     .build();
         });
+    }
+
+    public Mono<ResponseEntity<ResAPI>> logout(Api api) {
+
+        User us = api.getUser();
+        ResAPI res = new ResAPI(200).msg("logged out").delCookie(myCookies.delJweCookie());
+
+        if (us == null)
+            return res.build();
+
+        return tokenSvc.deleteByUserIdAndTokenT(us.getId(), TokenT.REFRESH).then(res.build());
     }
 }

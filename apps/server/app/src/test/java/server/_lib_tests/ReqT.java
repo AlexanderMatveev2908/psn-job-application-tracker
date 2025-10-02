@@ -10,6 +10,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestBodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestHeadersSpec;
 
+import server._lib_tests.shapes.ExpArgT;
 import server.lib.dev.MyLog;
 
 public class ReqT {
@@ -97,4 +98,17 @@ public class ReqT {
         return res;
     }
 
+    public static ResT grabTk(WebTestClient web) {
+        return ReqT.withUrl(web, "/test/user").method(HttpMethod.GET).send();
+    }
+
+    public static ResT grabTk(WebTestClient web, ExpArgT... expired) {
+        ReqT reqTokens = ReqT.withUrl(web, "/test/user").method(HttpMethod.GET);
+
+        for (ExpArgT exp : expired)
+            reqTokens.addQuery("expired[]", exp.getValue());
+
+        return reqTokens.send();
+
+    }
 }
