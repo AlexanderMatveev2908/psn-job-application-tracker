@@ -21,12 +21,13 @@ import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
 public abstract class BaseMdw implements WebFilter {
+
     @Autowired
     private RateLimit rl;
     @Autowired
     private TkMng tkMng;
     @Autowired
-    UserSvc userSvc;
+    private UserSvc userSvc;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 

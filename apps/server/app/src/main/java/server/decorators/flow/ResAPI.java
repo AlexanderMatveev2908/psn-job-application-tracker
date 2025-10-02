@@ -13,12 +13,13 @@ import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import reactor.core.publisher.Mono;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 
-@Getter @JsonSerialize(using = ResApiJson.class)
+@SuppressFBWarnings({ "EI" }) @Getter @JsonSerialize(using = ResApiJson.class)
 public final class ResAPI {
     private String msg;
     private Integer status;
