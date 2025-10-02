@@ -23,6 +23,6 @@ public class GetTestCtrl {
 
     public Mono<ResponseEntity<ResAPI>> getUserTest(Api api) {
         return testUserSvc.getUserTest(api)
-                .flatMap(data -> new ResAPI(200).msg("data test generated as requested").data(data).build());
+                .flatMap(data -> new ResAPI(200).msg("data test generated as").data(data).build());
     }
 }

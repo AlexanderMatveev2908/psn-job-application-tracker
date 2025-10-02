@@ -24,7 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
@@ -47,7 +47,7 @@ public class MyJwe {
     }
 
     private RSAPrivateKey getPrivateKey() throws Exception {
-        String privKeyPem = Frmt.hexToUtf8(envKeeper.getJwePrivate());
+        String privKeyPem = Prs.hexToUtf8(envKeeper.getJwePrivate());
         String base64Key = stripKey(privKeyPem, "PRIVATE");
 
         byte[] decoded = Base64.getDecoder().decode(base64Key);
@@ -58,7 +58,7 @@ public class MyJwe {
     }
 
     private RSAPublicKey getPublicKey() throws Exception {
-        String pubKeyPem = Frmt.hexToUtf8(envKeeper.getJwePublic());
+        String pubKeyPem = Prs.hexToUtf8(envKeeper.getJwePublic());
         pubKeyPem = stripKey(pubKeyPem, "PUBLIC");
 
         byte[] decoded = Base64.getDecoder().decode(pubKeyPem);
@@ -77,7 +77,7 @@ public class MyJwe {
 
             Map<String, Object> claims = Map.of("userId", userId, "iat", recExp.iat(), "exp", exp);
 
-            JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));
+            JWEObject jwe = new JWEObject(hdr, new Payload(Prs.toJson(claims)));
 
             RSAEncrypter encrypter = new RSAEncrypter(getPublicKey());
             jwe.encrypt(encrypter);

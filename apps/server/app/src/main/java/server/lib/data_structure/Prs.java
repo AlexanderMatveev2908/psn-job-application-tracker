@@ -2,19 +2,22 @@ package server.lib.data_structure;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import server.decorators.flow.ErrAPI;
 
-public final class Frmt {
+public final class Prs {
 
-    private final static ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-            .registerModule(new Jdk8Module());
+    private static final ObjectMapper jack = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT)
+            .addModule(new Jdk8Module()).configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, false).build();
 
     @SuppressWarnings({ "unused", "UseSpecificCatch" })
     public static String toJson(Object obj) {
@@ -34,6 +37,7 @@ public final class Frmt {
             System.out.println("❌ err parsing arg to map");
             return null;
         }
+
     }
 
     public static String hexToUtf8(String txtHex) {
@@ -70,4 +74,15 @@ public final class Frmt {
         throw new ErrAPI("unknown arg type");
     }
 
+    public static LinkedHashMap<String, Object> linkedMap(Object... kvp) {
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+
+        if (kvp.length % 2 != 0)
+            throw new ErrAPI("passed odd pairs kv", 400);
+
+        for (int i = 0; i < kvp.length; i += 2)
+            map.put((String) kvp[i], kvp[i + 1]);
+
+        return map;
+    }
 }

@@ -18,11 +18,9 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.lib.combo.Kit;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 
-@Component
-@Order(10)
-@RequiredArgsConstructor
+@Component @Order(10) @RequiredArgsConstructor
 public class CorsMdw implements WebFilter {
 
     private final Kit kit;
@@ -60,7 +58,7 @@ public class CorsMdw implements WebFilter {
             body = String.format("{ \"msg\": \"%s\", \"status\": 403 }", msg);
         }
 
-        var buff = res.bufferFactory().wrap(Frmt.utf8ToBinary(body));
+        var buff = res.bufferFactory().wrap(Prs.utf8ToBinary(body));
         return res.writeWith(Mono.just(buff));
     }
 

@@ -1,7 +1,9 @@
 package server.decorators.flow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public final class ResAPI {
     public ResAPI(int status, String msg, Map<String, Object> data) {
         this.status = status;
         this.msg = msg;
-        this.data = (data == null) ? null : Map.copyOf(data);
+        this.data = (data == null) ? null : Collections.unmodifiableMap(new LinkedHashMap<>(data));
     }
 
     public ResAPI(int status) {
@@ -70,7 +72,7 @@ public final class ResAPI {
     }
 
     public ResAPI data(Map<String, Object> data) {
-        this.data = (data == null) ? null : Map.copyOf(data);
+        this.data = (data == null) ? null : Collections.unmodifiableMap(new LinkedHashMap<>(data));
         return this;
     }
 

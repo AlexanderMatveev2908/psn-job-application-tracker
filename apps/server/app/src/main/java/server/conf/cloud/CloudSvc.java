@@ -21,11 +21,9 @@ import server.conf.cloud.etc.CloudResourceT;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.AppFile;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 
-@Service
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "EI2" })
+@Service @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class CloudSvc {
     private final WebClient.Builder webClientBuilder;
     private final EnvKeeper envKeeper;
@@ -33,15 +31,13 @@ public class CloudSvc {
     private WebClient getClient() {
         String cloudName = envKeeper.getCloudName();
 
-        return webClientBuilder
-                .baseUrl("https://api.cloudinary.com/v1_1/" + cloudName)
-                .build();
+        return webClientBuilder.baseUrl("https://api.cloudinary.com/v1_1/" + cloudName).build();
     }
 
     private String sign(String stringToSign) {
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-            byte[] digest = sha1.digest(Frmt.utf8ToBinary(stringToSign));
+            byte[] digest = sha1.digest(Prs.utf8ToBinary(stringToSign));
             String sig = HexFormat.of().formatHex(digest);
 
             return sig;
@@ -53,10 +49,8 @@ public class CloudSvc {
     private String genSign(Map<String, String> params) {
         String cloudSecret = envKeeper.getCloudSecret();
 
-        String stringToSign = params.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(el -> el.getKey() + "=" + el.getValue())
-                .collect(Collectors.joining("&")) + cloudSecret;
+        String stringToSign = params.entrySet().stream().sorted(Map.Entry.comparingByKey())
+                .map(el -> el.getKey() + "=" + el.getValue()).collect(Collectors.joining("&")) + cloudSecret;
 
         return sign(stringToSign);
     }
@@ -99,22 +93,16 @@ public class CloudSvc {
         form.part("public_id", publicId);
         form.part("file", fileResource);
 
-        return getClient()
-                .post()
-                .uri(url)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(form.build()))
-                .retrieve()
-                .bodyToMono(String.class)
+        return getClient().post().uri(url).contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(form.build())).retrieve().bodyToMono(String.class)
                 .flatMap(str -> {
 
-                    Map<String, Object> parsed = Frmt.jsonToMap(str);
+                    Map<String, Object> parsed = Prs.jsonToMap(str);
 
-                    var asset = new CloudAsset((String) parsed.get("public_id"),
-                            (String) parsed.get("secure_url"), (String) parsed.get("resource_type"));
+                    var asset = new CloudAsset((String) parsed.get("public_id"), (String) parsed.get("secure_url"),
+                            (String) parsed.get("resource_type"));
 
-                    return Mono.just(
-                            asset);
+                    return Mono.just(asset);
                 });
     }
 
@@ -130,15 +118,10 @@ public class CloudSvc {
 
         String url = "/" + resourceType + "/destroy";
 
-        return getClient()
-                .post()
-                .uri(url)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(form.build()))
-                .retrieve()
-                .bodyToMono(String.class)
+        return getClient().post().uri(url).contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(form.build())).retrieve().bodyToMono(String.class)
                 .flatMap(response -> {
-                    Map<String, Object> parsed = Frmt.jsonToMap(response);
+                    Map<String, Object> parsed = Prs.jsonToMap(response);
 
                     String result = parsed.get("result").toString();
                     int count = "ok".equals(result) ? 1 : 0;

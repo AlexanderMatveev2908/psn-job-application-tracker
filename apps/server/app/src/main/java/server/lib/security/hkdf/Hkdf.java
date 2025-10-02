@@ -6,14 +6,13 @@ import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server.conf.env_conf.EnvKeeper;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecAad;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 
-@SuppressFBWarnings({ "EI2" })
-@Service
+@SuppressFBWarnings({ "EI2" }) @Service
 public class Hkdf {
     private final Digest digest = new SHA256Digest();
     private final EnvKeeper envKeeper;
@@ -23,7 +22,7 @@ public class Hkdf {
     }
 
     public byte[] derive(RecAad aad, int len) {
-        byte[] ikm = Frmt.utf8ToBinary(envKeeper.getHkdfMaster());
+        byte[] ikm = Prs.utf8ToBinary(envKeeper.getHkdfMaster());
 
         byte[] aadBinary = aad.toBinary();
 

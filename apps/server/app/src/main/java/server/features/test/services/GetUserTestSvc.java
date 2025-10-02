@@ -14,6 +14,7 @@ import net.datafaker.Faker;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
@@ -57,7 +58,7 @@ public class GetUserTestSvc {
         RecCreateCbcHmacReturnT recCbcHmac = myCbcHmac.create(tokenT, dbUser.getId(), expiredList.contains("cbc_hmac"));
 
         return Mono.zip(tokenRepo.insert(recJwe.inst()), tokenRepo.insertWithId(recCbcHmac.inst())).map(tpl -> {
-          return Map.of("accessToken", jwt, "refreshToken", recJwe.clientToken(), "cbcHmacToken",
+          return Prs.linkedMap("accessToken", jwt, "refreshToken", recJwe.clientToken(), "cbcHmacToken",
               recCbcHmac.clientToken(), "refreshTokenDb", tpl.getT1(), "cbcHmacTokenDb", tpl.getT2());
         });
       });

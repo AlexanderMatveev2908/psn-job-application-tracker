@@ -17,15 +17,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 import server.lib.dev.MyLog;
 
-@Component
-@Order(-1)
+@Component @Order(-1)
 public class ErrCatcher implements WebExceptionHandler {
 
-    private final ObjectMapper mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
+    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     public Mono<Void> handle(ServerWebExchange exc, Throwable err) {
@@ -52,7 +50,7 @@ public class ErrCatcher implements WebExceptionHandler {
         try {
             bytes = mapper.writeValueAsBytes(apiBody);
         } catch (JacksonException e) {
-            bytes = Frmt.utf8ToBinary("{\"msg\":\"serialization failed\",\"status\":500,\"data\":null}");
+            bytes = Prs.utf8ToBinary("{\"msg\":\"serialization failed\",\"status\":500,\"data\":null}");
 
         }
 
