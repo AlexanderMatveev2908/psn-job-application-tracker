@@ -63,6 +63,7 @@ dependencies {
     testImplementation(libs.spotbugsAnnotations)
     implementation(libs.jacksonDatatypeJdk8)
     implementation(libs.bcprovJdk18on)
+    implementation(libs.datafaker)
 }
 //_e
 

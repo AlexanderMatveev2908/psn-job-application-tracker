@@ -1,25 +1,17 @@
 package server.lib.dev;
 
-import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
-import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
-import server.models.token.etc.AlgT;
-import server.models.token.etc.TokenT;
 
-@SuppressFBWarnings({ "EI2" })
-@Service
-@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @Service @RequiredArgsConstructor
 public class Dev {
     // private final RdCmd cmd;
     private final DB db;
     private final RdCmd cmd;
-    private final MyCbcHmac cbcHmac;
 
     // @Bean
     // public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
@@ -34,18 +26,6 @@ public class Dev {
         db.truncateAll().flatMap(count -> {
             return cmd.flushAll();
         }).subscribe();
-    }
-
-    public void doAesHmacStuff() {
-
-        var usId = UUID.randomUUID();
-        var rec = cbcHmac.create(TokenT.CHANGE_EMAIL, usId);
-
-        System.out.println(rec.inst());
-
-        var res = cbcHmac.check(rec.clientToken(), AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
-
-        System.out.println(res);
     }
 
 }

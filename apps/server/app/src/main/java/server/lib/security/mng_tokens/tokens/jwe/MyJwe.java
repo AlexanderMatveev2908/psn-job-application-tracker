@@ -68,13 +68,14 @@ public class MyJwe {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    public RecCreateJweReturnT create(UUID userId) {
+    public RecCreateJweReturnT create(UUID userId, boolean forceExp) {
         try {
             JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM).build();
 
             RecExpTplSec recExp = expMng.jwe();
+            long exp = forceExp ? -recExp.exp() : recExp.exp();
 
-            Map<String, Object> claims = Map.of("userId", userId, "iat", recExp.iat(), "exp", recExp.exp());
+            Map<String, Object> claims = Map.of("userId", userId, "iat", recExp.iat(), "exp", exp);
 
             JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));
 
@@ -84,7 +85,7 @@ public class MyJwe {
             String refreshToken = jwe.serialize();
 
             MyToken newToken = new MyToken(userId, AlgT.RSA_OAEP256_A256GCM, TokenT.REFRESH,
-                    hashMng.hmacHash(refreshToken), recExp.exp());
+                    hashMng.hmacHash(refreshToken), exp);
 
             return new RecCreateJweReturnT(newToken, refreshToken);
         } catch (Exception err) {

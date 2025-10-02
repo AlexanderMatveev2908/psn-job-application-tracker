@@ -12,8 +12,7 @@ import server.features.test.controllers.GetTestCtrl;
 import server.features.test.controllers.PostTestCtrl;
 import server.router.RouterAPI;
 
-@RouterAPI("/api/v1/test")
-@RequiredArgsConstructor
+@RouterAPI("/api/v1/test") @RequiredArgsConstructor
 public class TestRouter {
 
     private final PostTestCtrl postCtrl;
@@ -22,6 +21,11 @@ public class TestRouter {
     @GetMapping("/limited")
     public Mono<ResponseEntity<ResAPI>> getLimited(Api exc) {
         return getCtrl.getLimited(exc);
+    }
+
+    @GetMapping("/user")
+    public Mono<ResponseEntity<ResAPI>> getUserTest(Api api) {
+        return getCtrl.getUserTest(api);
     }
 
     @GetMapping

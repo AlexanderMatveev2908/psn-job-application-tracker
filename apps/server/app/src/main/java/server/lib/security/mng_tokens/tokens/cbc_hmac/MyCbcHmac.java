@@ -95,13 +95,14 @@ public class MyCbcHmac {
         }
     }
 
-    public RecCreateCbcHmacReturnT create(TokenT tokenT, UUID userId) {
+    public RecCreateCbcHmacReturnT create(TokenT tokenT, UUID userId, boolean forceExp) {
         RecAad aad = new RecAad(tokenT, userId);
 
         RecCbcHmacKeys keys = deriveKeys(aad);
 
         RecExpTplSec recExp = expMng.cbcHmac();
-        byte[] plain = Frmt.mapToBinary(Map.of("userId", userId, "iat", recExp.iat(), "exp", recExp.exp()));
+        long exp = forceExp ? -recExp.exp() : recExp.exp();
+        byte[] plain = Frmt.mapToBinary(Map.of("userId", userId, "iat", recExp.iat(), "exp", exp));
 
         IvParameterSpec ivSpec = genIv();
 
@@ -112,8 +113,7 @@ public class MyCbcHmac {
         String clientToken = Frmt.binaryToHex(aad.toBinary()) + "." + Frmt.binaryToHex(ivSpec.getIV()) + "."
                 + Frmt.binaryToHex(ciphertext) + "." + Frmt.binaryToHex(tag);
 
-        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, hashMng.hmacHash(clientToken),
-                recExp.exp());
+        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, hashMng.hmacHash(clientToken), exp);
 
         return new RecCreateCbcHmacReturnT(newToken, clientToken);
     }

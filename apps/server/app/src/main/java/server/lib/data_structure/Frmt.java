@@ -69,4 +69,5 @@ public final class Frmt {
 
         throw new ErrAPI("unknown arg type");
     }
+
 }

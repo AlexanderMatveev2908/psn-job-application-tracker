@@ -30,12 +30,13 @@ public final class MyJwt {
         this.expMng = expMng;
     }
 
-    public String create(UUID userId) {
+    public String create(UUID userId, boolean forceExp) {
 
         RecExpTplSec rec = expMng.jwt();
+        long exp = forceExp ? -rec.exp() : rec.exp();
 
         return JWT.create().withIssuer(envKeeper.getAppName()).withSubject(MyTkPayload.toString(userId, rec))
-                .withIssuedAt(rec.toDate(rec.iat())).withExpiresAt(rec.toDate(rec.exp())).sign(alg);
+                .withIssuedAt(rec.toDate(rec.iat())).withExpiresAt(rec.toDate(exp)).sign(alg);
     }
 
     public MyTkPayload check(String token) {

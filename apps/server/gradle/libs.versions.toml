@@ -18,7 +18,6 @@ argon2 = "2.12"
 
 junit = "5.10.3"
 junit-platform = "1.10.3"
-datafaker = "2.1.0" 
 testlogger = "4.0.0"
 
 checkstyle = "10.20.1"
@@ -30,6 +29,7 @@ nimbus_jose_jwt = "10.5"
 spotbugs_annotations = "4.8.3"
 jackson_datatype_jdk8 = "2.17.2"
 bcprov_jdk18on = "1.78.1"
+datafaker = "2.1.0"
 
 
 
@@ -59,7 +59,7 @@ spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
-datafaker = { group = "net.datafaker", name = "datafaker", version.ref = "datafaker" }
+datafaker = {module = "net.datafaker:datafaker", version.ref = "datafaker"}
 javaJwt = {module = "com.auth0:java-jwt", version.ref = "java_jwt"}
 nimbusJoseJwt = {module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus_jose_jwt"}
 spotbugsAnnotations = {module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs_annotations"}
