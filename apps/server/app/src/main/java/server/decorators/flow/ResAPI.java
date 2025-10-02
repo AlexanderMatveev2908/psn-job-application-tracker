@@ -1,7 +1,9 @@
 package server.decorators.flow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,23 +13,24 @@ import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import reactor.core.publisher.Mono;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 
-@Getter
-@JsonSerialize(using = ResApiJson.class)
+@SuppressFBWarnings({ "EI" }) @Getter @JsonSerialize(using = ResApiJson.class)
 public final class ResAPI {
     private String msg;
     private Integer status;
     private Map<String, Object> data;
     private final List<ResponseCookie> cookies = new ArrayList<>();
+    private final List<ResponseCookie> deleteCookies = new ArrayList<>();
 
     public ResAPI(int status, String msg, Map<String, Object> data) {
         this.status = status;
         this.msg = msg;
-        this.data = (data == null) ? null : Map.copyOf(data);
+        this.data = (data == null) ? null : Collections.unmodifiableMap(new LinkedHashMap<>(data));
     }
 
     public ResAPI(int status) {
@@ -38,7 +41,7 @@ public final class ResAPI {
     }
 
     private static String prependEmj(String msg, ActT act) {
-        return String.format("%s %s", act.getEmj(), msg);
+        return msg == null ? null : String.format("%s %s", act.getEmj(), msg.replace("❌ ", ""));
     }
 
     public static Map<String, Object> flatData(Map<String, Object> data) {
@@ -52,7 +55,7 @@ public final class ResAPI {
     }
 
     public Map<String, Object> getData() {
-        return data == null ? null : Map.copyOf(data);
+        return data == null ? null : new LinkedHashMap<>(data);
     }
 
     public List<ResponseCookie> getCookies() {
@@ -70,12 +73,17 @@ public final class ResAPI {
     }
 
     public ResAPI data(Map<String, Object> data) {
-        this.data = (data == null) ? null : Map.copyOf(data);
+        this.data = (data == null) ? null : Collections.unmodifiableMap(new LinkedHashMap<>(data));
         return this;
     }
 
     public ResAPI cookie(ResponseCookie cookie) {
         this.cookies.add(cookie);
+        return this;
+    }
+
+    public ResAPI delCookie(ResponseCookie cookie) {
+        this.deleteCookies.add(cookie);
         return this;
     }
 
@@ -87,16 +95,14 @@ public final class ResAPI {
         for (ResponseCookie cookie : cookies)
             builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        for (ResponseCookie cookie : deleteCookies)
+            builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
+
         if (status == 204)
             return Mono.just(builder.build());
 
-        var myRes = new ResAPI()
-                .status(status)
-                .msg(prependEmj(safeMsg, act))
-                .data(data);
+        var myRes = new ResAPI().status(status).msg(prependEmj(safeMsg, act)).data(data);
 
-        return Mono.just(
-                builder.body(
-                        myRes));
+        return Mono.just(builder.body(myRes));
     }
 }

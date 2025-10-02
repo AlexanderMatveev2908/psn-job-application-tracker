@@ -24,7 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
@@ -47,7 +47,7 @@ public class MyJwe {
     }
 
     private RSAPrivateKey getPrivateKey() throws Exception {
-        String privKeyPem = Frmt.hexToUtf8(envKeeper.getJwePrivate());
+        String privKeyPem = Prs.hexToUtf8(envKeeper.getJwePrivate());
         String base64Key = stripKey(privKeyPem, "PRIVATE");
 
         byte[] decoded = Base64.getDecoder().decode(base64Key);
@@ -58,7 +58,7 @@ public class MyJwe {
     }
 
     private RSAPublicKey getPublicKey() throws Exception {
-        String pubKeyPem = Frmt.hexToUtf8(envKeeper.getJwePublic());
+        String pubKeyPem = Prs.hexToUtf8(envKeeper.getJwePublic());
         pubKeyPem = stripKey(pubKeyPem, "PUBLIC");
 
         byte[] decoded = Base64.getDecoder().decode(pubKeyPem);
@@ -68,15 +68,16 @@ public class MyJwe {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    public RecCreateJweReturnT create(UUID userId) {
+    public RecCreateJweReturnT create(UUID userId, boolean forceExp) {
         try {
             JWEHeader hdr = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM).build();
 
             RecExpTplSec recExp = expMng.jwe();
+            long exp = forceExp ? -recExp.exp() : recExp.exp();
 
-            Map<String, Object> claims = Map.of("userId", userId, "iat", recExp.iat(), "exp", recExp.exp());
+            Map<String, Object> claims = Map.of("userId", userId, "iat", recExp.iat(), "exp", exp);
 
-            JWEObject jwe = new JWEObject(hdr, new Payload(Frmt.toJson(claims)));
+            JWEObject jwe = new JWEObject(hdr, new Payload(Prs.toJson(claims)));
 
             RSAEncrypter encrypter = new RSAEncrypter(getPublicKey());
             jwe.encrypt(encrypter);
@@ -84,7 +85,7 @@ public class MyJwe {
             String refreshToken = jwe.serialize();
 
             MyToken newToken = new MyToken(userId, AlgT.RSA_OAEP256_A256GCM, TokenT.REFRESH,
-                    hashMng.hmacHash(refreshToken), recExp.exp());
+                    hashMng.hmacHash(refreshToken), exp);
 
             return new RecCreateJweReturnT(newToken, refreshToken);
         } catch (Exception err) {
@@ -102,14 +103,19 @@ public class MyJwe {
             MyTkPayload payload = MyTkPayload.fromObj(jwe.getPayload().toJSONObject());
 
             if (payload.exp() < Instant.now().getEpochSecond())
-                throw new ErrAPI("jwe_expired", 401);
+                throw new ErrAPI("jwe_expired", 401, Map.of("argDeleteJwe", payload.userId()));
 
             return payload;
         } catch (Exception err) {
             var msg = err.getMessage();
-            msg = msg.contains("jwe_expired") ? msg.substring(1) : "jwe_invalid";
+            msg = msg.contains("jwe_expired") ? msg : "jwe_invalid";
 
-            throw new ErrAPI(msg, 401);
+            Map<String, Object> data = null;
+
+            if (err instanceof ErrAPI errInst)
+                data = errInst.getData();
+
+            throw new ErrAPI(msg, 401, data);
         }
     }
 

@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 import server.lib.paths.Hiker;
 
 public final class MyLog {
@@ -27,9 +27,7 @@ public final class MyLog {
 
         StackTraceElement caller = Arrays.stream(Thread.currentThread().getStackTrace())
                 .filter(f -> f.getClassName().startsWith(APP_PKG))
-                .filter(f -> !f.getClassName().contains(MyLog.class.getSimpleName()))
-                .findFirst()
-                .orElse(null);
+                .filter(f -> !f.getClassName().contains(MyLog.class.getSimpleName())).findFirst().orElse(null);
 
         String fileName = (caller != null) ? caller.getFileName() : "unknown caller";
         String thread = Thread.currentThread().getName();
@@ -83,11 +81,8 @@ public final class MyLog {
 
         for (StackTraceElement f : frames) {
             if (f.toString().startsWith("server")) {
-                System.out.printf("📂 %s => 🔢 %d | 🆎 %s | ☢️ %s%n",
-                        f.getFileName(),
-                        f.getLineNumber(),
-                        f.getMethodName(),
-                        f.toString());
+                System.out.printf("📂 %s => 🔢 %d | 🆎 %s | ☢️ %s%n", f.getFileName(), f.getLineNumber(),
+                        f.getMethodName(), f.toString());
             }
         }
 
@@ -113,13 +108,10 @@ public final class MyLog {
 
         logThread.submit(() -> {
 
-            try (BufferedWriter bw = Files.newBufferedWriter(
-                    p,
-                    StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE,
+            try (BufferedWriter bw = Files.newBufferedWriter(p, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING)) {
 
-                String json = Frmt.toJson(arg);
+                String json = Prs.toJson(arg);
 
                 bw.write(json);
                 bw.newLine();

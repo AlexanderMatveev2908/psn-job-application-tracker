@@ -21,12 +21,13 @@ import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
 public abstract class BaseMdw implements WebFilter {
+
     @Autowired
     private RateLimit rl;
     @Autowired
     private TkMng tkMng;
     @Autowired
-    UserSvc userSvc;
+    private UserSvc userSvc;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -37,12 +38,17 @@ public abstract class BaseMdw implements WebFilter {
     }
 
     private Mono<User> checkJwt(Api api, boolean throwIfMiss) {
-        String token = api.getJwt(throwIfMiss);
+        String jwt = api.getJwt();
+        String jwe = api.getJwe();
 
-        if (token.isBlank() && !throwIfMiss)
-            return Mono.empty();
+        if (jwt.isBlank()) {
+            if (!throwIfMiss && jwe.isBlank())
+                return Mono.empty();
+            else
+                return Mono.error(new ErrAPI("jwt_not_provided", 401));
+        }
 
-        MyTkPayload payload = tkMng.checkJwt(token);
+        MyTkPayload payload = tkMng.checkJwt(jwt);
 
         return userSvc.findById(payload.userId()).switchIfEmpty(Mono.error(new ErrAPI("user not found", 404)))
                 .map(user -> {

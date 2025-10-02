@@ -3,6 +3,7 @@ package server.auth;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -20,7 +21,7 @@ import server._lib_tests.ResT;
 @SpringBootTest @AutoConfigureWebTestClient()
 public class RegisterTest {
 
-  private final static String URL = "/api/v1/auth/register";
+  private final static String URL = "/auth/register";
 
   @Autowired
   private WebTestClient web;
@@ -32,22 +33,17 @@ public class RegisterTest {
     req = ReqT.withUrl(web, URL);
   }
 
-  static Stream<Arguments> okCases() {
-    return Stream.of(Arguments.of("user created", 201, MyPayloads.register()));
-  }
+  @Test
+  void ok() {
+    ResT res = req.method(HttpMethod.POST).body(MyPayloads.register()).send();
 
-  @SuppressWarnings({ "unused", "UseSpecificCatch",
-      "CallToPrintStackTrace" }) @ParameterizedTest @MethodSource("okCases")
-  void ok(String msg, int status, Object bd) {
-    ResT res = req.method(HttpMethod.POST).body(bd).send();
+    MyAssrt.base(res, "user created", 201);
 
-    MyAssrt.assrt(res, msg, status);
-
-    MyAssrt.assrtSessionTokens(res);
+    MyAssrt.hasTokens(res);
 
   }
 
-  static Stream<Arguments> errCases() {
+  static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("data not provided", 400, null),
         Arguments.of("wrong data format", 400, "server do not expect a string as body"),
         Arguments.of("first name invalid", 422,
@@ -61,17 +57,17 @@ public class RegisterTest {
         Arguments.of("an account with this email already exists", 409, MyPayloads.register()));
   }
 
-  @ParameterizedTest @MethodSource("errCases")
+  @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status, Object bd) {
     ResT res = req.method(HttpMethod.POST).body(bd).send();
 
     if (!msg.contains("already exists")) {
-      MyAssrt.assrt(res, msg, status);
+      MyAssrt.base(res, msg, status);
       return;
     }
 
     ResT secondCall = req.method(HttpMethod.POST).body(bd).send();
-    MyAssrt.assrt(secondCall, msg, status);
+    MyAssrt.base(secondCall, msg, status);
 
   }
 }

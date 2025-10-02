@@ -26,6 +26,11 @@ server:
     relaxed-query-chars: "[,]"
 
 spring:
+  jackson:
+    mapper:
+      sort-properties-alphabetically: false
+    serialization:
+      order-map-entries-by-keys: false
   mail:
     host: ${BREVO_SMPT_SERVER}
     port: ${BREVO_SMPT_PORT}

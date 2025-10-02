@@ -13,9 +13,7 @@ import org.springframework.util.MultiValueMap;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-@Data
-@AllArgsConstructor
-@SuppressFBWarnings({ "EI" })
+@Data @AllArgsConstructor @SuppressFBWarnings({ "EI" })
 public class ResT implements RootCls {
 
     private final int status;
@@ -27,11 +25,7 @@ public class ResT implements RootCls {
     public static ResT of(EntityExchangeResult<Map<String, Object>> res) {
         Map<String, Object> bd = res.getResponseBody();
 
-        return new ResT(
-                res.getStatus().value(),
-                res.getResponseHeaders(),
-                res.getResponseCookies(),
-                bd);
+        return new ResT(res.getStatus().value(), res.getResponseHeaders(), res.getResponseCookies(), bd);
     }
 
     public String getHdr(String k) {
@@ -58,6 +52,10 @@ public class ResT implements RootCls {
 
     public String getJwe() {
         return getCk("refreshToken");
+    }
+
+    public String getCbcHmac() {
+        return (String) getBd().get("cbcHmacToken");
     }
 
     public String getMsg() {

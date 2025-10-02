@@ -21,11 +21,11 @@ public class TkMng {
     private final MyCbcHmac myCbcHmac;
 
     public String genJwt(UUID userId) {
-        return myJwt.create(userId);
+        return myJwt.create(userId, false);
     }
 
     public RecCreateJweReturnT genJwe(UUID userId) {
-        return myJwe.create(userId);
+        return myJwe.create(userId, false);
     }
 
     public MyTkPayload checkJwt(String token) {
@@ -41,6 +41,6 @@ public class TkMng {
     }
 
     public RecCreateCbcHmacReturnT genCbcHmac(TokenT tokenT, UUID userId) {
-        return myCbcHmac.create(tokenT, userId);
+        return myCbcHmac.create(tokenT, userId, false);
     }
 }

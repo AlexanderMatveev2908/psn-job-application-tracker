@@ -18,17 +18,21 @@ public class MyAssrt {
         return sb.toString();
     }
 
-    public static void assrt(ResT res, String msg, int status) {
+    public static void base(ResT res, String msg, int status) {
         assertEquals(status, res.getStatus(), buildStr(status, res.getStatus()));
         assertTrue((res.getMsg().toLowerCase()).contains(msg.toLowerCase()), buildStr(msg, res.getMsg()));
     }
 
-    public static void assrt(ResT res, int status) {
+    public static void base(ResT res, int status) {
         assertEquals(status, res.getStatus(), buildStr(status, res.getStatus()));
     }
 
-    public static void assrtSessionTokens(ResT res) {
+    public static void hasJwt(ResT res) {
         assertTrue(Reg.isJWT(res.getJwt()));
+    }
+
+    public static void hasTokens(ResT res) {
+        hasJwt(res);
         assertTrue(Reg.isJWE(res.getJwe()));
     }
 }

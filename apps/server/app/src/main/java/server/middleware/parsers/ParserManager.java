@@ -33,52 +33,34 @@ public class ParserManager {
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private static void nestKeyVal(Map<String, Object> dict, String key, Object val) {
+        boolean isArrayKey = key.endsWith("[]");
         String[] parts = key.replace("]", "").split("\\[");
 
         Map<String, Object> curr = dict;
-        // ? stop at -2 for lists and -1 for dicts
-        int stop = parts[parts.length - 1].isEmpty() ? parts.length - 2 : parts.length - 1;
+        int lastIdx = isArrayKey ? parts.length - 2 : parts.length - 1;
+        if (lastIdx < 0)
+            lastIdx = 0;
 
-        for (int i = 0; i < stop; i++) {
+        for (int i = 0; i < lastIdx; i++) {
             String p = parts[i];
-
-            Map<String, Object> next = (Map<String, Object>) curr.computeIfAbsent(p,
-                    k -> new HashMap<String, Object>());
+            Map<String, Object> next = (Map<String, Object>) curr.computeIfAbsent(p, k -> new HashMap<>());
             curr = next;
         }
 
-        String lastKey = parts[parts.length - 1];
+        String lastKey = parts[lastIdx];
 
-        if (lastKey.isEmpty()) {
-            String arrListKey = parts[parts.length - 2];
-            Object existingVal = curr.get(arrListKey);
+        addVal(curr, lastKey, isArrayKey, val);
+    }
 
-            if (existingVal instanceof List) {
-                // ? append as normal list
-                ((List<Object>) existingVal).add(val);
-            } else if (existingVal != null) {
-                // ? existing val for curr key but is not a list, shape must be changed from
-                // ? prev val(str, int ,etc...) to list.
-                List<Object> newArrList = new ArrayList<>();
-                newArrList.add(existingVal);
-                newArrList.add(val);
-                curr.put(arrListKey, newArrList);
-            } else {
-                // ? non-existent val, add curr val while creating list
-                curr.put(arrListKey, new ArrayList<>(List.of(val)));
-            }
-        } else if (curr.containsKey(lastKey)) {
-            Object existingVal = curr.get(lastKey);
+    private static void addVal(Map<String, Object> curr, String lastKey, boolean isArrayKey, Object val) {
+        Object existingVal = curr.get(lastKey);
 
-            // ? check val being list in case client does not send keys
-            // ? with [] at the end for lists
-            if (existingVal instanceof List) {
-                ((List<Object>) existingVal).add(val);
-            } else {
-                curr.put(lastKey, new ArrayList<>(List.of(existingVal, val)));
-            }
-        } else {
-            curr.put(lastKey, val);
-        }
+        if (existingVal instanceof List)
+            ((List<Object>) existingVal).add(val);
+        else if (existingVal != null)
+            curr.put(lastKey, new ArrayList<>(List.of(existingVal, val)));
+        else
+            curr.put(lastKey, isArrayKey ? new ArrayList<>(List.of(val)) : val);
+
     }
 }

@@ -23,6 +23,7 @@ public class RefreshSvc {
   public Mono<String> refresh(Api api) {
 
     String jwe = api.getJwe();
+
     if (jwe.isBlank())
       throw new ErrAPI("jwe_not_provided", 401);
 

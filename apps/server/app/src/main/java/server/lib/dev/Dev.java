@@ -6,20 +6,18 @@ import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
+import server.conf.Reg;
 import server.conf.db.database.DB;
 import server.conf.db.remote_dictionary.RdCmd;
-import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
-import server.models.token.etc.AlgT;
-import server.models.token.etc.TokenT;
+import server.lib.data_structure.Prs;
+import server.lib.security.mng_tokens.TkMng;
 
-@SuppressFBWarnings({ "EI2" })
-@Service
-@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @Service @RequiredArgsConstructor
 public class Dev {
     // private final RdCmd cmd;
     private final DB db;
     private final RdCmd cmd;
-    private final MyCbcHmac cbcHmac;
+    private final TkMng tkMng;
 
     // @Bean
     // public ApplicationRunner logRoutes(RequestMappingHandlerMapping mapping) {
@@ -36,16 +34,13 @@ public class Dev {
         }).subscribe();
     }
 
-    public void doAesHmacStuff() {
+    public void jwtStuff() {
+        String jwt = tkMng.genJwt(UUID.randomUUID());
 
-        var usId = UUID.randomUUID();
-        var rec = cbcHmac.create(TokenT.CHANGE_EMAIL, usId);
+        for (String p : jwt.split("\\."))
+            if (Reg.isB64(p))
+                System.out.println(Prs.base64ToMap(p));
 
-        System.out.println(rec.inst());
-
-        var res = cbcHmac.check(rec.clientToken(), AlgT.AES_CBC_HMAC_SHA256, TokenT.CHANGE_EMAIL, usId);
-
-        System.out.println(res);
     }
 
 }

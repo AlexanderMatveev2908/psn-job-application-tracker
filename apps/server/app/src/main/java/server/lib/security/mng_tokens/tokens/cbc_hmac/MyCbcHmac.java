@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Frmt;
+import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.hkdf.Hkdf;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
@@ -73,7 +73,7 @@ public class MyCbcHmac {
             cipher.init(Cipher.DECRYPT_MODE, aesKey, new IvParameterSpec(iv));
             byte[] plain = cipher.doFinal(ciphertext);
 
-            return Frmt.jsonToMap(new String(plain, StandardCharsets.UTF_8));
+            return Prs.jsonToMap(new String(plain, StandardCharsets.UTF_8));
         } catch (Exception err) {
             throw new ErrAPI("cbc_hmac_invalid", 401);
         }
@@ -95,13 +95,14 @@ public class MyCbcHmac {
         }
     }
 
-    public RecCreateCbcHmacReturnT create(TokenT tokenT, UUID userId) {
+    public RecCreateCbcHmacReturnT create(TokenT tokenT, UUID userId, boolean forceExp) {
         RecAad aad = new RecAad(tokenT, userId);
 
         RecCbcHmacKeys keys = deriveKeys(aad);
 
         RecExpTplSec recExp = expMng.cbcHmac();
-        byte[] plain = Frmt.mapToBinary(Map.of("userId", userId, "iat", recExp.iat(), "exp", recExp.exp()));
+        long exp = forceExp ? -recExp.exp() : recExp.exp();
+        byte[] plain = Prs.mapToBinary(Map.of("userId", userId, "iat", recExp.iat(), "exp", exp));
 
         IvParameterSpec ivSpec = genIv();
 
@@ -109,11 +110,10 @@ public class MyCbcHmac {
 
         byte[] tag = hash(keys.getHmacSpec(), aad, ivSpec.getIV(), ciphertext);
 
-        String clientToken = Frmt.binaryToHex(aad.toBinary()) + "." + Frmt.binaryToHex(ivSpec.getIV()) + "."
-                + Frmt.binaryToHex(ciphertext) + "." + Frmt.binaryToHex(tag);
+        String clientToken = Prs.binaryToHex(aad.toBinary()) + "." + Prs.binaryToHex(ivSpec.getIV()) + "."
+                + Prs.binaryToHex(ciphertext) + "." + Prs.binaryToHex(tag);
 
-        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, hashMng.hmacHash(clientToken),
-                recExp.exp());
+        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, hashMng.hmacHash(clientToken), exp);
 
         return new RecCreateCbcHmacReturnT(newToken, clientToken);
     }
@@ -126,9 +126,9 @@ public class MyCbcHmac {
 
         RecAad aad = RecAad.fromPart(parts[0]);
 
-        byte[] iv = Frmt.hexToBinary(parts[1]);
-        byte[] cyphertext = Frmt.hexToBinary(parts[2]);
-        byte[] tag = Frmt.hexToBinary(parts[3]);
+        byte[] iv = Prs.hexToBinary(parts[1]);
+        byte[] cyphertext = Prs.hexToBinary(parts[2]);
+        byte[] tag = Prs.hexToBinary(parts[3]);
 
         RecCbcHmacKeys keys = deriveKeys(aad);
 

@@ -2,6 +2,7 @@ package server._lib_tests;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -14,10 +15,12 @@ import server.lib.dev.MyLog;
 public class ReqT {
 
     private final WebTestClient web;
-    private final String url;
+    private final Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> cookies = new HashMap<>();
+    private final Map<String, String> query = new HashMap<>();
+    private String url;
     private HttpMethod method = HttpMethod.GET;
     private Object body;
-    private final Map<String, String> headers = new HashMap<>();
 
     private ReqT(WebTestClient web, String url) {
         this.web = web;
@@ -25,7 +28,7 @@ public class ReqT {
     }
 
     public static ReqT withUrl(WebTestClient web, String url) {
-        return new ReqT(web, url);
+        return new ReqT(web, "/api/v1" + url);
     }
 
     public ReqT method(HttpMethod method) {
@@ -43,8 +46,34 @@ public class ReqT {
         return this;
     }
 
+    public ReqT addCk(String name, String value) {
+        this.cookies.put(name, value);
+        return this;
+    }
+
+    public ReqT jwt(String token) {
+        return header("Authorization", "Bearer " + token);
+    }
+
+    public ReqT jwe(String token) {
+        return addCk("refreshToken", token);
+    }
+
+    public ReqT addQuery(String key, String val) {
+        this.query.put(key, val);
+        return this;
+    }
+
     public ResT send() {
-        RequestHeadersSpec<?> req = web.method(method).uri(url);
+        String fullUrl = url;
+
+        if (!query.isEmpty()) {
+            String joined = query.entrySet().stream().map(pair -> pair.getKey() + "=" + pair.getValue())
+                    .collect(Collectors.joining("&"));
+            fullUrl += "?" + joined;
+        }
+
+        RequestHeadersSpec<?> req = web.method(method).uri(fullUrl);
 
         if (!headers.isEmpty())
             req = req.headers(existing -> headers.forEach(existing::add));
@@ -52,14 +81,17 @@ public class ReqT {
         if (body != null && req instanceof RequestBodySpec bodySpec)
             req = bodySpec.bodyValue(body);
 
-        var res = ResT.of(
-                req.exchange()
-                        .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
-                        })
-                        .returnResult());
+        if (!cookies.isEmpty())
+            for (var pair : cookies.entrySet())
+                req = req.cookie(pair.getKey(), pair.getValue());
 
+        var res = ResT.of(req.exchange().expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
+        }).returnResult());
+
+        System.out.println("\n");
         MyLog.logTtl(url, "🚦 " + res.getStatus(), "📜 " + res.getHdrs(), "🍪 " + res.getCks());
         res.getBd().forEach((k, v) -> MyLog.logKV(k, v));
+        System.out.println("\n");
         MyLog.wOk(res);
 
         return res;
