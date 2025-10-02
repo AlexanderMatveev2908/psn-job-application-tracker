@@ -1,7 +1,5 @@
 package server.features.auth.services;
 
-import java.time.Instant;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,20 +23,16 @@ public class RefreshSvc {
   public Mono<String> refresh(Api api) {
 
     String jwe = api.getJwe();
+    if (jwe.isBlank())
+      throw new ErrAPI("jwe_not_provided", 401);
+
     MyTkPayload payload = tkMng.checkJwe(jwe);
 
-    return tokenRepo.findByUserIdAndTokenT(payload.userId(), TokenT.REFRESH).flatMap(dbToken -> {
+    String recomputed = hashMng.hmacHash(jwe);
 
-      if (!hashMng.hmacCheck(dbToken.getHashed(), jwe))
-        return Mono.error(new ErrAPI("jwe_invalid", 401));
-      if (dbToken.getExp() < Instant.now().getEpochSecond())
-        return tokenRepo.deleteByUserIdAndTokenT(dbToken.getUserId(), TokenT.REFRESH)
-            .then(Mono.error(new ErrAPI("jwe_expired", 401)));
-
+    return tokenRepo.findByHash(payload.userId(), TokenT.REFRESH, recomputed).flatMap(dbToken -> {
       String freshJwt = tkMng.genJwt(payload.userId());
-
       return Mono.just(freshJwt);
-    });
-
+    }).switchIfEmpty(Mono.error(new ErrAPI("jwe_not_found", 401)));
   }
 }

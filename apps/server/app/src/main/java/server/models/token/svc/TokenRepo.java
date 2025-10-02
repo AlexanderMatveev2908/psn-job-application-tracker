@@ -24,6 +24,15 @@ public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
   Mono<MyToken> findByUserIdAndTokenT(UUID userId, TokenT tokenT);
 
   @Query("""
+        SELECT * FROM tokens
+        WHERE user_id = :userId
+        AND token_type = CAST(:tokenT AS token_t)
+        AND HASHED = :hashed
+        LIMIT 1
+      """)
+  Mono<MyToken> findByHash(UUID userId, TokenT tokenT, String hashed);
+
+  @Query("""
       INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
       VALUES (:#{#token.userId}, CAST(:#{#token.tokenType} AS token_t), CAST(:#{#token.algType} AS alg_t), :#{#token.hashed}, :#{#token.exp})
       RETURNING *
