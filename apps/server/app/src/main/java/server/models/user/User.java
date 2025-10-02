@@ -11,9 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.hash.MyArgonHash;
 import server.models.RootTable;
 
 @Data @EqualsAndHashCode(callSuper = true) @Table("users")
@@ -50,13 +48,6 @@ public class User extends RootTable {
     @Override
     public String toString() {
         return reflectiveToString();
-    }
-
-    public Mono<User> hashPwd() {
-        return MyArgonHash.rctHash(password).map(hash -> {
-            setPassword(hash);
-            return this;
-        });
     }
 
     public Map<String, Object> forClient() {

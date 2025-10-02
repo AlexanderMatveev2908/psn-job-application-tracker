@@ -10,7 +10,7 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import server.decorators.flow.ErrAPI;
 import server.features.auth.paperwork.LoginForm;
-import server.lib.security.hash.MyArgonHash;
+import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
 import server.models.token.etc.TokenT;
@@ -22,11 +22,12 @@ public class LoginSvc {
   private final UserRepo userRepo;
   private final TkMng tkMng;
   private final TokenRepo tokenRepo;
+  private final MyHashMng hashMng;
 
   public Mono<Tuple2<String, String>> login(LoginForm form) {
     return userRepo.findByEmail(form.getEmail()).flatMap(user ->
 
-    MyArgonHash.rctCheck(user.getPassword(), form.getPassword()).flatMap(resCheck -> {
+    hashMng.argonCheck(user.getPassword(), form.getPassword()).flatMap(resCheck -> {
       if (!resCheck)
         return Mono.<Tuple2<String, String>>error(new ErrAPI("invalid password", 401));
 

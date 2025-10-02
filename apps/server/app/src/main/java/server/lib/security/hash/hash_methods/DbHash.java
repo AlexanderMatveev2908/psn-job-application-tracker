@@ -1,4 +1,4 @@
-package server.lib.security.hash;
+package server.lib.security.hash.hash_methods;
 
 import java.security.MessageDigest;
 

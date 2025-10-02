@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
-import server.lib.security.hash.DbHash;
+import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
@@ -39,7 +39,7 @@ public class MyJwe {
 
     private final EnvKeeper envKeeper;
     private final ExpMng expMng;
-    private final DbHash dbHash;
+    private final MyHashMng hashMng;
 
     private String stripKey(String key, String type) {
         return key.replace(String.format("-----BEGIN %s KEY-----", type), "")
@@ -83,8 +83,8 @@ public class MyJwe {
 
             String refreshToken = jwe.serialize();
 
-            MyToken newToken = new MyToken(userId, AlgT.RSA_OAEP256_A256GCM, TokenT.REFRESH, dbHash.hash(refreshToken),
-                    recExp.exp());
+            MyToken newToken = new MyToken(userId, AlgT.RSA_OAEP256_A256GCM, TokenT.REFRESH,
+                    hashMng.hmacHash(refreshToken), recExp.exp());
 
             return new RecCreateJweReturnT(newToken, refreshToken);
         } catch (Exception err) {

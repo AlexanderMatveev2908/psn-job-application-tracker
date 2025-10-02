@@ -19,7 +19,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Frmt;
-import server.lib.security.hash.DbHash;
+import server.lib.security.hash.MyHashMng;
 import server.lib.security.hkdf.Hkdf;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
@@ -30,15 +30,13 @@ import server.models.token.MyToken;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 
-@Service
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "REC" })
+@Service @RequiredArgsConstructor @SuppressFBWarnings({ "REC" })
 public class MyCbcHmac {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private final Hkdf hkdf;
     private final ExpMng expMng;
-    private final DbHash dbHash;
+    private final MyHashMng hashMng;
 
     private RecCbcHmacKeys deriveKeys(RecAad rec) {
         byte[] okm = hkdf.derive(rec, 64);
@@ -112,14 +110,12 @@ public class MyCbcHmac {
         byte[] tag = hash(keys.getHmacSpec(), aad, ivSpec.getIV(), ciphertext);
 
         String clientToken = Frmt.binaryToHex(aad.toBinary()) + "." + Frmt.binaryToHex(ivSpec.getIV()) + "."
-                + Frmt.binaryToHex(ciphertext) + "."
-                + Frmt.binaryToHex(tag);
+                + Frmt.binaryToHex(ciphertext) + "." + Frmt.binaryToHex(tag);
 
-        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, dbHash.hash(clientToken),
+        var newToken = new MyToken(aad.getTokenId(), userId, aad.getAlgT(), tokenT, hashMng.hmacHash(clientToken),
                 recExp.exp());
 
-        return new RecCreateCbcHmacReturnT(newToken,
-                clientToken);
+        return new RecCreateCbcHmacReturnT(newToken, clientToken);
     }
 
     public Map<String, Object> check(String clientToken, AlgT algT, TokenT tokenT, UUID userId) {

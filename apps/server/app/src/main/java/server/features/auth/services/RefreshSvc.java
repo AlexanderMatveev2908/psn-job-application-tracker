@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.hash.DbHash;
+import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.models.token.etc.TokenT;
@@ -20,7 +20,7 @@ import server.models.token.svc.TokenRepo;
 public class RefreshSvc {
   private final TkMng tkMng;
   private final TokenRepo tokenRepo;
-  private final DbHash dbHash;
+  private final MyHashMng hashMng;
 
   public Mono<String> refresh(Api api) {
 
@@ -29,7 +29,7 @@ public class RefreshSvc {
 
     return tokenRepo.findByUserIdAndTokenT(payload.userId(), TokenT.REFRESH).flatMap(dbToken -> {
 
-      if (!dbHash.check(dbToken.getHashed(), jwe))
+      if (!hashMng.hmacCheck(dbToken.getHashed(), jwe))
         return Mono.error(new ErrAPI("jwe_invalid", 401));
       if (dbToken.getExp() < Instant.now().getEpochSecond())
         return tokenRepo.deleteByUserIdAndTokenT(dbToken.getUserId(), TokenT.REFRESH)
