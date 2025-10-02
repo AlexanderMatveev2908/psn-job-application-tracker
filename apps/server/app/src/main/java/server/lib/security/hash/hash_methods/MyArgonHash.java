@@ -1,7 +1,9 @@
-package server.lib.security.hash;
+package server.lib.security.hash.hash_methods;
 
 import java.util.Arrays;
 import java.util.concurrent.Executors;
+
+import org.springframework.stereotype.Service;
 
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
@@ -10,6 +12,7 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import server.decorators.flow.ErrAPI;
 
+@Service
 public final class MyArgonHash {
     private static final int POOL_SIZE = Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
 
@@ -17,11 +20,7 @@ public final class MyArgonHash {
 
     private static final Argon2 ARGON = Argon2Factory.create();
 
-    public MyArgonHash() {
-        throw new ErrAPI("MyHash should be a static lib only");
-    }
-
-    public static String hash(String arg) {
+    public String hash(String arg) {
         char[] splitted = arg.toCharArray();
 
         try {
@@ -29,8 +28,7 @@ public final class MyArgonHash {
             int iterations = 3;
             int memoryKB = 64 * 1024;
 
-            String hash = ARGON.hash(iterations, memoryKB, POOL_SIZE,
-                    splitted);
+            String hash = ARGON.hash(iterations, memoryKB, POOL_SIZE, splitted);
 
             return hash;
         } finally {
@@ -38,7 +36,7 @@ public final class MyArgonHash {
         }
     }
 
-    public static boolean check(String hash, String txt) {
+    public boolean check(String hash, String txt) {
         char[] splitted = txt.toCharArray();
 
         try {
@@ -50,11 +48,11 @@ public final class MyArgonHash {
         }
     }
 
-    public static Mono<String> rctHash(String arg) {
+    public Mono<String> rctHash(String arg) {
         return Mono.fromCallable(() -> hash(arg)).subscribeOn(hashPool);
     }
 
-    public static Mono<Boolean> rctCheck(String hash, String txt) {
+    public Mono<Boolean> rctCheck(String hash, String txt) {
         return Mono.fromCallable(() -> check(hash, txt)).subscribeOn(hashPool);
     }
 }

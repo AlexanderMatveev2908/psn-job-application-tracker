@@ -11,7 +11,7 @@ import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
 import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.mng_tokens.MyTkMng;
+import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.token.etc.TokenT;
@@ -23,7 +23,7 @@ import server.models.user.svc.UserRepo;
 public class RegisterSvc {
   private final UserRepo userRepo;
   private final TokenRepo tokensRepo;
-  private final MyTkMng tkMng;
+  private final TkMng tkMng;
   private final MailSvc mailSvc;
 
   public Mono<Tuple2<String, String>> register(User us) {

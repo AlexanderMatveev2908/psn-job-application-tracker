@@ -5,17 +5,17 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.lib.security.mng_tokens.tokens.jwe.MyJwe;
 import server.lib.security.mng_tokens.tokens.jwe.etc.RecCreateJweReturnT;
 import server.lib.security.mng_tokens.tokens.jwt.MyJwt;
-import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
 import server.models.token.etc.TokenT;
 
 @Service @RequiredArgsConstructor
-public class MyTkMng {
+public class TkMng {
     private final MyJwt myJwt;
     private final MyJwe myJwe;
     private final MyCbcHmac myCbcHmac;
@@ -28,8 +28,12 @@ public class MyTkMng {
         return myJwe.create(userId);
     }
 
-    public MyJwtPayload checkJwt(String token) {
+    public MyTkPayload checkJwt(String token) {
         return myJwt.check(token);
+    }
+
+    public MyTkPayload checkJwe(String token) {
+        return myJwe.check(token);
     }
 
     public RecSessionTokensReturnT genSessionTokens(UUID userId) {

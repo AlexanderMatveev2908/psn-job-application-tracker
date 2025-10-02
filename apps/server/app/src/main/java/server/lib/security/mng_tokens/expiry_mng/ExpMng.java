@@ -6,11 +6,9 @@ import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplDate;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
 
-@SuppressFBWarnings({ "EI" })
-@Service
+@SuppressFBWarnings({ "EI" }) @Service
 public class ExpMng {
 
     private final static int EXP_JWT = 15;
@@ -25,8 +23,8 @@ public class ExpMng {
 
     }
 
-    public RecExpTplDate jwt() {
-        return genTpl(EXP_JWT).toDate();
+    public RecExpTplSec jwt() {
+        return genTpl(EXP_JWT);
     }
 
     public RecExpTplSec jwe() {

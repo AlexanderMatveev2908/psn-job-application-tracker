@@ -16,11 +16,13 @@ import server.features.auth.paperwork.RegisterForm;
 import server.features.auth.services.LoginSvc;
 import server.features.auth.services.RegisterSvc;
 import server.lib.security.cookies.MyCookies;
+import server.lib.security.hash.MyHashMng;
 import server.models.user.User;
 
 @Component @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class PostAuthCtrl {
 
+    private final MyHashMng hashMng;
     private final RegisterSvc registerSvc;
     private final LoginSvc loginSvc;
     private final MyCookies myCookies;
@@ -29,8 +31,9 @@ public class PostAuthCtrl {
         RegisterForm form = api.getMappedData();
         var us = new User(form.getFirstName(), form.getLastName(), form.getEmail(), form.getPassword());
 
-        return us.hashPwd().flatMap(hashedUser -> {
-            return registerSvc.register(hashedUser);
+        return hashMng.argonHash(us.getPassword()).flatMap(hashed -> {
+            us.setPassword(hashed);
+            return registerSvc.register(us);
         }).flatMap(tpl -> {
 
             ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());

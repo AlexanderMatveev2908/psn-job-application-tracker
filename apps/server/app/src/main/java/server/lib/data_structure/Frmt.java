@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
+import server.decorators.flow.ErrAPI;
+
 public final class Frmt {
 
     private final static ObjectMapper jack = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
@@ -55,4 +57,16 @@ public final class Frmt {
         return utf8ToBinary(toJson(arg));
     }
 
+    public static long fromAnyToLong(Object arg) {
+        if (arg == null)
+            throw new ErrAPI("expected string or number received null");
+
+        if (arg instanceof Number num)
+            return num.longValue();
+
+        if (arg instanceof String str)
+            return Long.parseLong(str);
+
+        throw new ErrAPI("unknown arg type");
+    }
 }

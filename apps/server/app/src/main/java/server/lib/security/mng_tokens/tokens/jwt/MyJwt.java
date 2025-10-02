@@ -13,9 +13,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
-import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplDate;
-import server.lib.security.mng_tokens.tokens.jwt.etc.MyJwtPayload;
+import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
 
 @Service
 
@@ -32,20 +32,20 @@ public final class MyJwt {
 
     public String create(UUID userId) {
 
-        RecExpTplDate rec = expMng.jwt();
+        RecExpTplSec rec = expMng.jwt();
 
-        return JWT.create().withIssuer(envKeeper.getAppName()).withSubject(MyJwtPayload.toString(userId))
-                .withIssuedAt(rec.iat()).withExpiresAt(rec.exp()).sign(alg);
+        return JWT.create().withIssuer(envKeeper.getAppName()).withSubject(MyTkPayload.toString(userId, rec))
+                .withIssuedAt(rec.toDate(rec.iat())).withExpiresAt(rec.toDate(rec.exp())).sign(alg);
     }
 
-    public MyJwtPayload check(String token) {
+    public MyTkPayload check(String token) {
 
         try {
             JWTVerifier verifier = JWT.require(alg).withIssuer(envKeeper.getAppName()).build();
 
             DecodedJWT resCheck = verifier.verify(token);
 
-            return MyJwtPayload.fromString(resCheck.getSubject());
+            return MyTkPayload.fromString(resCheck.getSubject());
 
         } catch (TokenExpiredException err) {
             throw new ErrAPI("jwt_expired", 401);
