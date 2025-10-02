@@ -27,6 +27,11 @@ public class AuthRouter {
         return postCtrl.login(api);
     }
 
+    @PostMapping("/logout")
+    public Mono<ResponseEntity<ResAPI>> logout(Api api) {
+        return postCtrl.logout(api);
+    }
+
     @GetMapping("/refresh")
     public Mono<ResponseEntity<ResAPI>> refresh(Api api) {
         return getCtrl.refresh(api);
