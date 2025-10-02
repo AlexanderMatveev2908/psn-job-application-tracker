@@ -36,7 +36,7 @@ public class PostAuthCtrl {
             return registerSvc.register(us);
         }).flatMap(tpl -> {
 
-            ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());
+            ResponseCookie refreshCookie = myCookies.jweCookie(tpl.getT1());
 
             return new ResAPI(201).msg("user created").data(Map.of("accessToken", tpl.getT2())).cookie(refreshCookie)
                     .build();
@@ -46,7 +46,7 @@ public class PostAuthCtrl {
     public Mono<ResponseEntity<ResAPI>> login(Api api) {
         return loginSvc.login((LoginForm) api.getMappedData()).flatMap(tpl -> {
 
-            ResponseCookie refreshCookie = myCookies.genRefreshCookie(tpl.getT1());
+            ResponseCookie refreshCookie = myCookies.jweCookie(tpl.getT1());
 
             return new ResAPI(200).msg("user logged").cookie(refreshCookie).data(Map.of("accessToken", tpl.getT2()))
                     .build();

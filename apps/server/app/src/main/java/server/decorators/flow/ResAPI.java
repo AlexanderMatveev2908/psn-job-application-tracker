@@ -16,13 +16,13 @@ import reactor.core.publisher.Mono;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 
-@Getter
-@JsonSerialize(using = ResApiJson.class)
+@Getter @JsonSerialize(using = ResApiJson.class)
 public final class ResAPI {
     private String msg;
     private Integer status;
     private Map<String, Object> data;
     private final List<ResponseCookie> cookies = new ArrayList<>();
+    private final List<ResponseCookie> deleteCookies = new ArrayList<>();
 
     public ResAPI(int status, String msg, Map<String, Object> data) {
         this.status = status;
@@ -38,7 +38,7 @@ public final class ResAPI {
     }
 
     private static String prependEmj(String msg, ActT act) {
-        return String.format("%s %s", act.getEmj(), msg);
+        return msg == null ? null : String.format("%s %s", act.getEmj(), msg.replace("❌ ", ""));
     }
 
     public static Map<String, Object> flatData(Map<String, Object> data) {
@@ -79,6 +79,11 @@ public final class ResAPI {
         return this;
     }
 
+    public ResAPI delCookie(ResponseCookie cookie) {
+        this.deleteCookies.add(cookie);
+        return this;
+    }
+
     public Mono<ResponseEntity<ResAPI>> build() {
         String safeMsg = status == 204 ? null : msg != null ? msg : MapperMsg.fromCode(status).getMsg();
         ActT act = (status >= 200 && status < 300) ? ActT.OK : ActT.ERR;
@@ -87,16 +92,14 @@ public final class ResAPI {
         for (ResponseCookie cookie : cookies)
             builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        for (ResponseCookie cookie : deleteCookies)
+            builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
+
         if (status == 204)
             return Mono.just(builder.build());
 
-        var myRes = new ResAPI()
-                .status(status)
-                .msg(prependEmj(safeMsg, act))
-                .data(data);
+        var myRes = new ResAPI().status(status).msg(prependEmj(safeMsg, act)).data(data);
 
-        return Mono.just(
-                builder.body(
-                        myRes));
+        return Mono.just(builder.body(myRes));
     }
 }

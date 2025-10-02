@@ -102,14 +102,19 @@ public class MyJwe {
             MyTkPayload payload = MyTkPayload.fromObj(jwe.getPayload().toJSONObject());
 
             if (payload.exp() < Instant.now().getEpochSecond())
-                throw new ErrAPI("jwe_expired", 401);
+                throw new ErrAPI("jwe_expired", 401, Map.of("argDeleteJwe", payload.userId()));
 
             return payload;
         } catch (Exception err) {
             var msg = err.getMessage();
-            msg = msg.contains("jwe_expired") ? msg.substring(1) : "jwe_invalid";
+            msg = msg.contains("jwe_expired") ? msg : "jwe_invalid";
 
-            throw new ErrAPI(msg, 401);
+            Map<String, Object> data = null;
+
+            if (err instanceof ErrAPI errInst)
+                data = errInst.getData();
+
+            throw new ErrAPI(msg, 401, data);
         }
     }
 

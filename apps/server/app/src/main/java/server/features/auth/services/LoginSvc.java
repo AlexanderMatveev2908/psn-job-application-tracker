@@ -34,7 +34,7 @@ public class LoginSvc {
       RecSessionTokensReturnT rec = tkMng.genSessionTokens(user.getId());
 
       return tokenRepo.deleteByUserIdAndTokenT(user.getId(), TokenT.REFRESH).collectList()
-          .doOnNext(ids -> System.out.println("jwe deleted => " + ids.size()))
+          .doOnNext(ids -> System.out.println("🧹 jwe deleted pre insert => " + ids.size()))
           .then(tokenRepo.insert(rec.jwe().inst()).thenReturn(Tuples.of(rec.jwe().clientToken(), rec.jwt())));
     })).switchIfEmpty(Mono.error(new ErrAPI("user not found", 404)));
   }

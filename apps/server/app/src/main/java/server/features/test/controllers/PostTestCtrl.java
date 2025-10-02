@@ -23,24 +23,21 @@ import server.decorators.flow.ErrAPI;
 import server.decorators.flow.ResAPI;
 import server.lib.data_structure.ShapeCheck;
 
-@Component
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "EI2" })
+@Component @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class PostTestCtrl {
 
     private final CloudSvc cloud;
 
     public Mono<ResponseEntity<ResAPI>> postMsg(Api api) {
         return api.getBd(new TypeReference<Map<String, Object>>() {
-        })
-                .flatMap(bd -> {
-                    var msg = (String) bd.get("msg");
+        }).flatMap(bd -> {
+            var msg = (String) bd.get("msg");
 
-                    if (!ShapeCheck.isStr(msg))
-                        return new ResAPI(400).msg("missing msg").build();
+            if (!ShapeCheck.isStr(msg))
+                return new ResAPI(400).msg("missing msg").build();
 
-                    return new ResAPI(200).msg("msg received").data(Map.of("clientMsg", msg)).build();
-                });
+            return new ResAPI(200).msg("msg received").data(Map.of("clientMsg", msg)).build();
+        });
     }
 
     @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
@@ -73,20 +70,17 @@ public class PostTestCtrl {
             }
         }
 
-        return Flux.merge(promises)
-                .collectList()
+        return Flux.merge(promises).collectList()
                 .zipWhen(saved -> Flux.fromIterable(saved)
-                        .flatMap(el -> cloud.delete(el.getPublicId(), el.getResourceType()))
-                        .collectList())
+                        .flatMap(el -> cloud.delete(el.getPublicId(), el.getResourceType())).collectList())
                 .flatMap(tuple -> {
                     List<CloudAsset> saved = tuple.getT1();
                     List<Integer> deleted = tuple.getT2();
 
                     return new ResAPI(200).msg(
                             "form parsed • processed • saved locally • uploaded on cloud • deleted locally • deleted from cloud")
-                            .data(
-                                    Map.of("saved", saved, "deleted",
-                                            deleted.stream().reduce(0, (acc, curr) -> acc + curr)))
+                            .data(Map.of("saved", saved, "deleted",
+                                    deleted.stream().reduce(0, (acc, curr) -> acc + curr)))
                             .build();
                 });
 

@@ -25,7 +25,10 @@ public class TokenSvc {
         return repo.findByUserId(userId);
     }
 
-    public Flux<MyToken> deleteByUserIdAndTokenT(UUID userId, TokenT tokenT) {
-        return repo.deleteByUserIdAndTokenT(userId, tokenT);
+    public Mono<Integer> deleteByUserIdAndTokenT(UUID userId, TokenT tokenT) {
+        return repo.deleteByUserIdAndTokenT(userId, tokenT).collectList().flatMap(ids -> {
+            System.out.println("🧹 tokens deleted => " + ids.size());
+            return Mono.just(ids.size());
+        });
     }
 }
