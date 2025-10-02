@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     tmp_email VARCHAR(255),
     password VARCHAR(255) NOT NULL,
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     totp_secret VARCHAR(255)
 ) INHERITS (root_table);
 

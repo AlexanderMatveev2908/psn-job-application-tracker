@@ -32,6 +32,9 @@ public class User extends RootTable {
     @Column("password")
     private String password;
 
+    @Column("is_verified")
+    private boolean isVerified;
+
     @Column("totp_secret")
     private String totpSecret;
 
