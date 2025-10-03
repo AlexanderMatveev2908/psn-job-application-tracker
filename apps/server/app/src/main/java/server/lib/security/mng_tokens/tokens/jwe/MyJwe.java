@@ -100,7 +100,7 @@ public class MyJwe {
             RSADecrypter decrypter = new RSADecrypter(getPrivateKey());
             jwe.decrypt(decrypter);
 
-            MyTkPayload payload = MyTkPayload.fromObj(jwe.getPayload().toJSONObject());
+            MyTkPayload payload = MyTkPayload.fromMap(jwe.getPayload().toJSONObject());
 
             if (payload.exp() < Instant.now().getEpochSecond())
                 throw new ErrAPI("jwe_expired", 401, Map.of("argDeleteJwe", payload.userId()));

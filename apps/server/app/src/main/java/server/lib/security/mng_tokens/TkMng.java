@@ -43,4 +43,8 @@ public class TkMng {
     public RecCreateCbcHmacReturnT genCbcHmac(TokenT tokenT, UUID userId) {
         return myCbcHmac.create(tokenT, userId, false);
     }
+
+    public MyTkPayload checkCbcHmac(String token) {
+        return myCbcHmac.check(token);
+    }
 }

@@ -2,8 +2,10 @@ package server.lib.security.mng_tokens.tokens.cbc_hmac;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -21,13 +23,13 @@ import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.hkdf.Hkdf;
+import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.lib.security.mng_tokens.expiry_mng.ExpMng;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecAad;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCbcHmacKeys;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.token.MyToken;
-import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 
 @Service @RequiredArgsConstructor @SuppressFBWarnings({ "REC" })
@@ -118,7 +120,7 @@ public class MyCbcHmac {
         return new RecCreateCbcHmacReturnT(newToken, clientToken);
     }
 
-    public Map<String, Object> check(String clientToken, AlgT algT, TokenT tokenT, UUID userId) {
+    public MyTkPayload check(String clientToken) {
 
         String[] parts = clientToken.split("\\.");
         if (parts.length != 4)
@@ -134,12 +136,18 @@ public class MyCbcHmac {
 
         byte[] recomputed = hash(keys.getHmacSpec(), aad, iv, cyphertext);
 
-        if (!Arrays.equals(tag, recomputed))
+        if (!MessageDigest.isEqual(tag, recomputed))
             throw new ErrAPI("cbc_hmac_invalid", 401);
 
         Map<String, Object> payload = decrypt(keys.getAesSpec(), iv, cyphertext);
 
-        return payload;
+        MyTkPayload mappedPayload = MyTkPayload.fromMap(payload);
+
+        if (mappedPayload.exp() < Instant.now().getEpochSecond())
+            throw new ErrAPI("cbc_hmac_expired", 401, Map.of("idCbcHmacRm", aad.getTokenId()));
+
+        return mappedPayload;
+
     }
 
 }

@@ -10,13 +10,12 @@ import server.decorators.flow.ResAPI;
 import server.features.user.controllers.GetUserCtrl;
 import server.router.RouterAPI;
 
-@RouterAPI
-@RequiredArgsConstructor
+@RouterAPI("/api/v1/user/profile") @RequiredArgsConstructor
 public class UserRouter {
 
     private final GetUserCtrl getCtrl;
 
-    @GetMapping("/user/profile")
+    @GetMapping
     public Mono<ResponseEntity<ResAPI>> getUserProfile(Api api) {
         return getCtrl.getUser(api);
     }
