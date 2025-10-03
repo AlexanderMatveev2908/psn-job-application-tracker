@@ -26,16 +26,16 @@ public class RegisterTest {
   @Autowired
   private WebTestClient web;
 
-  private ReqT req;
+  private ReqT mainReq;
 
   @BeforeEach
   void setup() {
-    req = ReqT.withUrl(web, URL);
+    mainReq = ReqT.withUrl(web, URL);
   }
 
   @Test
   void ok() {
-    ResT res = req.method(HttpMethod.POST).body(MyPayloads.register()).send();
+    ResT res = mainReq.method(HttpMethod.POST).body(MyPayloads.register()).send();
 
     MyAssrt.base(res, "user created", 201);
 
@@ -59,14 +59,14 @@ public class RegisterTest {
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status, Object bd) {
-    ResT res = req.method(HttpMethod.POST).body(bd).send();
+    ResT res = mainReq.method(HttpMethod.POST).body(bd).send();
 
     if (!msg.contains("already exists")) {
       MyAssrt.base(res, msg, status);
       return;
     }
 
-    ResT secondCall = req.method(HttpMethod.POST).body(bd).send();
+    ResT secondCall = mainReq.method(HttpMethod.POST).body(bd).send();
     MyAssrt.base(secondCall, msg, status);
 
   }

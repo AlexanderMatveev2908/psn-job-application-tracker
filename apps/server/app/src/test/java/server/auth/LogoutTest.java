@@ -25,18 +25,18 @@ public class LogoutTest {
 
   @Autowired
   private WebTestClient web;
-  private ReqT req;
+  private ReqT mainReq;
 
   @BeforeEach
   void setup() {
-    req = ReqT.withUrl(web, URL).method(HttpMethod.POST);
+    mainReq = ReqT.withUrl(web, URL).method(HttpMethod.POST);
   }
 
   @Test
   void ok() {
     ResT resTk = ReqT.grabTk(web);
 
-    ResT resLogout = req.jwt(resTk.getJwt()).send();
+    ResT resLogout = mainReq.jwt(resTk.getJwt()).send();
 
     MyAssrt.base(resLogout, 200);
   }
@@ -51,15 +51,15 @@ public class LogoutTest {
     ResT resTk = ReqT.grabTk(web, ExpArgT.JWT);
 
     if (msg.equals("jwt_expired"))
-      req.jwt(resTk.getJwt());
+      mainReq.jwt(resTk.getJwt());
     else if (msg.equals("jwt_not_provided"))
-      req.jwe(resTk.getJwe());
+      mainReq.jwe(resTk.getJwe());
 
     // ? a user with neither jwt or jwe at this point
     // ? first should not be present, but if exists has no sense block
     // ? if he want to go out alone
 
-    ResT resLogout = req.send();
+    ResT resLogout = mainReq.send();
 
     MyAssrt.base(resLogout, msg, status);
 

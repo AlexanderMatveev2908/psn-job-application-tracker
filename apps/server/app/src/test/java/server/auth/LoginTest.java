@@ -29,7 +29,7 @@ public class LoginTest {
 
   @Autowired
   private WebTestClient web;
-  private ReqT req;
+  private ReqT mainReq;
 
   @BeforeAll
   void register() {
@@ -39,12 +39,12 @@ public class LoginTest {
 
   @BeforeEach
   void setup() {
-    req = ReqT.withUrl(web, URL).method(HttpMethod.POST);
+    mainReq = ReqT.withUrl(web, URL).method(HttpMethod.POST);
   }
 
   @Test
   void ok() {
-    ResT res = req.body(MyPayloads.extractLoginForm(registerPayload)).send();
+    ResT res = mainReq.body(MyPayloads.extractLoginForm(registerPayload)).send();
 
     MyAssrt.base(res, "user logged", 200);
 
@@ -63,7 +63,7 @@ public class LoginTest {
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status, Object bd) {
 
-    ResT res = req.body(bd).send();
+    ResT res = mainReq.body(bd).send();
 
     MyAssrt.base(res, msg, status);
   }
