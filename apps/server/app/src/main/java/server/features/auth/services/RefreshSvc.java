@@ -31,7 +31,7 @@ public class RefreshSvc {
 
     String recomputed = hashMng.hmacHash(jwe);
 
-    return tokenRepo.findByHash(payload.userId(), TokenT.REFRESH, recomputed).flatMap(dbToken -> {
+    return tokenRepo.findByUserIdTypeHash(payload.userId(), TokenT.REFRESH, recomputed).flatMap(dbToken -> {
       String freshJwt = tkMng.genJwt(payload.userId());
       return Mono.just(freshJwt);
     }).switchIfEmpty(Mono.error(new ErrAPI("jwe_not_found", 401)));

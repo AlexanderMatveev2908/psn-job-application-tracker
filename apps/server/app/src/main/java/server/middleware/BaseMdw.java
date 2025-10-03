@@ -83,7 +83,7 @@ public abstract class BaseMdw implements WebFilter {
         try {
             MyTkPayload payload = tkMng.checkCbcHmac(token);
 
-            return tokenSvc.findByHash(payload.userId(), tokenT, hashMng.hmacHash(token))
+            return tokenSvc.findByUserIdTypeHash(payload.userId(), tokenT, hashMng.hmacHash(token))
                     .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_not_found", 401)))
                     .flatMap(dbToken -> userSvc.findById(dbToken.getUserId())
                             .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_invalid", 401))).map(dbUser -> {
@@ -96,9 +96,8 @@ public abstract class BaseMdw implements WebFilter {
             if (err instanceof ErrAPI errInst)
                 data = errInst.getData();
 
-            return (data != null && data.get("idCbcHmacRm") instanceof UUID tokenId)
-                    ? tokenSvc.delById(tokenId).then(Mono.error(err))
-                    : Mono.error(err);
+            return (data != null && data.get("idCbcHmacRm") instanceof UUID tokenId) ? tokenSvc.delById(tokenId)
+                    .then(Mono.error(new ErrAPI(err.getMessage(), ((ErrAPI) err).getStatus()))) : Mono.error(err);
         }
 
     }

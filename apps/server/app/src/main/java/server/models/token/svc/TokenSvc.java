@@ -39,8 +39,8 @@ public class TokenSvc {
         }).defaultIfEmpty(0);
     }
 
-    public Mono<MyToken> findByHash(UUID userId, TokenT tokenT, String hash) {
-        return repo.findByHash(userId, tokenT, hash);
+    public Mono<MyToken> findByUserIdTypeHash(UUID userId, TokenT tokenT, String hash) {
+        return repo.findByUserIdTypeHash(userId, tokenT, hash);
     }
 
 }
