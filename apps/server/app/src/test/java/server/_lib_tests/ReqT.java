@@ -116,7 +116,7 @@ public class ReqT {
     }
 
     public static ResT grabTk(WebTestClient web, TokenT tokenT, ExpArgT... expired) {
-        ReqT reqTokens = ReqT.withUrl(web, "/test/user").method(HttpMethod.GET);
+        ReqT reqTokens = ReqT.withUrl(web, "/test/user").method(HttpMethod.POST);
 
         if (tokenT != null)
             reqTokens.addQuery("tokenT", tokenT.getValue());

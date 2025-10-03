@@ -31,7 +31,7 @@ public class RefreshTest {
 
   @BeforeEach
   void setup() {
-    mainReq = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.GET);
+    mainReq = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.POST);
   }
 
   @Test

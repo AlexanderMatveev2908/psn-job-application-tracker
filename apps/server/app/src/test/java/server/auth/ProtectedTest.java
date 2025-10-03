@@ -19,13 +19,13 @@ import lombok.RequiredArgsConstructor;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
+import server._lib_tests.shapes.ExpArgT;
 import server.lib.data_structure.Prs;
 
 @SuppressWarnings({ "unused", "UseSpecificCatch",
     "CallToPrintStackTrace" }) @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
 public class ProtectedTest {
 
-  private final static String URL = "/test/user";
   private ResT resTok;
 
   @Autowired
@@ -33,13 +33,13 @@ public class ProtectedTest {
 
   @BeforeEach
   void setup() {
-    resTok = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.GET).send();
+    resTok = ReqT.grabTk(web, ExpArgT.JWT);
   }
 
   @Test
   void ok() {
 
-    ResT resTokens = ReqT.withUrl(web, URL).method(HttpMethod.GET).send();
+    ResT resTokens = ReqT.grabTk(web);
     ResT resProtected = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET).jwt(resTokens.getJwt()).send();
 
     MyAssrt.base(resProtected, "here you are protected data", 200);
