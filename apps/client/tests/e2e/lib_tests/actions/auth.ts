@@ -7,6 +7,7 @@ import { Browser, expect, Page } from "@playwright/test";
 import { genRegisterPayload, PayloadRegisterT } from "../conf/payloads";
 import { genPwd } from "@/core/lib/pwd";
 import { REG_JWT } from "@/core/constants/regex";
+import { isToastOk, preTest } from "../idx";
 
 export const registerUserOk = async (
   browser: Browser,
@@ -41,6 +42,31 @@ export const registerUserOk = async (
 
   return {
     payload,
+  };
+};
+
+export const loginUserOk = async (browser: Browser) => {
+  const payload = genRegisterPayload();
+
+  await registerUserOk(browser, payload);
+
+  const page = await preTest(browser, "auth/login");
+  const form = await getByID(page, "login__form");
+
+  const email = await getByID(form, "email");
+  email.fill(payload.email);
+
+  const pwd = await getByID(form, "password");
+  pwd.fill(payload.password);
+
+  await clickByID(form, "login__form__submit");
+
+  await waitURL(page, "/");
+
+  await isToastOk(page);
+  return {
+    payload,
+    page,
   };
 };
 
