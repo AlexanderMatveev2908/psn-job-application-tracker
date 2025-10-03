@@ -17,13 +17,13 @@ public record MyTkPayload(UUID userId, long iat, long exp) {
     try {
       Map<String, Object> obj = Prs.jsonToMap(json);
 
-      return fromObj(obj);
+      return fromMap(obj);
     } catch (Exception err) {
       throw new ErrAPI("jwt_invalid", 401);
     }
   }
 
-  public static MyTkPayload fromObj(Map<String, Object> obj) {
+  public static MyTkPayload fromMap(Map<String, Object> obj) {
     UUID usId = UUID.fromString((String) obj.get("userId"));
     long iat = Prs.fromAnyToLong(obj.get("iat"));
     long exp = Prs.fromAnyToLong(obj.get("exp"));

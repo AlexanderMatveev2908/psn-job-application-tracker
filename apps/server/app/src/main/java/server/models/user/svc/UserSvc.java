@@ -20,10 +20,7 @@ import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.etc.UserPop;
 
-@Service
-@Transactional
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "EI2" })
+@Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class UserSvc {
 
     private final UserRepo userRepo;
@@ -50,18 +47,15 @@ public class UserSvc {
     }
 
     public Mono<User> softDelete(UUID id) {
-        return userRepo.findById(id)
-                .flatMap(user -> {
-                    user.setDeletedAt(System.currentTimeMillis());
-                    return userRepo.save(user);
-                });
+        return userRepo.findById(id).flatMap(user -> {
+            user.setDeletedAt(System.currentTimeMillis());
+            return userRepo.save(user);
+        });
     }
 
     public Mono<Integer> hardDelete(UUID id) {
-        return userRepo.findById(id)
-                .flatMap(user -> userRepo.delete(user)
-                        .thenReturn(1)
-                        .doOnSuccess(v -> System.out.println("🔪 deleted 1 column")))
+        return userRepo.findById(id).flatMap(
+                user -> userRepo.delete(user).thenReturn(1).doOnSuccess(v -> System.out.println("🔪 deleted 1 column")))
                 .switchIfEmpty(Mono.defer(() -> {
                     System.out.println("🗑️ deleted 0 columns");
                     return Mono.just(0);
@@ -70,9 +64,15 @@ public class UserSvc {
 
     public Flux<User> findAll() {
         AtomicInteger counter = new AtomicInteger(0);
-        return userRepo.findAll()
-                .doOnNext(u -> counter.incrementAndGet())
+        return userRepo.findAll().doOnNext(u -> counter.incrementAndGet())
                 .doOnComplete(() -> System.out.println("Total users: " + counter.get()));
     }
 
+    public Mono<Integer> verifyUser(UUID userId) {
+        return userRepo.verifyUser(userId).map(res -> {
+            System.out.println("⚙️ rows updated => " + res);
+
+            return res;
+        });
+    }
 }

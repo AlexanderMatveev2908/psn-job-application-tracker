@@ -108,6 +108,13 @@ public final class Api extends ServerWebExchangeDecorator {
         return jwe;
     }
 
+    public String getCbcHmac() {
+        if (getParsedQuery().orElse(Map.of()).get("cbcHmacToken") instanceof String cbcHmac)
+            return cbcHmac;
+
+        return "";
+    }
+
     public User getUser() {
         return getAttribute("user");
     }

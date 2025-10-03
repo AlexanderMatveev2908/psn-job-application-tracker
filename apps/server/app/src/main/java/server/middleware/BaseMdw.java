@@ -1,6 +1,7 @@
 package server.middleware;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -14,9 +15,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
 import server.middleware.security.RateLimit;
+import server.models.token.etc.TokenT;
+import server.models.token.svc.TokenSvc;
 import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
@@ -28,6 +32,10 @@ public abstract class BaseMdw implements WebFilter {
     private TkMng tkMng;
     @Autowired
     private UserSvc userSvc;
+    @Autowired
+    private TokenSvc tokenSvc;
+    @Autowired
+    private MyHashMng hashMng;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -50,7 +58,7 @@ public abstract class BaseMdw implements WebFilter {
 
         MyTkPayload payload = tkMng.checkJwt(jwt);
 
-        return userSvc.findById(payload.userId()).switchIfEmpty(Mono.error(new ErrAPI("user not found", 404)))
+        return userSvc.findById(payload.userId()).switchIfEmpty(Mono.error(new ErrAPI("jwt_invalid", 401)))
                 .map(user -> {
                     api.setAttr("user", user);
                     return user;
@@ -64,6 +72,34 @@ public abstract class BaseMdw implements WebFilter {
 
     protected Mono<User> checkJwtOptional(Api api) {
         return checkJwt(api, false);
+    }
+
+    protected Mono<User> checkCbcHmac(Api api, TokenT tokenT) {
+        String token = api.getCbcHmac();
+
+        if (token.isBlank())
+            return Mono.error(new ErrAPI("cbc_hmac_not_provided", 401));
+
+        try {
+            MyTkPayload payload = tkMng.checkCbcHmac(token);
+
+            return tokenSvc.findByUserIdTypeHash(payload.userId(), tokenT, hashMng.hmacHash(token))
+                    .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_not_found", 401)))
+                    .flatMap(dbToken -> userSvc.findById(dbToken.getUserId())
+                            .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_invalid", 401))).map(dbUser -> {
+                                api.setAttr("user", dbUser);
+                                return dbUser;
+                            }));
+        } catch (Exception err) {
+            Map<String, Object> data = null;
+
+            if (err instanceof ErrAPI errInst)
+                data = errInst.getData();
+
+            return (data != null && data.get("idCbcHmacRm") instanceof UUID tokenId) ? tokenSvc.delById(tokenId)
+                    .then(Mono.error(new ErrAPI(err.getMessage(), ((ErrAPI) err).getStatus()))) : Mono.error(err);
+        }
+
     }
 
     protected Mono<Map<String, Object>> grabBody(Api api) {

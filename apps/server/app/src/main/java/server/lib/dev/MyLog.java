@@ -22,6 +22,11 @@ public final class MyLog {
     private static final String APP_PKG = "server";
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
 
+    public static void endLog() {
+        System.out.println("-".repeat(50));
+        System.out.println("\n");
+    }
+
     public static void logTtl(String title, Object... arg) {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
@@ -37,10 +42,11 @@ public final class MyLog {
         else
             System.out.printf("⏰ %s • 🗃️ %s • 🧵 %s%n", time, fileName, thread);
 
-        if (arg == null)
-            return;
-        for (Object v : arg)
-            System.out.println(v);
+        if (arg != null)
+            for (Object v : arg)
+                System.out.println(v);
+
+        endLog();
     }
 
     public static void log(Object... arg) {
@@ -51,7 +57,7 @@ public final class MyLog {
         System.out.printf("🔑 %s => 🖍️ %s%n", key, val);
     }
 
-    public static void logCols(List<String> cols) {
+    public static String logCols(List<String> cols) {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < cols.size(); i++) {
@@ -59,10 +65,8 @@ public final class MyLog {
             if ((i + 1) % 3 == 0)
                 sb.append("\n");
         }
-        if (cols.size() % 3 != 0)
-            sb.append("\n");
 
-        System.out.println(sb.toString());
+        return sb.toString();
     }
 
     public static void logErr(Throwable err) {
@@ -73,11 +77,10 @@ public final class MyLog {
             return;
         }
 
-        logTtl(err instanceof ErrAPI ? err.toString() : "💣 unexpected err");
+        System.out.println(err instanceof ErrAPI ? err.toString() : "💣 unexpected err");
+        System.out.println("\t");
 
         StackTraceElement[] frames = err.getStackTrace();
-
-        System.out.println("\t");
 
         for (StackTraceElement f : frames) {
             if (f.toString().startsWith("server")) {
@@ -94,14 +97,14 @@ public final class MyLog {
         System.out.printf("📝 msg => %s%n", msg);
         System.out.printf("📏 depth => %d%n", depth);
 
-        if (last == null)
-            return;
+        if (last != null) {
+            System.out.printf("💥 last file => 📁 %s%n", last.getFileName());
+            System.out.printf("📏 last line => %d%n", last.getLineNumber());
+            System.out.printf("👻 last cb name => %s%n", last.getMethodName());
+        }
 
-        System.out.printf("💥 last file => 📁 %s%n", last.getFileName());
-        System.out.printf("📏 last line => %d%n", last.getLineNumber());
-        System.out.printf("👻 last cb name => %s%n", last.getMethodName());
+        endLog();
 
-        System.out.println("\t");
     }
 
     public static void asyncLog(Path p, Object arg) {

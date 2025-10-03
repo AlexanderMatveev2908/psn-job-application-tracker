@@ -31,4 +31,16 @@ public class TokenSvc {
             return Mono.just(ids.size());
         });
     }
+
+    public Mono<Integer> delById(UUID id) {
+        return repo.delById(id).map(res -> {
+            System.out.println("🧹 token deleted => " + res);
+            return 1;
+        }).defaultIfEmpty(0);
+    }
+
+    public Mono<MyToken> findByUserIdTypeHash(UUID userId, TokenT tokenT, String hash) {
+        return repo.findByUserIdTypeHash(userId, tokenT, hash);
+    }
+
 }

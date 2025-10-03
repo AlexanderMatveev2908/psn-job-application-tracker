@@ -30,7 +30,7 @@ public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
         AND HASHED = :hashed
         LIMIT 1
       """)
-  Mono<MyToken> findByHash(UUID userId, TokenT tokenT, String hashed);
+  Mono<MyToken> findByUserIdTypeHash(UUID userId, TokenT tokenT, String hashed);
 
   @Query("""
       INSERT INTO tokens (user_id, token_type, alg_type, hashed, exp)
@@ -53,4 +53,11 @@ public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
       RETURNING id
       """)
   Flux<MyToken> deleteByUserIdAndTokenT(UUID userId, TokenT tokenT);
+
+  @Query("""
+      DELETE FROM tokens
+      WHERE id = :id
+      RETURNING id
+      """)
+  Mono<String> delById(UUID id);
 }
