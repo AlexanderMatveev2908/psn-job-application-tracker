@@ -41,7 +41,6 @@ public class PostTestCtrl {
         return testUserSvc.getUserTest(api).flatMap(data -> {
 
             ResponseCookie jweCk = ckMng.jweCookie((String) data.get("refreshToken"));
-            data.remove("refreshToken");
 
             return new ResAPI(200).msg("data test generated as requested").cookie(jweCk).data(data).build();
         });

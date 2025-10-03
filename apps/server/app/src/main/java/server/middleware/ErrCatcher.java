@@ -30,7 +30,7 @@ public class ErrCatcher implements WebExceptionHandler {
 
         MyLog.logErr(err);
 
-        String msg = Optional.of(err.getMessage()).orElse("");
+        String msg = Optional.ofNullable(err.getMessage()).orElse("");
         boolean isRouteNotFound = msg.equals("404 NOT_FOUND");
         if (isRouteNotFound) {
             String endpoint = exc.getRequest().getPath().value();

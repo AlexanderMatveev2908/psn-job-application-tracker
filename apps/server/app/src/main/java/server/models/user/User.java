@@ -88,4 +88,13 @@ public class User extends RootTable {
         return data;
     }
 
+    public static User fromTestPayload(Map<String, String> arg) {
+
+        try {
+            return new User(arg.get("firstName"), arg.get("lastName"), arg.get("email"), arg.get("password"));
+        } catch (Exception err) {
+            throw new ErrAPI("invalid data");
+        }
+    }
+
 }
