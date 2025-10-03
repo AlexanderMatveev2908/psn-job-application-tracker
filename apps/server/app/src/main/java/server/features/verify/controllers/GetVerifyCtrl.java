@@ -6,6 +6,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
@@ -18,7 +19,7 @@ import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.svc.UserRepo;
 
-@Component @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
 public class GetVerifyCtrl {
 
   private final UserRepo userRepo;

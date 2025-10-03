@@ -47,7 +47,7 @@ public final class LifeSpawn {
             MyLog.logTtl(String.format("server running on => %d... 🚀", e.getWebServer().getPort()),
                     String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
                     String.format("🧮 redis keys => %d", size),
-                    String.format("🗃️ db tables => \n%s", MyLog.logCols(tables)));
+                    String.format("🗃️ db tables => %n%s", MyLog.logCols(tables)));
 
         }).thenReturn(res)).subscribe(res -> {
         }, err -> MyLog.logErr(err));
