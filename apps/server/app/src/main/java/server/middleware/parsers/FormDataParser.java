@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import server.decorators.AppFile;
 import server.decorators.flow.Api;
-import server.decorators.flow.ErrAPI;
 import server.lib.paths.Hiker;
 
 @Component @Order(20)
@@ -32,7 +31,7 @@ public class FormDataParser implements WebFilter {
         var api = (Api) exc;
 
         if (!Hiker.existsDir())
-            throw new ErrAPI("missing required dirs");
+            Hiker.existsDir();
 
         return splitParts(api).flatMap(parts -> {
             CtxParse ctx = new CtxParse();

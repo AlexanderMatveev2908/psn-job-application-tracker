@@ -52,22 +52,18 @@ public final class Hiker {
             if (!Files.exists(CA_FILE))
                 Files.createFile(CA_FILE);
 
-        } catch (IOException e) {
+        } catch (IOException err) {
             throw new ErrAPI("err generating required app dirs");
         }
     }
 
     public static boolean existsDir() {
         try {
-            return Files.isDirectory(CERTS_DIR)
-                    && Files.isDirectory(IMAGES_DIR)
-                    && Files.isDirectory(VIDEOS_DIR)
-                    && Files.isDirectory(LOG_DIR)
-                    && Files.isRegularFile(LOG_FILE)
-                    && Files.isRegularFile(LOG_FILE_ERR)
-                    && Files.isRegularFile(CA_FILE)
-                    && Files.isRegularFile(MAIL_TMPL);
+            return Files.isDirectory(CERTS_DIR) && Files.isDirectory(IMAGES_DIR) && Files.isDirectory(VIDEOS_DIR)
+                    && Files.isDirectory(LOG_DIR) && Files.isRegularFile(LOG_FILE) && Files.isRegularFile(LOG_FILE_ERR)
+                    && Files.isRegularFile(CA_FILE) && Files.isRegularFile(MAIL_TMPL);
         } catch (Exception err) {
+
             return false;
         }
     }
