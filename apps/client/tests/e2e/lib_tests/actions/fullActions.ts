@@ -25,7 +25,7 @@ export const getTokensLib = async (
   const page = await preTest(browser, "/");
 
   const res = await page.request.post(
-    `${BASE_URL}/test/tokens-health?cbcHmacToken_t=${tokenType}&verify_user=${verifyUser}`,
+    `${BASE_URL}/test/user?tokenT=${tokenType}&verifyUser=${verifyUser}`,
     { data: payload }
   );
   const data = await res.json();
