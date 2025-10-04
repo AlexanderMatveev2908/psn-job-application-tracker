@@ -48,10 +48,7 @@ public class PostAuthCtrl {
 
     public Mono<ResponseEntity<ResAPI>> login(Api api) {
         return loginSvc.login((LoginForm) api.getMappedData()).flatMap(tpl -> {
-
-            ResponseCookie refreshCookie = myCookies.jweCookie(tpl.getT1());
-
-            return new ResAPI(200).msg("user logged").cookie(refreshCookie).data(Map.of("accessToken", tpl.getT2()))
+            return new ResAPI(200).msg("user logged").cookie(tpl.getT1()).data(Map.of("accessToken", tpl.getT2()))
                     .build();
         });
     }

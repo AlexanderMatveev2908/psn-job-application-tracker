@@ -26,7 +26,7 @@ public class TokenSvc {
     }
 
     public Mono<Integer> deleteByUserIdAndTokenT(UUID userId, TokenT tokenT) {
-        return repo.deleteByUserIdAndTokenT(userId, tokenT).collectList().flatMap(ids -> {
+        return repo.delByUserIdAndTokenT(userId, tokenT).collectList().flatMap(ids -> {
             System.out.println("🧹 tokens deleted => " + ids.size());
             return Mono.just(ids.size());
         });

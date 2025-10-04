@@ -58,8 +58,16 @@ public abstract class BaseMdw implements WebFilter {
         }).switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400)));
     }
 
+    protected Mono<Void> limit(Api api, int limit, int minutes) {
+        return rl.limit(api, limit, minutes);
+    }
+
+    protected Mono<Void> limit(Api api) {
+        return limit(api, 5, 15);
+    }
+
     protected Mono<Map<String, Object>> limitAndRef(Api api, int limit, int minutes) {
-        return rl.limit(api, limit, minutes).then(grabBody(api));
+        return limit(api, limit, minutes).then(grabBody(api));
     }
 
     protected Mono<Map<String, Object>> limitAndRef(Api api) {

@@ -1,7 +1,6 @@
 package server.lib.dev;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +9,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -108,19 +108,21 @@ public final class MyLog {
     }
 
     public static void asyncLog(Path p, Object arg) {
-
         logThread.submit(() -> {
-
             try (BufferedWriter bw = Files.newBufferedWriter(p, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING)) {
 
-                String json = Prs.toJson(arg);
+                String json;
+                if (arg instanceof Throwable err)
+                    json = Prs.toJson(Map.of("msg", err.getMessage(), "type", err.getClass().getSimpleName(), "time",
+                            LocalTime.now().toString()));
+                else
+                    json = Prs.toJson(arg);
 
                 bw.write(json);
                 bw.newLine();
-            } catch (IOException err) {
-                System.out.println("❌ err writing log.json file");
-
+            } catch (Exception err) {
+                System.out.println("❌ failed log");
             }
         });
     }
