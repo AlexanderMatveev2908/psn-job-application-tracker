@@ -16,9 +16,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
+import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
+import server._lib_tests.shapes.ExpArgT;
 import server.lib.data_structure.Prs;
 
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
@@ -27,11 +29,11 @@ public class RefreshTest {
 
   @Autowired
   private WebTestClient web;
-  private ReqT mainReq;
+  private GrabTk mainReq;
 
   @BeforeEach
   void setup() {
-    mainReq = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.POST);
+    mainReq = GrabTk.with(web).expired(ExpArgT.JWT);
   }
 
   @Test
@@ -40,7 +42,7 @@ public class RefreshTest {
 
     ResT resErr = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET).jwt(resTk.getJwt()).send();
 
-    MyAssrt.base(resErr, "jwt_expired", 401);
+    MyAssrt.base(resErr, 401, "jwt_expired");
 
     ResT resRefresh = ReqT.withUrl(web, URL).jwe(resTk.getJwe()).method(HttpMethod.GET).send();
 
@@ -57,7 +59,7 @@ public class RefreshTest {
   void err(String msg, int status) {
 
     if (msg.equals("jwe_expired"))
-      mainReq.addQuery("expired[]", "jwe");
+      mainReq.expired(ExpArgT.JWE);
 
     ResT resTk = mainReq.send();
 
@@ -81,7 +83,7 @@ public class RefreshTest {
 
     ResT resRefresh = reqRefresh.send();
 
-    MyAssrt.base(resRefresh, msg, status);
+    MyAssrt.base(resRefresh, status, msg);
 
   }
 }

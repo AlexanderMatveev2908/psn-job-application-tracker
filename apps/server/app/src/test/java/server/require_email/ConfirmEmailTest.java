@@ -1,5 +1,6 @@
-package server.auth;
+package server.require_email;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,18 +15,20 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
+import net.datafaker.Faker;
 import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
-import server._lib_tests.shapes.ExpArgT;
+import server.models.token.etc.TokenT;
 
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
-public class LogoutTest {
-  private final static String URL = "/auth/logout";
+public class ConfirmEmailTest {
+  private final static String URL = "/require-email/confirm-email";
 
   @Autowired
   private WebTestClient web;
+  private final Faker faker = new Faker();
   private ReqT mainReq;
 
   @BeforeEach
@@ -35,34 +38,32 @@ public class LogoutTest {
 
   @Test
   void ok() {
-    ResT resTk = GrabTk.with(web).send();
+    ResT resTk = GrabTk.with(web).tokenT(TokenT.CONF_EMAIL).send();
 
-    ResT resLogout = mainReq.jwt(resTk.getJwt()).send();
+    ResT resRequire = mainReq.body(Map.of("email", resTk.getUser().getEmail())).send();
 
-    MyAssrt.base(resLogout, 200);
+    MyAssrt.base(resRequire, 200, "email sent");
   }
 
   static Stream<Arguments> badCases() {
-    return Stream.of(Arguments.of("jwt_expired", 401), Arguments.of("jwt_not_provided", 401),
-        Arguments.of("logged out", 200));
+    return Stream.of(Arguments.of("user not found", 404), Arguments.of("user already verified", 409),
+        Arguments.of("email not provided", 400));
   }
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
-    ResT resTk = GrabTk.with(web).expired(ExpArgT.JWT).send();
 
-    if (msg.equals("jwt_expired"))
-      mainReq.jwt(resTk.getJwt());
-    else if (msg.equals("jwt_not_provided"))
-      mainReq.jwe(resTk.getJwe());
+    ResT resTk = GrabTk.with(web).send();
 
-    // ? a user with neither jwt or jwe at this point
-    // ? first should not be present, but if exists has no sense block
-    // ? if he want to go out alone
+    if (msg.contains("already verified"))
+      ReqT.withUrl(web, "/verify/confirm-email").method(HttpMethod.GET).addCbcHmac(resTk.getCbcHmac()).send();
 
-    ResT resLogout = mainReq.send();
+    var email = status == 404 ? faker.internet().emailAddress() : resTk.getUser().getEmail();
+    mainReq.body(Map.of(status == 400 ? "mail" : "email", email));
 
-    MyAssrt.base(resLogout, status, msg);
+    ResT resRequire = mainReq.send();
+
+    MyAssrt.base(resRequire, status, msg);
 
   }
 }
