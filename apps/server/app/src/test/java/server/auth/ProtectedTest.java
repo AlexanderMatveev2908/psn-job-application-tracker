@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
+import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
@@ -33,13 +34,13 @@ public class ProtectedTest {
 
   @BeforeEach
   void setup() {
-    resTok = ReqT.grabTk(web, ExpArgT.JWT);
+    resTok = GrabTk.with(web).expired(ExpArgT.JWT).send();
   }
 
   @Test
   void ok() {
 
-    ResT resTokens = ReqT.grabTk(web);
+    ResT resTokens = GrabTk.with(web).send();
     ResT resProtected = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET).jwt(resTokens.getJwt()).send();
 
     MyAssrt.base(resProtected, "here you are protected data", 200);

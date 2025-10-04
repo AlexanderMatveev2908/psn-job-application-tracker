@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
+import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
@@ -39,7 +40,7 @@ public class ConfirmEmail {
 
   @Test
   void ok() {
-    ResT resTk = ReqT.grabTk(web, TokenT.CONF_EMAIL);
+    ResT resTk = GrabTk.with(web).token(TokenT.CONF_EMAIL).send();
 
     ResT resVerify = mainReq.addQuery("cbcHmacToken", resTk.getCbcHmac()).send();
 
@@ -49,17 +50,28 @@ public class ConfirmEmail {
 
   static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("cbc_hmac_not_provided", 401), Arguments.of("cbc_hmac_expired", 401),
-        Arguments.of("cbc_hmac_invalid", 401));
+        Arguments.of("cbc_hmac_invalid", 401), Arguments.of("user already verified", 409),
+        Arguments.of("cbc_hmac_not_found", 401));
   }
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
 
-    ResT resTk = ReqT.grabTk(web, TokenT.CONF_EMAIL, ExpArgT.fromSplit(msg));
+    GrabTk reqTk = GrabTk.with(web).token(msg.equals("cbc_hmac_not_found") ? TokenT.RECOVER_PWD : TokenT.CONF_EMAIL)
+        .expired(ExpArgT.fromSplit(msg));
+
+    if (status == 409) {
+      ResT firstCall = GrabTk.with(web).token(TokenT.CONF_EMAIL).send();
+      ResT resVerifyFirstCall = ReqT.withUrl(web, URL).addQuery("cbcHmacToken", firstCall.getCbcHmac()).send();
+      MyAssrt.hasTokens(resVerifyFirstCall);
+
+      reqTk.existingPayload(firstCall.getUser());
+    }
+
+    ResT resTk = reqTk.send();
 
     if (!msg.equals("cbc_hmac_not_provided"))
       if (!msg.equals("cbc_hmac_invalid")) {
-
         mainReq.addQuery("cbcHmacToken", resTk.getCbcHmac());
       } else {
         String parts[] = resTk.getCbcHmac().split("\\.");

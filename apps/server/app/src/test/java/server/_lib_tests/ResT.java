@@ -63,7 +63,8 @@ public class ResT implements RootCls {
         return (String) getBd().get("msg");
     }
 
+    @SuppressWarnings({ "unchecked", })
     public User getUser() {
-        return (User) getBd().get("user");
+        return User.fromTestPayload((Map<String, Object>) getBd().get("user"));
     }
 }

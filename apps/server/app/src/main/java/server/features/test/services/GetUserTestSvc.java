@@ -51,11 +51,15 @@ public class GetUserTestSvc {
     return getInst(api).flatMap(dbUser -> handleTokens(dbUser, tokenT, expiredList));
   }
 
+  @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
   private Mono<User> getInst(Api api) {
-    return api.getBd(new TypeReference<Map<String, String>>() {
+    return api.getBd(new TypeReference<Map<String, Object>>() {
     }).flatMap(body -> {
 
-      User us = User.fromTestPayload(body);
+      if (body.get("existingPayload") == null)
+        return createUser();
+
+      User us = User.fromTestPayload((Map<String, Object>) body.get("existingPayload"));
 
       return userRepo.findByEmail(us.getEmail()).switchIfEmpty(Mono.error(new ErrAPI("received user not found", 400)))
           .flatMap(dbUser -> {
@@ -66,16 +70,17 @@ public class GetUserTestSvc {
               return dbUser;
             });
           });
-    }).switchIfEmpty(Mono.defer(() -> {
+    }).switchIfEmpty(createUser());
+  }
 
-      var us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
-          "8cLS4XY!{2Wdvl4*l^4");
+  private Mono<User> createUser() {
+    var us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
+        "8cLS4XY!{2Wdvl4*l^4");
 
-      return hashMng.argonHash(us.getPassword()).flatMap(hashed -> {
-        us.setPassword(hashed);
-        return userRepo.insert(us);
-      });
-    }));
+    return hashMng.argonHash(us.getPassword()).flatMap(hashed -> {
+      us.setPassword(hashed);
+      return userRepo.insert(us);
+    });
   }
 
   private Mono<Map<String, Object>> handleTokens(User dbUser, TokenT tokenT, Set<String> expiredList) {

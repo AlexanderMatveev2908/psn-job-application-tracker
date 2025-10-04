@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
+import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
@@ -34,7 +35,7 @@ public class LogoutTest {
 
   @Test
   void ok() {
-    ResT resTk = ReqT.grabTk(web);
+    ResT resTk = GrabTk.with(web).send();
 
     ResT resLogout = mainReq.jwt(resTk.getJwt()).send();
 
@@ -48,7 +49,7 @@ public class LogoutTest {
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
-    ResT resTk = ReqT.grabTk(web, ExpArgT.JWT);
+    ResT resTk = GrabTk.with(web).expired(ExpArgT.JWT).send();
 
     if (msg.equals("jwt_expired"))
       mainReq.jwt(resTk.getJwt());
