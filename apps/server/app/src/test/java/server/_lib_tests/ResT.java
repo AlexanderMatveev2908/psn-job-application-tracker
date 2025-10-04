@@ -3,6 +3,7 @@ package server._lib_tests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import server.decorators.RootCls;
+import server.models.user.User;
 
 import java.util.Map;
 
@@ -60,5 +61,10 @@ public class ResT implements RootCls {
 
     public String getMsg() {
         return (String) getBd().get("msg");
+    }
+
+    @SuppressWarnings({ "unchecked", })
+    public User getUser() {
+        return User.fromTestPayload((Map<String, Object>) getBd().get("user"));
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestBodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestHeadersSpec;
 
-import server._lib_tests.shapes.ExpArgT;
 import server.lib.dev.MyLog;
 
 public class ReqT {
@@ -89,26 +88,17 @@ public class ReqT {
         var res = ResT.of(req.exchange().expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
         }).returnResult());
 
-        System.out.println("\n");
-        MyLog.logTtl(url, "🚦 " + res.getStatus(), "📜 " + res.getHdrs(), "🍪 " + res.getCks());
+        if (url.startsWith("/api/v1/test/"))
+            return res;
+
+        System.out.println("🚦 " + url + " => " + res.getStatus());
+        System.out.println("📜 " + res.getHdrs());
+        System.out.println("🍪 " + res.getCks());
         res.getBd().forEach((k, v) -> MyLog.logKV(k, v));
-        System.out.println("\n");
+        MyLog.endLog();
         MyLog.wOk(res);
 
         return res;
     }
 
-    public static ResT grabTk(WebTestClient web) {
-        return ReqT.withUrl(web, "/test/user").method(HttpMethod.GET).send();
-    }
-
-    public static ResT grabTk(WebTestClient web, ExpArgT... expired) {
-        ReqT reqTokens = ReqT.withUrl(web, "/test/user").method(HttpMethod.GET);
-
-        for (ExpArgT exp : expired)
-            reqTokens.addQuery("expired[]", exp.getValue());
-
-        return reqTokens.send();
-
-    }
 }

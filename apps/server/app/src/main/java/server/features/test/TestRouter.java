@@ -28,9 +28,9 @@ public class TestRouter {
         return getCtrl.getProtectedData(api);
     }
 
-    @GetMapping("/user")
+    @PostMapping("/user")
     public Mono<ResponseEntity<ResAPI>> getUserTest(Api api) {
-        return getCtrl.getUserTest(api);
+        return postCtrl.getUserTest(api);
     }
 
     @GetMapping

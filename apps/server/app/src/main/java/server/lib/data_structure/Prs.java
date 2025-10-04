@@ -58,6 +58,10 @@ public final class Prs {
         return jsonToMap(hexToUtf8(arg));
     }
 
+    public static String mapToHex(Map<String, Object> arg) {
+        return binaryToHex(mapToBinary(arg));
+    }
+
     public static byte[] utf8ToBinary(String arg) {
         return arg.getBytes(StandardCharsets.UTF_8);
     }

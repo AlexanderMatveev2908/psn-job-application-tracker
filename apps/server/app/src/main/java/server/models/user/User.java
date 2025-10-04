@@ -88,4 +88,23 @@ public class User extends RootTable {
         return data;
     }
 
+    public static User fromTestPayload(Map<String, Object> arg) {
+        try {
+            if (arg == null)
+                throw new ErrAPI("user null");
+
+            String firstName = (String) arg.get("firstName");
+            String lastName = (String) arg.get("lastName");
+            String email = (String) arg.get("email");
+            String password = (String) arg.get("password");
+
+            if (firstName == null || lastName == null || email == null || password == null)
+                throw new ErrAPI("missing user fields");
+
+            return new User(firstName, lastName, email, password);
+        } catch (Exception err) {
+            throw new ErrAPI("invalid test data");
+        }
+    }
+
 }

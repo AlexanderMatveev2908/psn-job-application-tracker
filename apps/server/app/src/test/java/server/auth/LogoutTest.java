@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
+import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
@@ -25,18 +26,18 @@ public class LogoutTest {
 
   @Autowired
   private WebTestClient web;
-  private ReqT req;
+  private ReqT mainReq;
 
   @BeforeEach
   void setup() {
-    req = ReqT.withUrl(web, URL).method(HttpMethod.POST);
+    mainReq = ReqT.withUrl(web, URL).method(HttpMethod.POST);
   }
 
   @Test
   void ok() {
-    ResT resTk = ReqT.grabTk(web);
+    ResT resTk = GrabTk.with(web).send();
 
-    ResT resLogout = req.jwt(resTk.getJwt()).send();
+    ResT resLogout = mainReq.jwt(resTk.getJwt()).send();
 
     MyAssrt.base(resLogout, 200);
   }
@@ -48,18 +49,18 @@ public class LogoutTest {
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
-    ResT resTk = ReqT.grabTk(web, ExpArgT.JWT);
+    ResT resTk = GrabTk.with(web).expired(ExpArgT.JWT).send();
 
     if (msg.equals("jwt_expired"))
-      req.jwt(resTk.getJwt());
+      mainReq.jwt(resTk.getJwt());
     else if (msg.equals("jwt_not_provided"))
-      req.jwe(resTk.getJwe());
+      mainReq.jwe(resTk.getJwe());
 
     // ? a user with neither jwt or jwe at this point
     // ? first should not be present, but if exists has no sense block
     // ? if he want to go out alone
 
-    ResT resLogout = req.send();
+    ResT resLogout = mainReq.send();
 
     MyAssrt.base(resLogout, msg, status);
 

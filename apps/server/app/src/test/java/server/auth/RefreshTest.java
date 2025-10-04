@@ -27,16 +27,16 @@ public class RefreshTest {
 
   @Autowired
   private WebTestClient web;
-  private ReqT req;
+  private ReqT mainReq;
 
   @BeforeEach
   void setup() {
-    req = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.GET);
+    mainReq = ReqT.withUrl(web, "/test/user").addQuery("expired[]", "jwt").method(HttpMethod.POST);
   }
 
   @Test
   void ok() {
-    ResT resTk = req.send();
+    ResT resTk = mainReq.send();
 
     ResT resErr = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET).jwt(resTk.getJwt()).send();
 
@@ -57,9 +57,9 @@ public class RefreshTest {
   void err(String msg, int status) {
 
     if (msg.equals("jwe_expired"))
-      req.addQuery("expired[]", "jwe");
+      mainReq.addQuery("expired[]", "jwe");
 
-    ResT resTk = req.send();
+    ResT resTk = mainReq.send();
 
     ReqT reqRefresh = ReqT.withUrl(web, URL).method(HttpMethod.GET);
 

@@ -60,4 +60,11 @@ public interface TokenRepo extends ReactiveCrudRepository<MyToken, UUID> {
       RETURNING id
       """)
   Mono<String> delById(UUID id);
+
+  @Query("""
+      DELETE FROM tokens
+      WHERE user_id = :userId
+      RETURNING id
+      """)
+  Flux<String> delByUserId(UUID userId);
 }
