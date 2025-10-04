@@ -10,7 +10,6 @@ export interface GetTokensReturnT {
   accessToken: string;
   user: UserT;
   cbcHmacToken: string;
-  payload: PayloadRegisterT;
   page: Page;
 }
 
