@@ -15,6 +15,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.lib.security.hash.MyHashMng;
@@ -48,55 +49,63 @@ public class GetUserTestSvc {
         ? argExp.stream().map(Object::toString).collect(Collectors.toSet())
         : Set.of();
 
-    return getInst(api).flatMap(dbUser -> handleTokens(dbUser, tokenT, expiredList));
+    return getInst(api).flatMap(tpl -> handleTokens(tpl, tokenT, expiredList));
   }
 
   @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
-  private Mono<User> getInst(Api api) {
+  private Mono<Tuple2<User, String>> getInst(Api api) {
     return api.getBd(new TypeReference<Map<String, Object>>() {
     }).flatMap(body -> {
+      var existingPayload = (Map<String, Object>) body.get("existingPayload");
 
-      if (body.get("existingPayload") == null)
+      if (existingPayload == null)
         return createUser();
 
-      User us = User.fromTestPayload((Map<String, Object>) body.get("existingPayload"));
+      User us = User.fromTestPayload(existingPayload);
 
       return userRepo.findByEmail(us.getEmail()).switchIfEmpty(Mono.error(new ErrAPI("received user not found", 400)))
           .flatMap(dbUser -> {
 
-            return tokenRepo.delByUserId(dbUser.getId()).collectList().map(ids -> {
+            return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
               System.out.println("🧹 tokens deleted deleted => " + ids.size());
 
-              return dbUser;
+              String plainPwd = "";
+              if (existingPayload.get("plainPwd") instanceof String plainPwdStr)
+                plainPwd = plainPwdStr;
+
+              return Mono.zip(Mono.just(dbUser), Mono.just(plainPwd));
             });
           });
     }).switchIfEmpty(createUser());
   }
 
-  private Mono<User> createUser() {
-    var us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
-        "8cLS4XY!{2Wdvl4*l^4");
+  private Mono<Tuple2<User, String>> createUser() {
+    var plainPwd = "8cLS4XY!{2Wdvl4*l^4";
+    var us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), plainPwd);
 
     return hashMng.argonHash(us.getPassword()).flatMap(hashed -> {
       us.setPassword(hashed);
-      return userRepo.insert(us);
+      return Mono.zip(userRepo.insert(us), Mono.just(plainPwd));
     });
   }
 
-  private Mono<Map<String, Object>> handleTokens(User dbUser, TokenT tokenT, Set<String> expiredList) {
+  private Mono<Map<String, Object>> handleTokens(Tuple2<User, String> tpl, TokenT tokenT, Set<String> expiredList) {
 
+    User dbUser = tpl.getT1();
+    String plainPwd = tpl.getT2();
     String jwt = myJwt.create(dbUser.getId(), expiredList.contains("jwt"));
     RecCreateJweReturnT recJwe = myJwe.create(dbUser.getId(), expiredList.contains("jwe"));
     RecCreateCbcHmacReturnT recCbcHmac = myCbcHmac.create(tokenT, dbUser.getId(), expiredList.contains("cbc_hmac"));
 
-    return Mono.zip(tokenRepo.insert(recJwe.inst()), tokenRepo.insertWithId(recCbcHmac.inst())).map(tpl -> {
+    return Mono.zip(tokenRepo.insert(recJwe.inst()), tokenRepo.insertWithId(recCbcHmac.inst())).map(tplTokens -> {
       Map<String, Object> payload = new LinkedHashMap<>();
       payload.put("user", dbUser);
+      payload.put("plainPwd", plainPwd);
       payload.put("accessToken", jwt);
       payload.put("refreshToken", recJwe.clientToken());
       payload.put("cbcHmacToken", recCbcHmac.clientToken());
-      payload.put("refreshTokenDb", tpl.getT1());
-      payload.put("cbcHmacTokenDb", tpl.getT2());
+      payload.put("refreshTokenDb", tplTokens.getT1());
+      payload.put("cbcHmacTokenDb", tplTokens.getT2());
       return payload;
     });
   }
