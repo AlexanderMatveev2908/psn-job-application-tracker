@@ -60,7 +60,10 @@ public final class Api extends ServerWebExchangeDecorator {
     }
 
     public boolean isSamePath(String arg) {
-        return getPath().equals(arg);
+        if (arg == null)
+            return false;
+
+        return getPath().equals(arg.split("\\?", 2)[0]);
     }
 
     public HttpMethod getMethod() {
