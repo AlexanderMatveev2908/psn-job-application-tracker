@@ -15,8 +15,7 @@ public class PostRequireEmail {
 
   private final RequireConfEmailSvc requireConfEmailSvc;
 
-  public Mono<ResponseEntity<ResAPI>> confirmEmail(Api api) {
+  public Mono<ResponseEntity<ResAPI>> requireMailConfMail(Api api) {
     return requireConfEmailSvc.mng(api).then(new ResAPI(200).msg("email sent").build());
-
   }
 }
