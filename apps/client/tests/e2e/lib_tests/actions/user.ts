@@ -14,7 +14,7 @@ import { genMailNoticeMsg } from "@/core/constants/etc";
 import { TokenT } from "@/common/types/tokens";
 
 export const getAccessManageAcc = async (browser: Browser) => {
-  const { payload, page } = await getTokensLib(browser, {});
+  const { user, page, plainPwd } = await getTokensLib(browser, {});
 
   await goPage(page, "/user/manage-account");
 
@@ -24,7 +24,7 @@ export const getAccessManageAcc = async (browser: Browser) => {
 
   const pwd = await getByID(form, "password");
 
-  await pwd.fill(payload.password);
+  await pwd.fill(plainPwd);
   await clickByID(form, "manage_acc__form__submit");
 
   await waitURL(page, "/user/manage-account");
@@ -34,14 +34,14 @@ export const getAccessManageAcc = async (browser: Browser) => {
   const container = await getByID(page, "manage_acc__form");
 
   return {
-    payload,
+    user,
     page,
     container,
   };
 };
 
 export const changeEmailOk = async (browser: Browser) => {
-  const { page, container, payload } = await getAccessManageAcc(browser);
+  const { page, container, user } = await getAccessManageAcc(browser);
 
   const newEmail = faker.internet.email();
 
@@ -57,12 +57,12 @@ export const changeEmailOk = async (browser: Browser) => {
   await getByTxt(page, genMailNoticeMsg("to change your email address"));
 
   return {
-    payload,
+    payload: user,
   };
 };
 
 export const getAccessManageAccVerified = async (browser: Browser) => {
-  const { page, payload, ...rst } = await getTokensLib(browser, {
+  const { page, user, plainPwd, ...rst } = await getTokensLib(browser, {
     tokenType: TokenT.MANAGE_ACC,
     verifyUser: true,
   });
@@ -72,7 +72,7 @@ export const getAccessManageAccVerified = async (browser: Browser) => {
 
   const form = await getByID(page, "manage_acc__form");
 
-  await (await getByID(form, "password")).fill(payload.password);
+  await (await getByID(form, "password")).fill(plainPwd);
   await clickByID(form, "manage_acc__form__submit");
   await waitURL(page, "/user/manage-account");
 
@@ -90,7 +90,7 @@ export const getAccessManageAccVerified = async (browser: Browser) => {
   return {
     ...rst,
     page,
-    payload,
+    payload: user,
     swap,
   };
 };

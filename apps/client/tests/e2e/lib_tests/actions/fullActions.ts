@@ -10,6 +10,7 @@ export interface GetTokensReturnT {
   accessToken: string;
   user: UserT;
   cbcHmacToken: string;
+  plainPwd: string;
   page: Page;
 }
 
