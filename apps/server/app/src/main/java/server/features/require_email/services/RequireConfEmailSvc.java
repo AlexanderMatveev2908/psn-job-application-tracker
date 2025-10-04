@@ -15,6 +15,6 @@ public class RequireConfEmailSvc {
   private final TokenComboSvc tokenCombo;
 
   public Mono<Void> mng(Api api) {
-    return tokenCombo.insertCbcHmacWithMail(api, TokenT.CONF_EMAIL);
+    return tokenCombo.insertCbcHmacWithMail(api.getUser(), TokenT.CONF_EMAIL);
   }
 }

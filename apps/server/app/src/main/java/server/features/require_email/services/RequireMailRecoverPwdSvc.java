@@ -15,6 +15,6 @@ public class RequireMailRecoverPwdSvc {
   private final TokenComboSvc tokenCombo;
 
   public Mono<Void> mng(Api api) {
-    return tokenCombo.insertCbcHmacWithMail(api, TokenT.RECOVER_PWD);
+    return tokenCombo.insertCbcHmacWithMail(api.getUser(), TokenT.RECOVER_PWD);
   }
 }

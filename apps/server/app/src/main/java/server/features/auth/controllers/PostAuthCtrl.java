@@ -2,7 +2,6 @@ package server.features.auth.controllers;
 
 import java.util.Map;
 
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +38,7 @@ public class PostAuthCtrl {
             return registerSvc.register(us);
         }).flatMap(tpl -> {
 
-            ResponseCookie refreshCookie = myCookies.jweCookie(tpl.getT1());
-
-            return new ResAPI(201).msg("user created").data(Map.of("accessToken", tpl.getT2())).cookie(refreshCookie)
+            return new ResAPI(201).msg("user created").data(Map.of("accessToken", tpl.getT2())).cookie(tpl.getT1())
                     .build();
         });
     }

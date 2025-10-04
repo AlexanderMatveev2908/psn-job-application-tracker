@@ -19,13 +19,13 @@ public class PostRequireEmail {
   private final TokenComboSvc tokensCombo;
 
   public Mono<ResponseEntity<ResAPI>> requireMailConfMail(Api api) {
-    return db.trxMono((cnt) -> tokensCombo.insertCbcHmacWithMail(api, TokenT.CONF_EMAIL))
+    return db.trxMono((cnt) -> tokensCombo.insertCbcHmacWithMail(api.getUser(), TokenT.CONF_EMAIL))
         .then(new ResAPI(200).msg("email sent").build());
 
   }
 
   public Mono<ResponseEntity<ResAPI>> recoverPwd(Api api) {
-    return db.trxMono((cnt) -> tokensCombo.insertCbcHmacWithMail(api, TokenT.RECOVER_PWD))
+    return db.trxMono((cnt) -> tokensCombo.insertCbcHmacWithMail(api.getUser(), TokenT.RECOVER_PWD))
         .then(new ResAPI(200).msg("email sent").build());
   }
 }

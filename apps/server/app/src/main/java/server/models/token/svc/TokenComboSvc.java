@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
-import server.decorators.flow.Api;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
@@ -42,8 +41,7 @@ public class TokenComboSvc {
     });
   }
 
-  public Mono<Void> insertCbcHmacWithMail(Api api, TokenT tokenT) {
-    var user = api.getUser();
+  public Mono<Void> insertCbcHmacWithMail(User user, TokenT tokenT) {
 
     var recCbcHmac = tkMng.genCbcHmac(tokenT, user.getId());
 
