@@ -162,6 +162,22 @@ public final class Api extends ServerWebExchangeDecorator {
 
     }
 
+    public <T> void setMappedDataAttr(T data) {
+        setAttr("mappedData", data);
+    }
+
+    public void setParsedQueryAttr(Map<String, Object> parsed) {
+        setAttr("parsedQuery", parsed);
+    }
+
+    public void setParsedFormAttr(Map<String, Object> parsed) {
+        setAttr("parsedForm", parsed);
+    }
+
+    public void setUserAttr(User user) {
+        setAttr("user", user);
+    }
+
     // ? the middleware FormChecker after parsed the body to Map<String,Object>
     // ? has checked with Hibernate validator that the body respect shape
     // ? expected defined in a separate class.

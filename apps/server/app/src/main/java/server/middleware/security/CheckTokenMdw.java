@@ -40,7 +40,7 @@ public class CheckTokenMdw {
     MyTkPayload payload = tkMng.checkJwt(jwt);
 
     return userSvc.findById(payload.userId()).switchIfEmpty(Mono.error(new ErrAPI("jwt_invalid", 401))).map(user -> {
-      api.setAttr("user", user);
+      api.setUserAttr(user);
       return user;
     });
   }
@@ -58,7 +58,7 @@ public class CheckTokenMdw {
           .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_not_found", 401)))
           .flatMap(dbToken -> userSvc.findById(dbToken.getUserId())
               .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_invalid", 401))).map(dbUser -> {
-                api.setAttr("user", dbUser);
+                api.setUserAttr(dbUser);
                 return dbUser;
               }));
     } catch (Exception err) {

@@ -13,13 +13,11 @@ import reactor.core.scheduler.Schedulers;
 import server.conf.env_conf.EnvKeeper;
 import server.conf.env_conf.etc.EnvMode;
 import server.conf.mail.etc.MailTmpl;
-import server.conf.mail.etc.SubjEmailT;
 import server.decorators.flow.ErrAPI;
+import server.models.token.etc.TokenT;
 import server.models.user.User;
 
-@Service
-@RequiredArgsConstructor
-@SuppressFBWarnings({ "EI2" })
+@Service @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class MailSvc {
 
     private final JavaMailSender mailSender;
@@ -36,7 +34,7 @@ public class MailSvc {
         mailSender.send(msg);
     }
 
-    public void sendHtmlMail(SubjEmailT subject, User user, String clientToken) {
+    public void sendHtmlMail(TokenT tokenT, User user, String clientToken) {
         MimeMessage msg = mailSender.createMimeMessage();
 
         try {
@@ -45,7 +43,7 @@ public class MailSvc {
 
             helper.setFrom(envKeeper.getNextPblSmptFrom());
             helper.setTo(user.getEmail());
-            helper.setSubject(subject.getValue());
+            helper.setSubject(tokenT.getSubject());
             helper.setText(mailTmpl.replacePlaceholder(user.getFirstName(), clientToken), true);
 
             if (!envKeeper.getEnvMode().equals(EnvMode.TEST))
@@ -57,8 +55,8 @@ public class MailSvc {
     }
 
     public Mono<Void> sendRctTxtMail(String to, String subject, String text) {
-        return Mono.fromRunnable(() -> sendTxtMail(to, subject, text))
-                .subscribeOn(Schedulers.boundedElastic()).doOnSuccess((nl) -> {
+        return Mono.fromRunnable(() -> sendTxtMail(to, subject, text)).subscribeOn(Schedulers.boundedElastic())
+                .doOnSuccess((nl) -> {
                     System.out.println("📫 mail sent");
                 }).onErrorResume((err) -> {
                     System.out.println("❌ err sending mail");
@@ -67,8 +65,8 @@ public class MailSvc {
                 }).then();
     }
 
-    public Mono<Void> sendRctHtmlMail(SubjEmailT subject, User user, String clientToken) {
-        return Mono.fromRunnable(() -> sendHtmlMail(subject, user, clientToken)).doOnSuccess((nl) -> {
+    public Mono<Void> sendRctHtmlMail(TokenT tokenT, User user, String clientToken) {
+        return Mono.fromRunnable(() -> sendHtmlMail(tokenT, user, clientToken)).doOnSuccess((nl) -> {
             System.out.println("📫 mail sent");
         }).onErrorResume((err) -> {
             System.out.println("❌ err sending mail");

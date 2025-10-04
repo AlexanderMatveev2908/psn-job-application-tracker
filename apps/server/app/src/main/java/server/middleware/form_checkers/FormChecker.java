@@ -21,7 +21,7 @@ public class FormChecker {
         Set<ConstraintViolation<T>> errs = checker.validate(form);
 
         if (errs.isEmpty())
-            return Mono.fromRunnable(() -> api.setAttr("mappedData", form));
+            return Mono.fromRunnable(() -> api.setMappedDataAttr(form));
 
         List<Map<String, String>> errors = errs.stream()
                 .map(err -> Map.of("field", err.getPropertyPath().toString(), "msg", err.getMessage())).toList();

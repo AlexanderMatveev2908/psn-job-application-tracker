@@ -11,8 +11,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 
-@Component
-@Order(30)
+@Component @Order(30)
 public class QueryParserMdw implements WebFilter {
 
     @Override
@@ -22,7 +21,7 @@ public class QueryParserMdw implements WebFilter {
         String query = api.getQuery();
         Map<String, Object> parsedQuery = ParserManager.nestDict(query);
 
-        api.setAttr("parsedQuery", parsedQuery);
+        api.setParsedQueryAttr(parsedQuery);
 
         return chain.filter(api);
     }

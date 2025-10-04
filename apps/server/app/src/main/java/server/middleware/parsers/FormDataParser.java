@@ -24,8 +24,7 @@ import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.lib.paths.Hiker;
 
-@Component
-@Order(20)
+@Component @Order(20)
 public class FormDataParser implements WebFilter {
 
     @Override
@@ -35,30 +34,27 @@ public class FormDataParser implements WebFilter {
         if (!Hiker.existsDir())
             throw new ErrAPI("missing required dirs");
 
-        return splitParts(api)
-                .flatMap(parts -> {
-                    CtxParse ctx = new CtxParse();
-                    Arrays.stream(parts).forEach(prt -> handlePart(prt, ctx));
+        return splitParts(api).flatMap(parts -> {
+            CtxParse ctx = new CtxParse();
+            Arrays.stream(parts).forEach(prt -> handlePart(prt, ctx));
 
-                    if (ctx.sb.length() > 0)
-                        ctx.sb.setLength(ctx.sb.length() - 1);
+            if (ctx.sb.length() > 0)
+                ctx.sb.setLength(ctx.sb.length() - 1);
 
-                    Map<String, Object> parsedForm = ParserManager.nestDict(ctx.sb.toString());
-                    parsedForm.put("images", ctx.images);
-                    parsedForm.put("videos", ctx.videos);
+            Map<String, Object> parsedForm = ParserManager.nestDict(ctx.sb.toString());
+            parsedForm.put("images", ctx.images);
+            parsedForm.put("videos", ctx.videos);
 
-                    api.setAttr("parsedForm", parsedForm);
+            api.setParsedFormAttr(parsedForm);
 
-                    return Mono.when(ctx.promises.isEmpty() ? Mono.empty() : Mono.when(ctx.promises))
-                            .then(chain.filter(api));
+            return Mono.when(ctx.promises.isEmpty() ? Mono.empty() : Mono.when(ctx.promises)).then(chain.filter(api));
 
-                })
-                .switchIfEmpty(Mono.defer(() ->
-                // ? flatMap above will fallback in this block if
-                // ? • no form data => all ok as usual
-                // ? • form actually exists but returning Mono.empty() or Mono<Void> trigger
-                // ? flatMap to fallback to another Publisher
-                api.isResCmt() ? Mono.empty() : chain.filter(api)));
+        }).switchIfEmpty(Mono.defer(() ->
+        // ? flatMap above will fallback in this block if
+        // ? • no form data => all ok as usual
+        // ? • form actually exists but returning Mono.empty() or Mono<Void> trigger
+        // ? flatMap to fallback to another Publisher
+        api.isResCmt() ? Mono.empty() : chain.filter(api)));
 
     }
 
@@ -69,14 +65,13 @@ public class FormDataParser implements WebFilter {
 
         String boundary = "--" + contentType.split("boundary=")[1];
 
-        return api.getRawBd()
-                .flatMap(raw -> {
-                    if (raw.length == 0)
-                        return Mono.empty();
+        return api.getRawBd().flatMap(raw -> {
+            if (raw.length == 0)
+                return Mono.empty();
 
-                    String txtBody = new String(raw, StandardCharsets.ISO_8859_1);
-                    return Mono.just(txtBody.split(Pattern.quote(boundary)));
-                });
+            String txtBody = new String(raw, StandardCharsets.ISO_8859_1);
+            return Mono.just(txtBody.split(Pattern.quote(boundary)));
+        });
     }
 
     private void handlePart(String prt, CtxParse ctx) {
@@ -91,13 +86,9 @@ public class FormDataParser implements WebFilter {
         if (part.headers.contains("filename=")) {
             handleAssetPart(part, ctx);
         } else {
-            String val = new String(
-                    part.body.getBytes(StandardCharsets.ISO_8859_1),
-                    StandardCharsets.UTF_8).trim();
-            ctx.sb.append(URLEncoder.encode(part.name, StandardCharsets.UTF_8))
-                    .append("=")
-                    .append(URLEncoder.encode(val, StandardCharsets.UTF_8))
-                    .append("&");
+            String val = new String(part.body.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).trim();
+            ctx.sb.append(URLEncoder.encode(part.name, StandardCharsets.UTF_8)).append("=")
+                    .append(URLEncoder.encode(val, StandardCharsets.UTF_8)).append("&");
         }
     }
 
@@ -108,8 +99,7 @@ public class FormDataParser implements WebFilter {
         boolean isImage = part.name.equals("images");
         handleAsset(part).ifPresent(asset -> {
 
-            Mono<Void> prm = Mono.<Void>fromRunnable(asset::saveLocally)
-                    .subscribeOn(Schedulers.boundedElastic());
+            Mono<Void> prm = Mono.<Void>fromRunnable(asset::saveLocally).subscribeOn(Schedulers.boundedElastic());
 
             ctx.promises.add(prm);
 
@@ -131,13 +121,11 @@ public class FormDataParser implements WebFilter {
             return Optional.empty();
 
         byte[] rawFile = part.body.getBytes(StandardCharsets.ISO_8859_1);
-        return Optional.of(new AppFile(part.name, filename, contentTypePart,
-                rawFile));
+        return Optional.of(new AppFile(part.name, filename, contentTypePart, rawFile));
     }
 
     public static String findPattern(String key, String headers) {
-        Matcher m = Pattern.compile(String.format("%s=\"([^\"]+)\"",
-                Pattern.quote(key))).matcher(headers);
+        Matcher m = Pattern.compile(String.format("%s=\"([^\"]+)\"", Pattern.quote(key))).matcher(headers);
         return !m.find() ? null : m.group(1);
     }
 }
