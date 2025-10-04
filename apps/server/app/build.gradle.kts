@@ -137,14 +137,14 @@ tasks.named<Test>("test") {
 }
 
 testlogger {
-     theme = ThemeType.MOCHA
+    theme = ThemeType.MOCHA
     showPassed = false   
     showSkipped = false
     showFailed = true    
-    showExceptions = false
-    showCauses = false
-    showStackTraces = false
+    showExceptions = true
+    showCauses = true
     showStandardStreams = true
+    showStackTraces = false
 }
 
 tasks.named<BootJar>("bootJar") {

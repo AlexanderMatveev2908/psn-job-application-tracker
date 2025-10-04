@@ -43,7 +43,7 @@ public class ProtectedTest {
     ResT resTokens = GrabTk.with(web).send();
     ResT resProtected = ReqT.withUrl(web, "/test/protected").method(HttpMethod.GET).jwt(resTokens.getJwt()).send();
 
-    MyAssrt.base(resProtected, "here you are protected data", 200);
+    MyAssrt.base(resProtected, 200, "here you are protected data");
   }
 
   static Stream<Arguments> badCases() {
@@ -71,6 +71,6 @@ public class ProtectedTest {
 
     ResT resProtected = reqProtected.send();
 
-    MyAssrt.base(resProtected, msg, status);
+    MyAssrt.base(resProtected, status, msg);
   }
 }

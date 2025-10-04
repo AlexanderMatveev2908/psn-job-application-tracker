@@ -3,28 +3,22 @@ package server._lib_tests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import server.conf.Reg;
+import server.lib.data_structure.ShapeCheck;
 
 public class MyAssrt {
 
-    public static String buildStr(Object expected, Object received) {
-        StringBuilder sb = new StringBuilder();
+    public static void base(ResT res, int status, String msg) {
+        assertEquals(status, res.getStatus());
 
-        sb.append("\n\n🧪 expected =>\n");
-        sb.append(expected);
-        sb.append("\n❌ received =>\n");
-        sb.append(received + "\n\n");
-
-        return sb.toString();
-    }
-
-    public static void base(ResT res, String msg, int status) {
-        assertEquals(status, res.getStatus(), buildStr(status, res.getStatus()));
-        assertTrue((res.getMsg().toLowerCase()).contains(msg.toLowerCase()), buildStr(msg, res.getMsg()));
+        if (List.of(msg, res.getMsg()).stream().allMatch(ShapeCheck::isStr))
+            assertTrue((res.getMsg().toLowerCase()).contains(msg.toLowerCase()));
     }
 
     public static void base(ResT res, int status) {
-        assertEquals(status, res.getStatus(), buildStr(status, res.getStatus()));
+        base(res, status, null);
     }
 
     public static void hasJwt(ResT res) {

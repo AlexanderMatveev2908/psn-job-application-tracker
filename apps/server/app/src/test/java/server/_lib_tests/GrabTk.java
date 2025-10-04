@@ -1,7 +1,6 @@
 package server._lib_tests;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,13 +25,13 @@ public class GrabTk {
     return new GrabTk(web);
   }
 
-  public GrabTk token(TokenT tokenT) {
+  public GrabTk tokenT(TokenT tokenT) {
     this.tokenT = tokenT;
     return this;
   }
 
-  public GrabTk expired(ExpArgT... args) {
-    this.expired.addAll(Arrays.asList(args));
+  public GrabTk expired(ExpArgT arg) {
+    this.expired.add(arg);
     return this;
   }
 

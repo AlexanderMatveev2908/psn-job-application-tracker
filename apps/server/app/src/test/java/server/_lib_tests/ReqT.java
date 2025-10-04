@@ -64,6 +64,11 @@ public class ReqT {
         return this;
     }
 
+    public ReqT addCbcHmac(String token) {
+        this.addQuery("cbcHmacToken", token);
+        return this;
+    }
+
     public ResT send() {
         String fullUrl = url;
 

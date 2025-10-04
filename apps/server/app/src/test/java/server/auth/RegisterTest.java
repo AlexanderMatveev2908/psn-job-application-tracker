@@ -37,7 +37,7 @@ public class RegisterTest {
   void ok() {
     ResT res = mainReq.method(HttpMethod.POST).body(MyPayloads.register()).send();
 
-    MyAssrt.base(res, "user created", 201);
+    MyAssrt.base(res, 201, "user created");
 
     MyAssrt.hasTokens(res);
 
@@ -62,12 +62,12 @@ public class RegisterTest {
     ResT res = mainReq.method(HttpMethod.POST).body(bd).send();
 
     if (!msg.contains("already exists")) {
-      MyAssrt.base(res, msg, status);
+      MyAssrt.base(res, status, msg);
       return;
     }
 
     ResT secondCall = mainReq.method(HttpMethod.POST).body(bd).send();
-    MyAssrt.base(secondCall, msg, status);
+    MyAssrt.base(secondCall, status, msg);
 
   }
 }

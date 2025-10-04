@@ -26,7 +26,7 @@ import server.lib.data_structure.Prs;
 import server.models.token.etc.TokenT;
 
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
-public class ConfirmEmail {
+public class ConfirmEmailTest {
   private final static String URL = "/verify/confirm-email";
 
   @Autowired
@@ -40,11 +40,11 @@ public class ConfirmEmail {
 
   @Test
   void ok() {
-    ResT resTk = GrabTk.with(web).token(TokenT.CONF_EMAIL).send();
+    ResT resTk = GrabTk.with(web).tokenT(TokenT.CONF_EMAIL).send();
 
-    ResT resVerify = mainReq.addQuery("cbcHmacToken", resTk.getCbcHmac()).send();
+    ResT resVerify = mainReq.addCbcHmac(resTk.getCbcHmac()).send();
 
-    MyAssrt.base(resVerify, "user verified", 200);
+    MyAssrt.base(resVerify, 200, "user verified");
     MyAssrt.hasTokens(resVerify);
   }
 
@@ -57,11 +57,11 @@ public class ConfirmEmail {
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
 
-    GrabTk reqTk = GrabTk.with(web).token(msg.equals("cbc_hmac_not_found") ? TokenT.RECOVER_PWD : TokenT.CONF_EMAIL)
+    GrabTk reqTk = GrabTk.with(web).tokenT(msg.equals("cbc_hmac_not_found") ? TokenT.RECOVER_PWD : TokenT.CONF_EMAIL)
         .expired(ExpArgT.fromSplit(msg));
 
     if (status == 409) {
-      ResT firstCall = GrabTk.with(web).token(TokenT.CONF_EMAIL).send();
+      ResT firstCall = GrabTk.with(web).tokenT(TokenT.CONF_EMAIL).send();
       ResT resVerifyFirstCall = ReqT.withUrl(web, URL).addQuery("cbcHmacToken", firstCall.getCbcHmac()).send();
       MyAssrt.hasTokens(resVerifyFirstCall);
 
@@ -72,7 +72,7 @@ public class ConfirmEmail {
 
     if (!msg.equals("cbc_hmac_not_provided"))
       if (!msg.equals("cbc_hmac_invalid")) {
-        mainReq.addQuery("cbcHmacToken", resTk.getCbcHmac());
+        mainReq.addCbcHmac(resTk.getCbcHmac());
       } else {
         String parts[] = resTk.getCbcHmac().split("\\.");
         Map<String, Object> map = Prs.hexToMap(parts[0]);
@@ -83,13 +83,13 @@ public class ConfirmEmail {
             .concat(Stream.of(evilPart), Arrays.stream(Arrays.copyOfRange(parts, 1, parts.length)))
             .collect(Collectors.joining("."));
 
-        mainReq.addQuery("cbcHmacToken", evilCbcHmac);
+        mainReq.addCbcHmac(evilCbcHmac);
 
       }
 
     ResT resVerify = mainReq.send();
 
-    MyAssrt.base(resVerify, msg, status);
+    MyAssrt.base(resVerify, status, msg);
 
   }
 }
