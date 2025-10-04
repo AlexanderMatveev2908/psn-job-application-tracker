@@ -14,6 +14,7 @@ import server.conf.env_conf.EnvKeeper;
 import server.conf.env_conf.etc.EnvMode;
 import server.conf.mail.etc.MailTmpl;
 import server.decorators.flow.ErrAPI;
+import server.lib.dev.MyLog;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
 
@@ -59,8 +60,7 @@ public class MailSvc {
                 .doOnSuccess((nl) -> {
                     System.out.println("📫 mail sent");
                 }).onErrorResume((err) -> {
-                    System.out.println("❌ err sending mail");
-
+                    MyLog.logErr(err);
                     return Mono.empty();
                 }).then();
     }
@@ -69,8 +69,10 @@ public class MailSvc {
         return Mono.fromRunnable(() -> sendHtmlMail(tokenT, user, clientToken)).doOnSuccess((nl) -> {
             System.out.println("📫 mail sent");
         }).onErrorResume((err) -> {
-            System.out.println("❌ err sending mail");
-            return Mono.empty();
+
+            MyLog.logErr(err);
+
+            return Mono.error(new ErrAPI("err sending mail"));
         }).then();
     }
 

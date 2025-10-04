@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import server.decorators.AppFile;
 import server.decorators.flow.Api;
-import server.lib.paths.Hiker;
 
 @Component @Order(20)
 public class FormDataParser implements WebFilter {
@@ -29,9 +28,6 @@ public class FormDataParser implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
         var api = (Api) exc;
-
-        if (!Hiker.existsDir())
-            Hiker.existsDir();
 
         return splitParts(api).flatMap(parts -> {
             CtxParse ctx = new CtxParse();

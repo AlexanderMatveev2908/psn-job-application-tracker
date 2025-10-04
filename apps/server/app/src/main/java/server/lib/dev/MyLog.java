@@ -83,10 +83,10 @@ public final class MyLog {
         StackTraceElement[] frames = err.getStackTrace();
 
         for (StackTraceElement f : frames) {
-            if (f.toString().startsWith("server")) {
-                System.out.printf("📂 %s => 🔢 %d | 🆎 %s | ☢️ %s%n", f.getFileName(), f.getLineNumber(),
-                        f.getMethodName(), f.toString());
-            }
+            // if (f.toString().startsWith("server")) {
+            System.out.printf("📂 %s => 🔢 %d | 🆎 %s | ☢️ %s%n", f.getFileName(), f.getLineNumber(), f.getMethodName(),
+                    f.toString());
+            // }
         }
 
         String msg = err.getMessage();

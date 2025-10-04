@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import server.decorators.flow.ErrAPI;
+import server.lib.dev.MyLog;
 
 public final class Prs {
 
@@ -25,7 +26,7 @@ public final class Prs {
         try {
             return jack.writeValueAsString(obj);
         } catch (Exception err) {
-            System.out.println("❌ err parsing arg to json");
+            MyLog.logErr(err);
             return null;
         }
     }
@@ -35,7 +36,7 @@ public final class Prs {
             return jack.readValue(txt, new TypeReference<Map<String, Object>>() {
             });
         } catch (Exception err) {
-            System.out.println("❌ err parsing arg to map");
+            MyLog.logErr(err);
             return null;
         }
 

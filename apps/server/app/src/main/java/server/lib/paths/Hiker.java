@@ -1,6 +1,5 @@
 package server.lib.paths;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -28,7 +27,7 @@ public final class Hiker {
         LOG_FILE = LOG_DIR.resolve("log.json");
         LOG_FILE_ERR = LOG_DIR.resolve("log_err.json");
         CA_FILE = CERTS_DIR.resolve("supabase-ca.crt");
-        MAIL_TMPL = SERVER_DIR.resolve("app/src/main/java/server/conf/mail/templates/template.html").normalize();
+        MAIL_TMPL = SERVER_DIR.resolve("app/src/main/resources/mail_templates/template.html").normalize();
 
         ensureDirs();
     }
@@ -52,19 +51,8 @@ public final class Hiker {
             if (!Files.exists(CA_FILE))
                 Files.createFile(CA_FILE);
 
-        } catch (IOException err) {
-            throw new ErrAPI("err generating required app dirs");
-        }
-    }
-
-    public static boolean existsDir() {
-        try {
-            return Files.isDirectory(CERTS_DIR) && Files.isDirectory(IMAGES_DIR) && Files.isDirectory(VIDEOS_DIR)
-                    && Files.isDirectory(LOG_DIR) && Files.isRegularFile(LOG_FILE) && Files.isRegularFile(LOG_FILE_ERR)
-                    && Files.isRegularFile(CA_FILE) && Files.isRegularFile(MAIL_TMPL);
         } catch (Exception err) {
-
-            return false;
+            throw new ErrAPI(err.getMessage());
         }
     }
 
