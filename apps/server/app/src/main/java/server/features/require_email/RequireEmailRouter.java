@@ -23,8 +23,8 @@ public class RequireEmailRouter {
     return getCtrl.example(api);
   }
 
-  @PostMapping("/confirm-email")
-  public Mono<ResponseEntity<ResAPI>> confirmEmail(Api api) {
-    return postCtrl.confirmEmail(api);
+  @PostMapping({ "/confirm-email", "/confirm-email-logged" })
+  public Mono<ResponseEntity<ResAPI>> requireMailConfMail(Api api) {
+    return postCtrl.requireMailConfMail(api);
   }
 }

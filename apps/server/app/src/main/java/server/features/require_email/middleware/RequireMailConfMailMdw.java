@@ -13,7 +13,7 @@ import server.models.user.svc.UserSvc;
 import server.paperwork.EmailCheck;
 
 @SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
-public class RequireEmailMdw extends BaseMdw {
+public class RequireMailConfMailMdw extends BaseMdw {
 
   private final UserSvc userSvc;
 
