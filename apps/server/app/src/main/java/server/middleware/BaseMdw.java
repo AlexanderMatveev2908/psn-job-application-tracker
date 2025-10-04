@@ -1,7 +1,6 @@
 package server.middleware;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -15,27 +14,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.hash.MyHashMng;
-import server.lib.security.mng_tokens.TkMng;
-import server.lib.security.mng_tokens.etc.MyTkPayload;
+import server.middleware.form_checkers.FormChecker;
+import server.middleware.security.CheckTokenMdw;
 import server.middleware.security.RateLimit;
 import server.models.token.etc.TokenT;
-import server.models.token.svc.TokenSvc;
 import server.models.user.User;
-import server.models.user.svc.UserSvc;
 
 public abstract class BaseMdw implements WebFilter {
 
     @Autowired
     private RateLimit rl;
     @Autowired
-    private TkMng tkMng;
+    private FormChecker formCk;
     @Autowired
-    private UserSvc userSvc;
-    @Autowired
-    private TokenSvc tokenSvc;
-    @Autowired
-    private MyHashMng hashMng;
+    private CheckTokenMdw tokenCk;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -45,61 +37,20 @@ public abstract class BaseMdw implements WebFilter {
         return handle(api, chain);
     }
 
-    private Mono<User> checkJwt(Api api, boolean throwIfMiss) {
-        String jwt = api.getJwt();
-        String jwe = api.getJwe();
-
-        if (jwt.isBlank()) {
-            if (!throwIfMiss && jwe.isBlank())
-                return Mono.empty();
-            else
-                return Mono.error(new ErrAPI("jwt_not_provided", 401));
-        }
-
-        MyTkPayload payload = tkMng.checkJwt(jwt);
-
-        return userSvc.findById(payload.userId()).switchIfEmpty(Mono.error(new ErrAPI("jwt_invalid", 401)))
-                .map(user -> {
-                    api.setAttr("user", user);
-                    return user;
-                });
-
-    }
-
     protected Mono<User> checkJwtMandatory(Api api) {
-        return checkJwt(api, true);
+        return tokenCk.checkJwt(api, true);
     }
 
     protected Mono<User> checkJwtOptional(Api api) {
-        return checkJwt(api, false);
+        return tokenCk.checkJwt(api, false);
     }
 
     protected Mono<User> checkCbcHmac(Api api, TokenT tokenT) {
-        String token = api.getCbcHmac();
+        return tokenCk.checkCbcHmac(api, tokenT);
+    }
 
-        if (token.isBlank())
-            return Mono.error(new ErrAPI("cbc_hmac_not_provided", 401));
-
-        try {
-            MyTkPayload payload = tkMng.checkCbcHmac(token);
-
-            return tokenSvc.findByUserIdTypeHash(payload.userId(), tokenT, hashMng.hmacHash(token))
-                    .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_not_found", 401)))
-                    .flatMap(dbToken -> userSvc.findById(dbToken.getUserId())
-                            .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_invalid", 401))).map(dbUser -> {
-                                api.setAttr("user", dbUser);
-                                return dbUser;
-                            }));
-        } catch (Exception err) {
-            Map<String, Object> data = null;
-
-            if (err instanceof ErrAPI errInst)
-                data = errInst.getData();
-
-            return (data != null && data.get("idCbcHmacRm") instanceof UUID tokenId) ? tokenSvc.delById(tokenId)
-                    .then(Mono.error(new ErrAPI(err.getMessage(), ((ErrAPI) err).getStatus()))) : Mono.error(err);
-        }
-
+    protected <T> Mono<Void> checkForm(Api api, T form) {
+        return formCk.checkForm(api, form);
     }
 
     protected Mono<Map<String, Object>> grabBody(Api api) {

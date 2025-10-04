@@ -13,22 +13,18 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 
-@Service
-@RequiredArgsConstructor
+@Service @RequiredArgsConstructor
 public class FormChecker {
     private final Validator checker;
 
-    public <T> Mono<Void> checkBdForm(Api api, T form) {
+    public <T> Mono<Void> checkForm(Api api, T form) {
         Set<ConstraintViolation<T>> errs = checker.validate(form);
 
         if (errs.isEmpty())
             return Mono.fromRunnable(() -> api.setAttr("mappedData", form));
 
         List<Map<String, String>> errors = errs.stream()
-                .map(err -> Map.of(
-                        "field", err.getPropertyPath().toString(),
-                        "msg", err.getMessage()))
-                .toList();
+                .map(err -> Map.of("field", err.getPropertyPath().toString(), "msg", err.getMessage())).toList();
 
         return Mono.error(new ErrAPI(errors.get(0).get("msg"), 422, Map.of("errs", errors)));
     }
