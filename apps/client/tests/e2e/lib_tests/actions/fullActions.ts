@@ -26,7 +26,11 @@ export const getTokensLib = async (
 
   const res = await page.request.post(
     `${BASE_URL}/test/user?tokenT=${tokenType}&verifyUser=${verifyUser}`,
-    { data: payload }
+    {
+      data: {
+        existingPayload: payload,
+      },
+    }
   );
   const data = await res.json();
 
@@ -36,7 +40,7 @@ export const getTokensLib = async (
 
   expect(REG_CBC_HMAC.test(data.cbcHmacToken));
 
-  return { ...data, page: page };
+  return { ...data, plainPwd: data?.plainPwd ?? payload.password, page };
 };
 
 export interface ResUser2FA {

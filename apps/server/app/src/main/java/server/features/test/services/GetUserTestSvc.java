@@ -63,19 +63,18 @@ public class GetUserTestSvc {
 
       User us = User.fromTestPayload(existingPayload);
 
-      return userRepo.findByEmail(us.getEmail()).switchIfEmpty(Mono.error(new ErrAPI("received user not found", 400)))
-          .flatMap(dbUser -> {
+      return userRepo.findByEmail(us.getEmail()).flatMap(dbUser -> {
 
-            return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
-              System.out.println("🧹 tokens deleted deleted => " + ids.size());
+        return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
+          System.out.println("🧹 tokens deleted deleted => " + ids.size());
 
-              String plainPwd = "N/A";
-              if (existingPayload.get("plainPwd") instanceof String plainPwdStr)
-                plainPwd = plainPwdStr;
+          String plainPwd = "N/A";
+          if (existingPayload.get("plainPwd") instanceof String plainPwdStr)
+            plainPwd = plainPwdStr;
 
-              return Mono.zip(Mono.just(dbUser), Mono.just(plainPwd));
-            });
-          });
+          return Mono.zip(Mono.just(dbUser), Mono.just(plainPwd));
+        });
+      }).switchIfEmpty(Mono.defer(() -> createUser()));
     }).switchIfEmpty(createUser());
   }
 
