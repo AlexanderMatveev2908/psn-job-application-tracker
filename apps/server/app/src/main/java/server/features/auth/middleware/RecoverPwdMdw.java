@@ -25,7 +25,7 @@ public class RecoverPwdMdw extends BaseMdw {
         var user = api.getUser();
 
         return checkForm(api, form).then(hashMng.argonCheck(user.getPassword(), form.getPassword())
-            .flatMap(resCheck -> resCheck ? Mono.error(new ErrAPI("new password must be different from old one", 401))
+            .flatMap(resCheck -> resCheck ? Mono.error(new ErrAPI("new password must be different from old one", 400))
                 : chain.filter(api)));
       });
     });
