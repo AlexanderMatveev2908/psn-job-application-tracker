@@ -23,7 +23,7 @@ public final class MyLog {
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
 
     public static void limiter() {
-        System.out.println("-".repeat(75));
+        System.out.println("-".repeat(60));
     }
 
     public static void startLog() {

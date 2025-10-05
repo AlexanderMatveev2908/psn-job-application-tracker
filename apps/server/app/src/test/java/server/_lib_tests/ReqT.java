@@ -96,6 +96,7 @@ public class ReqT {
         if (url.startsWith("/api/v1/test/"))
             return res;
 
+        MyLog.startLog();
         System.out.println("🚦 " + url + " => " + res.getStatus());
         System.out.println("📜 " + res.getHdrs());
         System.out.println("🍪 " + res.getCks());
