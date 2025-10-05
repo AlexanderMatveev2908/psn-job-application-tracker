@@ -56,7 +56,7 @@ public class ResT implements RootCls {
     }
 
     public String getCbcHmac() {
-        return (String) getBd().get("cbcHmacToken");
+        return (getBd().get("cbcHmacToken") instanceof String token) ? token : "";
     }
 
     public String getPlainPwd() {
