@@ -17,6 +17,7 @@ import net.datafaker.Faker;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import server.decorators.flow.Api;
+import server.lib.dev.MyLog;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
@@ -70,7 +71,7 @@ public class GetUserTestSvc {
       return userRepo.findByEmail(userPayload.getEmail()).flatMap(dbUser -> {
 
         return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
-          System.out.println("🧹 tokens deleted deleted => " + ids.size());
+          MyLog.log("🧹 tokens deleted deleted => " + ids.size());
 
           String plainPwd = userPayload.getPassword();
 

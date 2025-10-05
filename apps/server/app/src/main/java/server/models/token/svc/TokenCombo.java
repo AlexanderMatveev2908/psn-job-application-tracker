@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
+import server.lib.dev.MyLog;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
@@ -24,7 +25,7 @@ public class TokenCombo {
   private final MyCookies ckMng;
 
   private void logDeleted(int count, TokenT tokenT) {
-    System.out.println(String.format("🧹 deleted %d %s tokens", count, tokenT));
+    MyLog.log(String.format("🧹 deleted %d %s tokens", count, tokenT));
   }
 
   public Mono<MyToken> insertCbcHmac(MyToken token) {

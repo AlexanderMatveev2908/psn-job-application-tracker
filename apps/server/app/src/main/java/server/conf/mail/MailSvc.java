@@ -58,7 +58,7 @@ public class MailSvc {
     public Mono<Void> sendRctTxtMail(String to, String subject, String text) {
         return Mono.fromRunnable(() -> sendTxtMail(to, subject, text)).subscribeOn(Schedulers.boundedElastic())
                 .doOnSuccess((nl) -> {
-                    System.out.println("📫 mail sent");
+                    MyLog.log("📫 mail sent");
                 }).onErrorResume((err) -> {
                     MyLog.logErr(err);
                     return Mono.empty();
@@ -67,7 +67,7 @@ public class MailSvc {
 
     public Mono<Void> sendRctHtmlMail(TokenT tokenT, User user, String clientToken) {
         return Mono.fromRunnable(() -> sendHtmlMail(tokenT, user, clientToken)).doOnSuccess((nl) -> {
-            System.out.println("📫 mail sent");
+            MyLog.log("📫 mail sent");
         }).onErrorResume((err) -> {
 
             MyLog.logErr(err);

@@ -7,6 +7,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
+import server.lib.dev.MyLog;
 import server.models.applications.svc.JobApplRepo;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.svc.TokenRepo;
@@ -24,11 +25,11 @@ public class DelAccSvc {
     var userId = api.getUser().getId();
 
     return jobApplRepo.delByUserId(userId).collectList()
-        .doOnNext(ids -> System.out.println("🧹 applications deleted => " + ids.size()))
+        .doOnNext(ids -> MyLog.log("🧹 applications deleted => " + ids.size()))
         .then(bkpCodeRepo.delByUserId(userId).collectList()
-            .doOnNext(ids -> System.out.println("🧹 bkp_codes deleted => " + ids.size())))
+            .doOnNext(ids -> MyLog.log("🧹 bkp_codes deleted => " + ids.size())))
         .then(tokenRepo.delByUserId(userId).collectList()
-            .doOnNext(ids -> System.out.println("🧹 tokens deleted => " + ids.size())))
+            .doOnNext(ids -> MyLog.log("🧹 tokens deleted => " + ids.size())))
         .then(userRepo.deleteById(userId));
   }
 }
