@@ -25,7 +25,7 @@ public class LoginMdw extends BaseMdw {
                 return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())
                         .switchIfEmpty(Mono.error(new ErrAPI("user not found", 404))).flatMap(user -> {
                             api.setUserAttr(user);
-                            return checkUserPwd(api, form.getPassword()).then(chain.filter(api));
+                            return checkUserPwdToMatch(api, form.getPassword()).then(chain.filter(api));
                         }));
             });
         });

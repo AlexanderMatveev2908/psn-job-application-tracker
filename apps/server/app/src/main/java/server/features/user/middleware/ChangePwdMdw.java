@@ -7,16 +7,16 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.middleware.BaseMdw;
-import server.paperwork.PwdCheck;
+import server.models.token.etc.TokenT;
 
 @Component @RequiredArgsConstructor
-public class GetAccessMngAccMdw extends BaseMdw {
+public class ChangePwdMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isTarget(api, chain, "/user/manage-account", () -> {
-      return limitAndRef(api, 10, 30).flatMap(
-          body -> checkUserLoggedPwdToMatch(api, PwdCheck.fromBody(body).getPassword()).then(chain.filter(api)));
+    return isTarget(api, chain, "/user/change-pwd", () -> {
+      return limit(api).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)
+          .then(checkPwdReg(api).flatMap(plainTxt -> checkUserPwdToNotMatch(api, plainTxt).then(chain.filter(api)))));
     });
   }
 }
