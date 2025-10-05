@@ -46,11 +46,21 @@ public class CheckTokenMdw {
     });
   }
 
-  public Mono<User> checkCbcHmac(Api api, TokenT tokenT) {
-    String token = api.getCbcHmac();
+  public Mono<User> checkQueryCbcHmac(Api api, TokenT tokenT) {
+    String token = api.getQueryCbcHmac();
 
     if (token.isBlank())
       return Mono.error(new ErrAPI("cbc_hmac_not_provided", 401));
+
+    return checkCbcHmac(api, tokenT, token);
+  }
+
+  public Mono<User> checkBodyCbcHmac(Api api, TokenT tokenT) {
+    return api.getBdCbcHmac().switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_not_provided", 401)))
+        .flatMap(token -> checkCbcHmac(api, tokenT, token));
+  }
+
+  private Mono<User> checkCbcHmac(Api api, TokenT tokenT, String token) {
 
     try {
       MyTkPayload payload = tkMng.checkCbcHmac(token);
@@ -75,6 +85,5 @@ public class CheckTokenMdw {
           ? tokenSvc.delById(tokenId).then(Mono.error(new ErrAPI(err.getMessage(), 401)))
           : Mono.error(err);
     }
-
   }
 }

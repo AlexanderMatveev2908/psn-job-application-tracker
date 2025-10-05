@@ -10,12 +10,12 @@ import server.middleware.BaseMdw;
 import server.models.token.etc.TokenT;
 
 @Component @RequiredArgsConstructor
-public class RecoverPwdMdw extends BaseMdw {
+public class VerifyRecoverPwdMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/verify/recover-pwd", () -> {
-      return limit(api).then(checkCbcHmac(api, TokenT.RECOVER_PWD).then(chain.filter(api)));
+      return limit(api).then(checkQueryCbcHmac(api, TokenT.RECOVER_PWD).then(chain.filter(api)));
     });
   }
 }

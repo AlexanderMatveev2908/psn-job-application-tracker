@@ -10,14 +10,14 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import server.decorators.flow.ErrAPI;
 import server.models.token.etc.TokenT;
-import server.models.token.svc.TokenComboSvc;
+import server.models.token.svc.TokenCombo;
 import server.models.user.User;
 import server.models.user.svc.UserRepo;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class RegisterSvc {
   private final UserRepo userRepo;
-  private final TokenComboSvc tokenComboSvc;
+  private final TokenCombo tokenComboSvc;
 
   public Mono<Tuple2<ResponseCookie, String>> register(User us) {
     return userRepo.findByEmail(us.getEmail())

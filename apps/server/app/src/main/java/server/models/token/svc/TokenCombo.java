@@ -17,7 +17,7 @@ import server.models.token.etc.TokenT;
 import server.models.user.User;
 
 @Service @RequiredArgsConstructor @SuppressFBWarnings("EI_EXPOSE_REP2")
-public class TokenComboSvc {
+public class TokenCombo {
   private final TokenRepo repo;
   private final TkMng tkMng;
   private final MailSvc mailSvc;
