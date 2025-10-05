@@ -30,4 +30,8 @@ public class MyAssrt {
         hasJwt(res);
         assertTrue(Reg.isJWE(res.getJwe()));
     }
+
+    public static void hasCbcHmac(ResT res) {
+        assertTrue(Reg.isCbcHmac(res.getCbcHmac()));
+    }
 }

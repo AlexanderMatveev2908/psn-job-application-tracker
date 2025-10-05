@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.lib.security.hash.MyHashMng;
 import server.middleware.form_checkers.FormChecker;
 import server.middleware.security.CheckTokenMdw;
 import server.middleware.security.RateLimit;
@@ -28,6 +29,8 @@ public abstract class BaseMdw implements WebFilter {
     private FormChecker formCk;
     @Autowired
     private CheckTokenMdw tokenCk;
+    @Autowired
+    private MyHashMng hashMng;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -80,6 +83,34 @@ public abstract class BaseMdw implements WebFilter {
 
     protected Mono<Map<String, Object>> limitCheckBodyCbcHmacRefBody(Api api, TokenT tokenT) {
         return limit(api).then(checkBodyCbcHmac(api, tokenT)).then(grabBody(api));
+    }
+
+    private String extractPwd(Map<String, Object> body) {
+        if ((body.get("password") instanceof String hashed))
+            return hashed;
+        throw new ErrAPI("password not provided", 401);
+    }
+
+    protected Mono<Void> checkUserPwd(Api api, String hashed) {
+        var user = api.getUser();
+
+        if (user == null)
+            throw new ErrAPI("passed null in mdw which expected user instance");
+
+        return hashMng.argonCheck(user.getPassword(), hashed).flatMap(resCheck -> {
+            if (!resCheck)
+                return Mono.error(new ErrAPI("invalid password", 401));
+
+            return Mono.empty();
+        });
+    }
+
+    protected Mono<Void> checkUserPwd(Api api, Map<String, Object> body) {
+        return checkUserPwd(api, extractPwd(body));
+    }
+
+    protected Mono<Void> checkUserLoggedPwd(Api api, Map<String, Object> body) {
+        return checkJwtMandatory(api).flatMap(user -> checkUserPwd(api, body));
     }
 
     protected Mono<Void> isTarget(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
