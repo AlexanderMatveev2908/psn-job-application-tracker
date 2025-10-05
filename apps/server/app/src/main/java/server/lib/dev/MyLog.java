@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
 import server.lib.paths.Hiker;
 
@@ -23,12 +22,21 @@ public final class MyLog {
     private static final String APP_PKG = "server";
     private static final ExecutorService logThread = Executors.newSingleThreadExecutor();
 
+    public static void limiter() {
+        System.out.println("-".repeat(75));
+    }
+
+    public static void startLog() {
+        System.out.println("\n");
+        limiter();
+    }
+
     public static void endLog() {
-        System.out.println("-".repeat(50));
+        limiter();
         System.out.println("\n");
     }
 
-    public static void logTtl(String title, Object... arg) {
+    private static RecMainLog getMainLogInfo() {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
         StackTraceElement caller = Arrays.stream(Thread.currentThread().getStackTrace())
@@ -38,10 +46,26 @@ public final class MyLog {
         String fileName = (caller != null) ? caller.getFileName() : "unknown caller";
         String thread = Thread.currentThread().getName();
 
-        if (title != null)
-            System.out.printf("⏰ %s • 🗃️ %s • 📌 %s%n", time, fileName, title);
-        else
-            System.out.printf("⏰ %s • 🗃️ %s • 🧵 %s%n", time, fileName, thread);
+        return new RecMainLog(time, fileName, thread);
+    }
+
+    private record RecMainLog(String time, String fileName, String thread) {
+    }
+
+    public static void logHeader(String title) {
+        var mainInfo = getMainLogInfo();
+
+        System.out.printf("⏰ %s • 🗃️ %s • %s%n", mainInfo.time(), mainInfo.fileName(),
+                title != null ? "📌 " + title : "🧵 " + mainInfo.thread());
+
+    }
+
+    public static void logTtl(String title, Object... arg) {
+
+        startLog();
+        logHeader(title);
+
+        System.out.println("\t");
 
         if (arg != null)
             for (Object v : arg)
@@ -73,13 +97,16 @@ public final class MyLog {
     public static void logErr(Throwable err) {
         wErr(err);
 
+        startLog();
+
         if (err == null) {
             logTtl("⚠️ null error passed to logErr ⚠️");
             return;
         }
 
-        var errInt = err instanceof ErrAPI ? err.toString() : "💣 unexpected err";
-        MyLog.log(errInt);
+        logHeader(err.getMessage());
+
+        System.out.println("\t");
 
         StackTraceElement[] frames = err.getStackTrace();
 
