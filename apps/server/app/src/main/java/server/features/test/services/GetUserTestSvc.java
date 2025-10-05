@@ -58,7 +58,7 @@ public class GetUserTestSvc {
       var existingPayload = (Map<String, Object>) body.get("existingPayload");
 
       if (existingPayload == null)
-        return createUser();
+        return createUser(null);
 
       User us = User.fromTestPayload(existingPayload);
 
@@ -73,13 +73,19 @@ public class GetUserTestSvc {
 
           return Mono.zip(Mono.just(dbUser), Mono.just(plainPwd));
         });
-      }).switchIfEmpty(Mono.defer(() -> createUser()));
-    }).switchIfEmpty(createUser());
+      }).switchIfEmpty(Mono.defer(() -> createUser(User.fromTestPayload(existingPayload))));
+    }).switchIfEmpty(createUser(null));
   }
 
-  private Mono<Tuple2<User, String>> createUser() {
-    var plainPwd = "8cLS4XY!{2Wdvl4*l^4";
-    var us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), plainPwd);
+  private Mono<Tuple2<User, String>> createUser(User existing) {
+    User us;
+    if (existing == null)
+      us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
+          "8cLS4XY!{2Wdvl4*l^4");
+    else
+      us = existing;
+
+    var plainPwd = us.getPassword();
 
     return hashMng.argonHash(us.getPassword()).flatMap(hashed -> {
       us.setPassword(hashed);
