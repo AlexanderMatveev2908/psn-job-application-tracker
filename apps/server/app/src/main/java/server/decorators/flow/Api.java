@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import server.lib.data_structure.ShapeCheck;
 import server.models.user.User;
 
 @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
