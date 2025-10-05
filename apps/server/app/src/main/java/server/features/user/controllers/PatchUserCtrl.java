@@ -8,16 +8,20 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
+import server.features.user.services.ChangeMailSvc;
 import server.features.user.services.ChangePwdSvc;
 
 @Component @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class PatchUserCtrl {
 
   private final ChangePwdSvc changePwdSvc;
+  private final ChangeMailSvc changeMailSvc;
 
   public Mono<ResponseEntity<ResAPI>> changePwd(Api api) {
-
     return changePwdSvc.mng(api).then(new ResAPI(200).msg("password changed").build());
+  }
 
+  public Mono<ResponseEntity<ResAPI>> changeEmail(Api api) {
+    return changeMailSvc.mng(api).then(new ResAPI(200).msg("email sent").build());
   }
 }

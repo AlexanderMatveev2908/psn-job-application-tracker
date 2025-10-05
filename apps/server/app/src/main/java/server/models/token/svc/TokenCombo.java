@@ -42,14 +42,20 @@ public class TokenCombo {
     });
   }
 
-  public Mono<Void> insertCbcHmacWithMail(User user, TokenT tokenT) {
+  public Mono<Void> insertCbcHmacWithMail(User user, String newEmail, TokenT tokenT) {
 
     var recCbcHmac = tkMng.genCbcHmac(tokenT, user.getId());
 
-    return insertCbcHmac(recCbcHmac.inst()).then(mailSvc.sendRctHtmlMail(tokenT, user, recCbcHmac.clientToken()));
+    return insertCbcHmac(recCbcHmac.inst())
+        .then(mailSvc.sendRctHtmlMail(tokenT, user, newEmail, recCbcHmac.clientToken()));
+  }
+
+  public Mono<Void> insertCbcHmacWithMail(User user, TokenT tokenT) {
+    return insertCbcHmacWithMail(user, null, tokenT);
   }
 
   public Mono<Tuple2<ResponseCookie, String>> genSessionTokens(User user) {
+
     RecSessionTokensReturnT rec = tkMng.genSessionTokens(user.getId());
     ResponseCookie jweCookie = ckMng.jweCookie(rec.jwe().clientToken());
 

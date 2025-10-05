@@ -43,4 +43,9 @@ public class UserRouter {
     public Mono<ResponseEntity<ResAPI>> changePwd(Api api) {
         return patchCtrl.changePwd(api);
     }
+
+    @PatchMapping("/change-email")
+    public Mono<ResponseEntity<ResAPI>> changeEmail(Api api) {
+        return patchCtrl.changeEmail(api);
+    }
 }
