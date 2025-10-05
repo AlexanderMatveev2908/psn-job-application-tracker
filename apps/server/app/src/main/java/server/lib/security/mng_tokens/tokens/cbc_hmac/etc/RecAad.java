@@ -63,6 +63,10 @@ public class RecAad {
         }
     }
 
+    public static RecAad fromToken(String clientToken) {
+        return fromPart(clientToken.split("\\.", 4)[0]);
+    }
+
     public byte[] toBinary() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("algT", algT.getValue());

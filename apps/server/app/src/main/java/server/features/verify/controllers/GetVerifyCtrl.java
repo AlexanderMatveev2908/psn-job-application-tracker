@@ -23,6 +23,6 @@ public class GetVerifyCtrl {
   }
 
   public Mono<ResponseEntity<ResAPI>> verifyRecoverPwd(Api api) {
-    return new ResAPI(200).msg("").build();
+    return new ResAPI(200).msg("").data(Map.of("user", api.getUser())).build();
   }
 }

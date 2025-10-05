@@ -51,13 +51,13 @@ public class ConfirmEmailTest {
   static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("cbc_hmac_not_provided", 401), Arguments.of("cbc_hmac_expired", 401),
         Arguments.of("cbc_hmac_invalid", 401), Arguments.of("user already verified", 409),
-        Arguments.of("cbc_hmac_not_found", 401));
+        Arguments.of("cbc_hmac_wrong_type", 401));
   }
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
 
-    GrabTk reqTk = GrabTk.with(web).tokenT(msg.equals("cbc_hmac_not_found") ? TokenT.RECOVER_PWD : TokenT.CONF_EMAIL)
+    GrabTk reqTk = GrabTk.with(web).tokenT(msg.equals("cbc_hmac_wrong_type") ? TokenT.RECOVER_PWD : TokenT.CONF_EMAIL)
         .expired(ExpArgT.fromSplit(msg));
 
     if (status == 409) {
