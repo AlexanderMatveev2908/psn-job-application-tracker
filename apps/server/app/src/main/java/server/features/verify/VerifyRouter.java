@@ -18,4 +18,9 @@ public class VerifyRouter {
   public Mono<ResponseEntity<ResAPI>> verifyEmail(Api api) {
     return getCtrl.verifyEmail(api);
   }
+
+  @GetMapping("/recover-pwd")
+  public Mono<ResponseEntity<ResAPI>> verifyRecoverPwd(Api api) {
+    return getCtrl.verifyRecoverPwd(api);
+  }
 }

@@ -30,38 +30,23 @@ public class DB {
     }
 
     public <T> Mono<T> trxMono(Function<DatabaseClient, Mono<T>> cb) {
-        return cb.apply(dbLow)
-                .as(trxMng::transactional)
-                .onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
+        return cb.apply(dbLow).as(trxMng::transactional).onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
     public <T> Flux<T> trxFlux(Function<DatabaseClient, Flux<T>> cb) {
-        return cb.apply(dbLow)
-                .as(trxMng::transactional)
-                .onErrorResume(err -> Flux.error(new ErrAPI(err.getMessage())));
+        return cb.apply(dbLow).as(trxMng::transactional).onErrorResume(err -> Flux.error(new ErrAPI(err.getMessage())));
     }
 
-    public Mono<Void> trxLow(
-            Function<Connection, Mono<Void>> cb) {
-        return Mono.usingWhen(
-                factory.create(),
-                cnt -> Mono.from(cnt.beginTransaction())
-                        .then(cb.apply(cnt))
-                        .then(Mono.from(cnt.commitTransaction())),
+    public Mono<Void> trxLow(Function<Connection, Mono<Void>> cb) {
+        return Mono.usingWhen(factory.create(),
+                cnt -> Mono.from(cnt.beginTransaction()).then(cb.apply(cnt)).then(Mono.from(cnt.commitTransaction())),
                 cnt -> Mono.from(cnt.close()),
                 (cnt, err) -> Mono.from(cnt.rollbackTransaction()).then(Mono.from(cnt.close())),
                 cnt -> Mono.from(cnt.close()));
     }
 
-    public <T> Mono<T> trxMid(Function<DatabaseClient, Mono<T>> cb) {
-        return cb.apply(dbLow)
-                .as(trxMng::transactional)
-                .onErrorResume(err -> Mono.error(new ErrAPI("trx failed => " + err.getMessage())));
-    }
-
     public <T> Mono<T> trxHigh(Function<R2dbcEntityTemplate, Mono<T>> cb) {
-        return cb.apply(dbHigh)
-                .as(trxMng::transactional)
+        return cb.apply(dbHigh).as(trxMng::transactional)
                 .onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
@@ -74,26 +59,16 @@ public class DB {
                       AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')
                 """;
 
-        return dbLow.sql(sql)
-                .map(row -> row.get("table_name", String.class))
-                .all()
-                .collectList()
-                .flatMap(tables -> {
-                    if (tables.isEmpty())
-                        return Mono.just(0);
+        return dbLow.sql(sql).map(row -> row.get("table_name", String.class)).all().collectList().flatMap(tables -> {
+            if (tables.isEmpty())
+                return Mono.just(0);
 
-                    String joined = String.join(", ", tables);
-                    String truncateSql = "TRUNCATE TABLE " + joined + " RESTART IDENTITY CASCADE";
-                    return dbLow.sql(truncateSql)
-                            .fetch()
-                            .rowsUpdated()
-                            .doOnNext((res) -> {
-                                System.out.println(String.format("🪓 truncated %d tables", tables.size()));
-                            })
-                            .thenReturn(tables.size());
-                })
-                .onErrorResume(err -> Mono.error(
-                        new ErrAPI(err.getMessage())));
+            String joined = String.join(", ", tables);
+            String truncateSql = "TRUNCATE TABLE " + joined + " RESTART IDENTITY CASCADE";
+            return dbLow.sql(truncateSql).fetch().rowsUpdated().doOnNext((res) -> {
+                System.out.println(String.format("🪓 truncated %d tables", tables.size()));
+            }).thenReturn(tables.size());
+        }).onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
 }

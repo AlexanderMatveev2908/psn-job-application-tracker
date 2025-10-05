@@ -36,7 +36,7 @@ public class ErrCatcher implements WebExceptionHandler {
             String endpoint = exc.getRequest().getPath().value();
             msg = String.format("route %s not found 🚦", endpoint);
         }
-        msg = String.format("%s %s", err instanceof ErrAPI ? "" : "💣", msg);
+        msg = String.format("%s %s", err instanceof ErrAPI ? "❌" : "💣", msg.replace("❌ ", ""));
         int status = (err instanceof ErrAPI) ? ((ErrAPI) err).getStatus() : isRouteNotFound ? 404 : 500;
         Map<String, Object> data = (err instanceof ErrAPI) ? ((ErrAPI) err).getData() : null;
 

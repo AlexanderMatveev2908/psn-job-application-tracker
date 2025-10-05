@@ -13,6 +13,7 @@ import server.decorators.flow.ErrAPI;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.MyTkPayload;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecAad;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenSvc;
 import server.models.user.User;
@@ -54,6 +55,9 @@ public class CheckTokenMdw {
     try {
       MyTkPayload payload = tkMng.checkCbcHmac(token);
 
+      if (!RecAad.fromToken(token).getTokenT().equals(tokenT))
+        return Mono.error(new ErrAPI("cbc_hmac_wrong_type", 401));
+
       return tokenSvc.findByUserIdTypeHash(payload.userId(), tokenT, hashMng.hmacHash(token))
           .switchIfEmpty(Mono.error(new ErrAPI("cbc_hmac_not_found", 401)))
           .flatMap(dbToken -> userSvc.findById(dbToken.getUserId())
@@ -68,7 +72,7 @@ public class CheckTokenMdw {
         data = errInst.getData();
 
       return (data != null && data.get("idCbcHmacRm") instanceof UUID tokenId)
-          ? tokenSvc.delById(tokenId).then(Mono.error(new ErrAPI(err.getMessage(), ((ErrAPI) err).getStatus())))
+          ? tokenSvc.delById(tokenId).then(Mono.error(new ErrAPI(err.getMessage(), 401)))
           : Mono.error(err);
     }
 
