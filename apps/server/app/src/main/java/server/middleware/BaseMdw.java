@@ -14,12 +14,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
-import server.lib.security.hash.MyHashMng;
 import server.middleware.form_checkers.FormChecker;
 import server.middleware.security.CheckTokenMdw;
+import server.middleware.security.CheckUserPwdMdw;
 import server.middleware.security.RateLimit;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
+import server.paperwork.PwdCheck;
 
 public abstract class BaseMdw implements WebFilter {
 
@@ -30,7 +31,7 @@ public abstract class BaseMdw implements WebFilter {
     @Autowired
     private CheckTokenMdw tokenCk;
     @Autowired
-    private MyHashMng hashMng;
+    private CheckUserPwdMdw checkUserMdw;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -81,40 +82,31 @@ public abstract class BaseMdw implements WebFilter {
         return limitAndRef(api, 5, 15);
     }
 
-    protected Mono<Map<String, Object>> limitCheckBodyCbcHmacRefBody(Api api, TokenT tokenT) {
-        return limit(api).then(checkBodyCbcHmac(api, tokenT)).then(grabBody(api));
-    }
-
     protected Mono<User> checkQueryCbcHmacLogged(Api api, TokenT tokenT) {
         return checkJwtMandatory(api).then(checkQueryCbcHmac(api, tokenT));
     }
 
-    private String extractPwd(Map<String, Object> body) {
-        if ((body.get("password") instanceof String hashed))
-            return hashed;
-        throw new ErrAPI("password not provided", 401);
+    protected Mono<User> checkBodyCbcHmacLogged(Api api, TokenT tokenT) {
+        return checkJwtMandatory(api).then(checkBodyCbcHmac(api, tokenT));
     }
 
-    protected Mono<Void> checkUserPwd(Api api, String hashed) {
-        var user = api.getUser();
-
-        if (user == null)
-            throw new ErrAPI("passed null in mdw which expected user instance");
-
-        return hashMng.argonCheck(user.getPassword(), hashed).flatMap(resCheck -> {
-            if (!resCheck)
-                return Mono.error(new ErrAPI("invalid password", 401));
-
-            return Mono.empty();
+    protected Mono<String> checkPwdReg(Api api) {
+        return grabBody(api).flatMap(body -> {
+            var form = PwdCheck.fromBody(body);
+            return checkForm(api, form).thenReturn(form.getPassword());
         });
     }
 
-    protected Mono<Void> checkUserPwd(Api api, Map<String, Object> body) {
-        return checkUserPwd(api, extractPwd(body));
+    protected Mono<Void> checkUserPwdToMatch(Api api, String plainText) {
+        return checkUserMdw.checkUserPwd(api, plainText, true);
     }
 
-    protected Mono<Void> checkUserLoggedPwd(Api api, Map<String, Object> body) {
-        return checkJwtMandatory(api).flatMap(user -> checkUserPwd(api, body));
+    protected Mono<Void> checkUserPwdToNotMatch(Api api, String plainTxt) {
+        return checkUserMdw.checkUserPwd(api, plainTxt, false);
+    }
+
+    protected Mono<Void> checkUserLoggedPwdToMatch(Api api, String plainText) {
+        return checkJwtMandatory(api).flatMap(user -> checkUserPwdToMatch(api, plainText));
     }
 
     protected Mono<Void> isTarget(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {

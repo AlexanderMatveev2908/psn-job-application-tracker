@@ -15,7 +15,7 @@ public class DelAccMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/delete-account", () -> {
-      return checkQueryCbcHmacLogged(api, TokenT.MANAGE_ACC).then(chain.filter(api));
+      return limit(api).then(checkQueryCbcHmacLogged(api, TokenT.MANAGE_ACC).then(chain.filter(api)));
     });
   }
 }
