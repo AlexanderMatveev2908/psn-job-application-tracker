@@ -29,6 +29,13 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
             """)
     Mono<Integer> verifyUser(UUID userId);
 
+    @Query("""
+            UPDATE users
+            SET password = :newPwd
+            WHERE id = :userId
+            """)
+
+    Mono<User> changePwd(UUID userId, String newPwd);
     // @Query("""
     // SELECT
     // us.*,

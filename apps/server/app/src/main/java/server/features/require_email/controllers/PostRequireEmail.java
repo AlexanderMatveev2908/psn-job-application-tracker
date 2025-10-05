@@ -10,13 +10,13 @@ import server.conf.db.database.DB;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.models.token.etc.TokenT;
-import server.models.token.svc.TokenComboSvc;
+import server.models.token.svc.TokenCombo;
 
 @SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
 public class PostRequireEmail {
 
   private final DB db;
-  private final TokenComboSvc tokensCombo;
+  private final TokenCombo tokensCombo;
 
   public Mono<ResponseEntity<ResAPI>> requireMailConfMail(Api api) {
     return db.trxMono((cnt) -> tokensCombo.insertCbcHmacWithMail(api.getUser(), TokenT.CONF_EMAIL))

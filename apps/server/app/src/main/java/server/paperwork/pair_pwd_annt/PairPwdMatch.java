@@ -1,4 +1,4 @@
-package server.features.auth.paperwork.pwd;
+package server.paperwork.pair_pwd_annt;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -9,11 +9,8 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PwdChecker.class)
-@Documented
-public @interface PwdMatch {
+@Target(ElementType.TYPE) @Retention(RetentionPolicy.RUNTIME) @Constraint(validatedBy = PairPwdValidator.class) @Documented
+public @interface PairPwdMatch {
     String message() default "passwords do not match";
 
     Class<?>[] groups() default {};

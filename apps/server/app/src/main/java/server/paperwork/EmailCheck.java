@@ -16,6 +16,6 @@ public class EmailCheck {
     if (body.get("email") instanceof String email)
       return new EmailCheck(email);
 
-    throw new ErrAPI("email not provided", 400);
+    throw new ErrAPI("email invalid", 400);
   }
 }

@@ -111,11 +111,20 @@ public final class Api extends ServerWebExchangeDecorator {
         return jwe;
     }
 
-    public String getCbcHmac() {
+    public String getQueryCbcHmac() {
         if (getParsedQuery().orElse(Map.of()).get("cbcHmacToken") instanceof String cbcHmac)
             return cbcHmac;
 
         return "";
+    }
+
+    public Mono<String> getBdCbcHmac() {
+        return getBd(new TypeReference<Map<String, Object>>() {
+        }).flatMap(body -> {
+            if (body.get("cbcHmacToken") instanceof String tokenStr && !tokenStr.isBlank())
+                return Mono.just(tokenStr);
+            return Mono.empty();
+        });
     }
 
     public User getUser() {

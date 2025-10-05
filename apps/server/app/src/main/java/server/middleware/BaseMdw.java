@@ -45,8 +45,12 @@ public abstract class BaseMdw implements WebFilter {
         return tokenCk.checkJwt(api, false);
     }
 
-    protected Mono<User> checkCbcHmac(Api api, TokenT tokenT) {
-        return tokenCk.checkCbcHmac(api, tokenT);
+    protected Mono<User> checkQueryCbcHmac(Api api, TokenT tokenT) {
+        return tokenCk.checkQueryCbcHmac(api, tokenT);
+    }
+
+    protected Mono<User> checkBodyCbcHmac(Api api, TokenT tokenT) {
+        return tokenCk.checkBodyCbcHmac(api, tokenT);
     }
 
     protected <T> Mono<Void> checkForm(Api api, T form) {
@@ -72,6 +76,10 @@ public abstract class BaseMdw implements WebFilter {
 
     protected Mono<Map<String, Object>> limitAndRef(Api api) {
         return limitAndRef(api, 5, 15);
+    }
+
+    protected Mono<Map<String, Object>> limitCheckBodyCbcHmacRefBody(Api api, TokenT tokenT) {
+        return limit(api).then(checkBodyCbcHmac(api, tokenT)).then(grabBody(api));
     }
 
     protected Mono<Void> isTarget(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {

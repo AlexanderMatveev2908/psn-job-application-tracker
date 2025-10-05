@@ -47,7 +47,7 @@ public class ConfirmEmailTest {
 
   static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("user not found", 404), Arguments.of("user already verified", 409),
-        Arguments.of("email not provided", 400));
+        Arguments.of("email invalid", 400));
   }
 
   @ParameterizedTest @MethodSource("badCases")

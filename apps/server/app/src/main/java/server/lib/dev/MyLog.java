@@ -1,6 +1,7 @@
 package server.lib.dev;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -121,7 +122,7 @@ public final class MyLog {
 
                 bw.write(json);
                 bw.newLine();
-            } catch (Exception err) {
+            } catch (IOException err) {
                 System.out.println("❌ failed log");
             }
         });

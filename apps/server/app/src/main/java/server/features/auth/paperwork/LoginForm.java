@@ -2,25 +2,39 @@ package server.features.auth.paperwork;
 
 import java.util.Map;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Valid;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import server.conf.Reg;
 import server.paperwork.EmailCheck;
+import server.paperwork.PwdCheck;
 
-@Data @EqualsAndHashCode(callSuper = true)
-public class LoginForm extends EmailCheck {
+@Data
+public class LoginForm {
 
-    @NotBlank(message = "password required") @Pattern(regexp = Reg.PWD, message = "password invalid")
-    private final String password;
+    @Valid
+    private final EmailCheck emailCheck;
+
+    @Valid
+    private final PwdCheck pwdCheck;
 
     public LoginForm(String email, String password) {
-        super(email);
-        this.password = password;
+        this.emailCheck = new EmailCheck(email);
+        this.pwdCheck = new PwdCheck(password);
+    }
+
+    public LoginForm(EmailCheck emailCheck, PwdCheck pwdCheck) {
+        this.emailCheck = emailCheck;
+        this.pwdCheck = pwdCheck;
+    }
+
+    public String getEmail() {
+        return emailCheck.getEmail();
+    }
+
+    public String getPassword() {
+        return pwdCheck.getPassword();
     }
 
     public static LoginForm fromMap(Map<String, Object> bd) {
-        return new LoginForm((String) bd.get("email"), (String) bd.get("password"));
+        return new LoginForm(EmailCheck.fromBody(bd), PwdCheck.fromBody(bd));
     }
 }
