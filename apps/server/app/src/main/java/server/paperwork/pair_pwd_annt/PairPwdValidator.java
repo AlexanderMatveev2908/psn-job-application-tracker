@@ -2,9 +2,11 @@ package server.paperwork.pair_pwd_annt;
 
 import java.lang.reflect.Method;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+@SuppressFBWarnings({ "REC_CATCH_EXCEPTION" })
 public class PairPwdValidator implements ConstraintValidator<PairPwdMatch, Object> {
 
     @Override

@@ -34,6 +34,16 @@ public class RegisterForm {
     @AssertTrue(message = "terms must be accepted")
     private final Boolean terms;
 
+    public RegisterForm(String firstName, String lastName, String email, String password, String confirmPassword,
+            Boolean terms) {
+        this.emailCheck = new EmailCheck(email);
+        this.pairPwdCheck = new PairPwdCheck(password, confirmPassword);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.confirmPassword = confirmPassword;
+        this.terms = terms;
+    }
+
     public String getEmail() {
         return emailCheck.getEmail();
     }
@@ -44,16 +54,6 @@ public class RegisterForm {
 
     public String getConfirmPassword() {
         return pairPwdCheck.getConfirmPassword();
-    }
-
-    public RegisterForm(String firstName, String lastName, String email, String password, String confirmPassword,
-            Boolean terms) {
-        this.emailCheck = new EmailCheck(email);
-        this.pairPwdCheck = new PairPwdCheck(password, confirmPassword);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.confirmPassword = confirmPassword;
-        this.terms = terms;
     }
 
     public static RegisterForm fromMap(Map<String, Object> bd) {
