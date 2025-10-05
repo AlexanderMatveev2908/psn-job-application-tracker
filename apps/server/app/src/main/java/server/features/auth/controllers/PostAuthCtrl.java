@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import server.conf.db.database.DB;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
-import server.features.auth.paperwork.LoginForm;
 import server.features.auth.paperwork.RegisterForm;
-import server.features.auth.services.LoginSvc;
 import server.features.auth.services.RegisterSvc;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.hash.MyHashMng;
 import server.models.token.etc.TokenT;
+import server.models.token.svc.TokenCombo;
 import server.models.token.svc.TokenSvc;
 import server.models.user.User;
 
@@ -25,8 +25,9 @@ public class PostAuthCtrl {
 
     private final MyHashMng hashMng;
     private final RegisterSvc registerSvc;
-    private final LoginSvc loginSvc;
+    private final TokenCombo tokenCombo;
     private final MyCookies myCookies;
+    private final DB db;
     private final TokenSvc tokenSvc;
 
     public Mono<ResponseEntity<ResAPI>> register(Api api) {
@@ -44,7 +45,9 @@ public class PostAuthCtrl {
     }
 
     public Mono<ResponseEntity<ResAPI>> login(Api api) {
-        return loginSvc.login((LoginForm) api.getMappedData()).flatMap(tpl -> {
+        var user = api.getUser();
+
+        return db.trxMono(cnt -> tokenCombo.genSessionTokens(user)).flatMap(tpl -> {
             return new ResAPI(200).msg("user logged").cookie(tpl.getT1()).data(Map.of("accessToken", tpl.getT2()))
                     .build();
         });
