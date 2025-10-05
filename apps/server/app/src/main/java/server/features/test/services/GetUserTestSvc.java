@@ -69,7 +69,7 @@ public class GetUserTestSvc {
             return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
               System.out.println("🧹 tokens deleted deleted => " + ids.size());
 
-              String plainPwd = "";
+              String plainPwd = "N/A";
               if (existingPayload.get("plainPwd") instanceof String plainPwdStr)
                 plainPwd = plainPwdStr;
 
