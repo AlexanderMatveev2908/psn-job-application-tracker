@@ -1,6 +1,5 @@
-package server.require_email;
+package server.verify;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,15 +14,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import lombok.RequiredArgsConstructor;
-import net.datafaker.Faker;
 import server._lib_tests.GrabTk;
 import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
+import server._lib_tests.shapes.ExpArgT;
+import server.models.token.etc.TokenT;
 
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
-public class RecoverPwd {
-  private final static String URL = "/require-email/recover-pwd";
+public class RecoverPwdTest {
+  private final static String URL = "/verify/recover-pwd";
 
   @Autowired
   private WebTestClient web;
@@ -31,29 +31,32 @@ public class RecoverPwd {
 
   @BeforeEach
   void setup() {
-    mainReq = ReqT.withUrl(web, URL).method(HttpMethod.POST);
+    mainReq = ReqT.withUrl(web, URL).method(HttpMethod.GET);
   }
 
   @Test
   void ok() {
-    ResT resTk = GrabTk.with(web).send();
-    ResT res = mainReq.body(Map.of("email", resTk.getUser().getEmail())).send();
+    ResT resTk = GrabTk.with(web).tokenT(TokenT.RECOVER_PWD).send();
 
-    MyAssrt.base(res, 200, "email sent");
+    ResT mainRes = mainReq.addCbcHmac(resTk.getCbcHmac()).send();
+
+    MyAssrt.base(mainRes, 200);
   }
 
   static Stream<Arguments> badCases() {
-    return Stream.of(Arguments.of("user not found", 404));
+    return Stream.of(Arguments.of("cbc_hmac_not_provided", 401), Arguments.of("cbc_hmac_expired", 401),
+        Arguments.of("cbc_hmac_wrong_type", 401));
   }
 
   @ParameterizedTest @MethodSource("badCases")
   void err(String msg, int status) {
+    ResT resTk = GrabTk.with(web).tokenT(msg.contains("wrong_type") ? TokenT.CHANGE_EMAIL : TokenT.RECOVER_PWD)
+        .expired(ExpArgT.fromSplit(msg)).send();
 
-    ResT resTk = GrabTk.with(web).send();
+    if (!msg.equals("cbc_hmac_not_provided"))
+      mainReq.addCbcHmac(resTk.getCbcHmac());
 
-    var email = status == 404 ? new Faker().internet().emailAddress() : resTk.getUser().getEmail();
-
-    ResT res = mainReq.body(Map.of("email", email)).send();
+    ResT res = mainReq.send();
 
     MyAssrt.base(res, status, msg);
   }
