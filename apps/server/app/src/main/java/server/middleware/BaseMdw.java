@@ -85,6 +85,10 @@ public abstract class BaseMdw implements WebFilter {
         return limit(api).then(checkBodyCbcHmac(api, tokenT)).then(grabBody(api));
     }
 
+    protected Mono<User> checkQueryCbcHmacLogged(Api api, TokenT tokenT) {
+        return checkJwtMandatory(api).then(checkQueryCbcHmac(api, tokenT));
+    }
+
     private String extractPwd(Map<String, Object> body) {
         if ((body.get("password") instanceof String hashed))
             return hashed;

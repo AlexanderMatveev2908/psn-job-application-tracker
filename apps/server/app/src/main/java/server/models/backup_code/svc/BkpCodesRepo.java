@@ -11,15 +11,22 @@ import server.models.backup_code.BkpCodes;
 
 public interface BkpCodesRepo extends ReactiveCrudRepository<BkpCodes, UUID> {
 
-        @Query("""
-                        INSERT INTO backup_codes (user_id, code)
-                        VALUES (:userId, :code)
-                        RETURNING *
-                        """)
-        public Mono<BkpCodes> insert(UUID userId, String code);
+  @Query("""
+      INSERT INTO backup_codes (user_id, code)
+      VALUES (:userId, :code)
+      RETURNING *
+      """)
+  public Mono<BkpCodes> insert(UUID userId, String code);
 
-        @Query("""
-                        SELECT * FROM backup_codes WHERE user_id = :userId
-                        """)
-        public Flux<BkpCodes> findByUserId(UUID userId);
+  @Query("""
+      SELECT * FROM backup_codes WHERE user_id = :userId
+      """)
+  public Flux<BkpCodes> findByUserId(UUID userId);
+
+  @Query("""
+        DELETE FROM backup_codes
+        WHERE user_id = :userId
+        RETURNING id
+      """)
+  Flux<String> delByUserId(UUID userId);
 }

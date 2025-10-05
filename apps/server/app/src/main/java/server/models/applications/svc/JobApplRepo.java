@@ -17,13 +17,16 @@ public interface JobApplRepo extends ReactiveCrudRepository<JobAppl, UUID> {
             VALUES (:userId, :companyName, :positionName, CAST(:status AS application_status_t), :appliedAt)
             RETURNING *
                 """)
-    public Mono<JobAppl> insert(
-            UUID userId,
-            String companyName,
-            String positionName,
-            JobApplStatusT status,
+    public Mono<JobAppl> insert(UUID userId, String companyName, String positionName, JobApplStatusT status,
             Long appliedAt);
 
     @Query("SELECT * FROM applications WHERE user_id = :userId")
     public Flux<JobAppl> findByUserId(UUID userId);
+
+    @Query("""
+            DELETE FROM applications
+            WHERE user_id = :userId
+            RETURNING id
+            """)
+    Flux<String> delByUserId(UUID userid);
 }
