@@ -52,44 +52,41 @@ public class GetUserTestSvc {
   }
 
   @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
-  private Mono<Tuple2<User, String>> getInst(Api api) {
+  private Mono<User> getPayload(Api api) {
+    var defUser = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
+        "8cLS4XY!{2Wdvl4*l^4");
+
     return api.getBd(new TypeReference<Map<String, Object>>() {
-    }).flatMap(body -> {
-      var existingPayload = (Map<String, Object>) body.get("existingPayload");
+    }).map(body -> {
+      if (body.get("existingPayload") instanceof Map userMap)
+        return User.fromTestPayload((Map<String, Object>) userMap);
+      return defUser;
+    }).defaultIfEmpty(defUser);
+  }
 
-      if (existingPayload == null)
-        return createUser(null);
+  private Mono<Tuple2<User, String>> getInst(Api api) {
+    return getPayload(api).flatMap(userPayload -> {
 
-      User us = User.fromTestPayload(existingPayload);
-
-      return userRepo.findByEmail(us.getEmail()).flatMap(dbUser -> {
+      return userRepo.findByEmail(userPayload.getEmail()).flatMap(dbUser -> {
 
         return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
           System.out.println("🧹 tokens deleted deleted => " + ids.size());
 
-          String plainPwd = "N/A";
-          if (existingPayload.get("plainPwd") instanceof String plainPwdStr)
-            plainPwd = plainPwdStr;
+          String plainPwd = userPayload.getPassword();
 
           return Mono.zip(Mono.just(dbUser), Mono.just(plainPwd));
         });
-      }).switchIfEmpty(Mono.defer(() -> createUser(User.fromTestPayload(existingPayload))));
-    }).switchIfEmpty(createUser(null));
+      }).switchIfEmpty(createUser(userPayload));
+    });
   }
 
   private Mono<Tuple2<User, String>> createUser(User existing) {
-    User us;
-    if (existing == null)
-      us = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
-          "8cLS4XY!{2Wdvl4*l^4");
-    else
-      us = existing;
 
-    var plainPwd = us.getPassword();
+    var plainPwd = existing.getPassword();
 
-    return hashMng.argonHash(us.getPassword()).flatMap(hashed -> {
-      us.setPassword(hashed);
-      return Mono.zip(userRepo.insert(us), Mono.just(plainPwd));
+    return hashMng.argonHash(existing.getPassword()).flatMap(hashed -> {
+      existing.setPassword(hashed);
+      return Mono.zip(userRepo.insert(existing), Mono.just(plainPwd));
     });
   }
 
