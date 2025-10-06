@@ -16,6 +16,7 @@ public class GrabTk {
   private final List<ExpArgT> expired = new ArrayList<>();
   private User existingPayload;
   private TokenT tokenT;
+  private boolean verifyUser;
 
   private GrabTk(WebTestClient web) {
     this.web = web;
@@ -25,8 +26,17 @@ public class GrabTk {
     return new GrabTk(web);
   }
 
+  public static GrabTk withVerify(WebTestClient web) {
+    return new GrabTk(web).verifyUser();
+  }
+
   public GrabTk tokenT(TokenT tokenT) {
     this.tokenT = tokenT;
+    return this;
+  }
+
+  public GrabTk verifyUser() {
+    this.verifyUser = true;
     return this;
   }
 
@@ -45,6 +55,9 @@ public class GrabTk {
 
     if (tokenT != null)
       req.addQuery("tokenT", tokenT.getValue());
+
+    if (verifyUser)
+      req.addQuery("verifyUser", "true");
 
     for (ExpArgT exp : expired)
       if (exp != null)

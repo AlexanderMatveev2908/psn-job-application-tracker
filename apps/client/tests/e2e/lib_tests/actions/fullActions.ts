@@ -46,8 +46,8 @@ export const getTokensLib = async (
 export interface ResUser2FA {
   payload: PayloadRegisterT;
   user: UserT;
-  totp_secret: string;
-  backup_codes: string[];
+  totpSecret: string;
+  backupCodes: string[];
   accessToken: string;
   cbcHmacToken: string;
 }

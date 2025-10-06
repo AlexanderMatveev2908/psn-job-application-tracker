@@ -36,10 +36,10 @@ const SwapSetup2FA: FC<FormManageAccPropsType & { user: UserT | null }> = ({
     if (!res) return;
 
     setRes2FA({
-      totp_secret_qrcode: res.totp_secret_qrcode,
-      totp_secret: res.totp_secret,
-      backup_codes: res.backup_codes,
-      zip_file: res.zip_file,
+      totpSecretQrCode: res.totpSecretQrCode,
+      totpSecret: res.totpSecret,
+      backupCodes: res.backupCodes,
+      zipFile: res.zipFile,
     });
   };
 

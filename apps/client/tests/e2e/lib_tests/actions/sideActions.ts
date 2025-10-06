@@ -37,7 +37,7 @@ export const isToastErr = async (page: Page) => {
 
 export const submitFormTOTP = async (
   page: Page,
-  { totp_secret, url }: { totp_secret: string; url: string }
+  { totpSecret, url }: { totpSecret: string; url: string }
 ) => {
   const form = await getByID(page, "totp_code__form");
 
@@ -48,7 +48,7 @@ export const submitFormTOTP = async (
 
   totp.options = { encoding: "hex" as KeyEncodings };
 
-  const code = totp.generate(b32ToHex(totp_secret));
+  const code = totp.generate(b32ToHex(totpSecret));
 
   await page.evaluate((c) => navigator.clipboard.writeText(c), code);
   await page.keyboard.press("Control+V");
@@ -61,7 +61,7 @@ export const submitFormTOTP = async (
 
 export const submitFormBackupCode = async (
   page: Page,
-  { backup_codes, url }: { backup_codes: string[]; url: string }
+  { backupCodes, url }: { backupCodes: string[]; url: string }
 ) => {
   await clickByID(page, "btns_swapper_next_swap");
 
@@ -70,7 +70,7 @@ export const submitFormBackupCode = async (
 
   await checkIsFocused(codeInput);
 
-  await codeInput.fill(backup_codes[0]);
+  await codeInput.fill(backupCodes[0]);
 
   await clickByID(form, "backup_code__form__submit");
 

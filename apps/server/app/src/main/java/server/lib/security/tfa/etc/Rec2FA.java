@@ -16,7 +16,7 @@ public record Rec2FA(String zipB64, String qrB64, RecTotpSecret recTOTP, RecBkpC
   }
 
   public Map<String, Object> forClient() {
-    return Map.of("totp_secret", recTOTP.uri(), "backup_codes", recBkpCodes().clientCodes(), "totp_secret_qrcode",
-        qrB64(), "zip_file", zipB64());
+    return Map.of("totpSecret", recTOTP.uri(), "backupCodes", recBkpCodes().clientCodes(), "totpSecretQrCode", qrB64(),
+        "zipFile", zipB64());
   }
 }

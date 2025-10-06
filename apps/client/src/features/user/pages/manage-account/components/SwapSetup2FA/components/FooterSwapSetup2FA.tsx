@@ -31,7 +31,7 @@ const FooterSwapSetup2FA: FC<PropsType> = ({
               label: "Download Zip",
             },
             testID: `${testID}__link`,
-            href: res2FA.zip_file,
+            href: res2FA.zipFile,
             act: "INFO",
             download: "2FA.zip",
           }}
