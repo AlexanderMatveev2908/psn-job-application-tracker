@@ -44,7 +44,7 @@ public final class LifeSpawn {
         }))).flatMap(res -> rd.dbSize().doOnNext(size -> {
 
             List<String> tables = (List<String>) res.get("tables");
-            MyLog.logTtl(String.format("server running on => %d... 🚀", e.getWebServer().getPort()),
+            MyLog.log(String.format("🚀 server running on => %d...", e.getWebServer().getPort()),
                     String.format("⬜ whitelist => %s", kit.getEnvKeeper().getFrontUrl()),
                     String.format("🧮 redis keys => %d", size),
                     String.format("🗃️ db tables => %n%s", MyLog.logCols(tables)));

@@ -49,7 +49,9 @@ public class GetUserTestSvc {
         ? argExp.stream().map(Object::toString).collect(Collectors.toSet())
         : Set.of();
 
-    return getInst(api).flatMap(tpl -> handleTokens(tpl, tokenT, expiredList));
+    boolean verifyUser = Boolean.valueOf((query.get("verifyUser") instanceof String val ? val : ""));
+
+    return getInst(api, verifyUser).flatMap(tpl -> handleTokens(tpl, tokenT, expiredList));
   }
 
   @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
@@ -65,7 +67,7 @@ public class GetUserTestSvc {
     }).defaultIfEmpty(defUser);
   }
 
-  private Mono<Tuple2<User, String>> getInst(Api api) {
+  private Mono<Tuple2<User, String>> getInst(Api api, boolean verifyUser) {
     return getPayload(api).flatMap(userPayload -> {
 
       return userRepo.findByEmail(userPayload.getEmail()).flatMap(dbUser -> {
@@ -77,17 +79,20 @@ public class GetUserTestSvc {
 
           return Mono.zip(Mono.just(dbUser), Mono.just(plainPwd));
         });
-      }).switchIfEmpty(createUser(userPayload));
+      }).switchIfEmpty(createUser(userPayload, verifyUser));
     });
   }
 
-  private Mono<Tuple2<User, String>> createUser(User existing) {
+  private Mono<Tuple2<User, String>> createUser(User payloadUser, boolean verifyUser) {
 
-    var plainPwd = existing.getPassword();
+    var plainPwd = payloadUser.getPassword();
 
-    return hashMng.argonHash(existing.getPassword()).flatMap(hashed -> {
-      existing.setPassword(hashed);
-      return Mono.zip(userRepo.insert(existing), Mono.just(plainPwd));
+    return hashMng.argonHash(payloadUser.getPassword()).flatMap(hashed -> {
+      payloadUser.setPassword(hashed);
+      return Mono.zip(
+          userRepo.insert(payloadUser)
+              .flatMap(dbUser -> verifyUser ? userRepo.verifyUser(dbUser.getId()) : Mono.<User>just(dbUser)),
+          Mono.just(plainPwd));
     });
   }
 

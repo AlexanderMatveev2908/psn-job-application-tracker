@@ -121,16 +121,16 @@ export const goFormPreManageAcc2FA = async (browser: Browser) => {
 };
 
 export const getAccessManageAcc2FA = async (browser: Browser) => {
-  const { page, totp_secret, ...rst } = await goFormPreManageAcc2FA(browser);
+  const { page, totpSecret, ...rst } = await goFormPreManageAcc2FA(browser);
 
-  await submitFormTOTP(page, { totp_secret, url: "/user/manage-account" });
+  await submitFormTOTP(page, { totpSecret, url: "/user/manage-account" });
 
   const form = await getByID(page, "manage_acc__form");
 
   return {
     ...rst,
     page,
-    totp_secret,
+    totpSecret,
     form,
   };
 };

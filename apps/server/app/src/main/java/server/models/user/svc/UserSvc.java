@@ -69,11 +69,7 @@ public class UserSvc {
                 .doOnComplete(() -> MyLog.log("Total users: " + counter.get()));
     }
 
-    public Mono<Integer> verifyUser(UUID userId) {
-        return userRepo.verifyUser(userId).map(res -> {
-            MyLog.log("⚙️ rows updated => " + res);
-
-            return res;
-        });
+    public Mono<User> verifyUser(UUID userId) {
+        return userRepo.verifyUser(userId);
     }
 }

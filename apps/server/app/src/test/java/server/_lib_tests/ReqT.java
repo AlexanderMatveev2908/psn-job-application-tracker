@@ -36,9 +36,20 @@ public class ReqT {
         return this;
     }
 
+    @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
     public ReqT body(Object body) {
-        this.body = body;
+        if (this.body == null) {
+            this.body = body;
+        } else {
+            if (body instanceof Map argMap && this.body instanceof Map existingMap)
+                (existingMap).putAll(argMap);
+        }
+
         return this;
+    }
+
+    public ReqT addBdCbcHmac(String token) {
+        return body(Map.of("cbcHmacToken", token));
     }
 
     public ReqT header(String key, String value) {

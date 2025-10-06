@@ -18,6 +18,7 @@ app:
   hkdfMaster: ${HKDF_MASTER}
   hkdfSalt: ${HKDF_SALT}
   dbHashKey: ${DB_HASH_KEY}
+  gcmKey: ${GCM_KEY}
 
 server:
   address: 0.0.0.0
@@ -26,6 +27,11 @@ server:
     relaxed-query-chars: "[,]"
 
 spring:
+  jackson:
+    mapper:
+      sort-properties-alphabetically: false
+    serialization:
+      order-map-entries-by-keys: false
   mail:
     host: ${BREVO_SMPT_SERVER}
     port: ${BREVO_SMPT_PORT}

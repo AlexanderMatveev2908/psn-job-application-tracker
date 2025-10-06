@@ -26,8 +26,9 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
             UPDATE users
             SET is_verified = TRUE
             WHERE id = :userId
+            RETURNING *
             """)
-    Mono<Integer> verifyUser(UUID userId);
+    Mono<User> verifyUser(UUID userId);
 
     @Query("""
             UPDATE users
@@ -44,6 +45,14 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
             RETURNING *
                         """)
     Mono<User> setTmpEmail(UUID userId, String newEmail);
+
+    @Query("""
+            UPDATE users
+            SET totp_secret = :totpSecret
+            WHERE id = :userId
+            RETURNING *
+                """)
+    Mono<User> setTotpSecret(String totpSecret, UUID userId);
 
     // @Query("""
     // SELECT

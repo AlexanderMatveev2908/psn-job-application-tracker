@@ -27,10 +27,10 @@ const BodySwapSetup2FA: FC<PropsType> = ({ res2FA, isCurr, swapMode }) => {
       <a
         data-testid={"qr_code_result"}
         download={"qrcode.png"}
-        href={res2FA.totp_secret_qrcode}
+        href={res2FA.totpSecretQrCode}
         className="w-[250px] h-[250px] my-[30px]"
       >
-        <ImgLoader {...{ src: res2FA.totp_secret_qrcode }} />
+        <ImgLoader {...{ src: res2FA.totpSecretQrCode }} />
       </a>
 
       <div className="cont__grid__lg justify-items-center h-fit items-center">
@@ -39,7 +39,7 @@ const BodySwapSetup2FA: FC<PropsType> = ({ res2FA, isCurr, swapMode }) => {
             {...{
               testID: "cpy_totp__btn",
               portalConf,
-              txt: res2FA.totp_secret,
+              txt: res2FA.totpSecret,
               label: "TOTP Secret",
             }}
           />
@@ -53,7 +53,7 @@ const BodySwapSetup2FA: FC<PropsType> = ({ res2FA, isCurr, swapMode }) => {
                 let txt = "";
 
                 for (let i = 0; i < 8; i += 2) {
-                  txt += res2FA.backup_codes.slice(i, i + 2).join("  ") + "\n";
+                  txt += res2FA.backupCodes.slice(i, i + 2).join("  ") + "\n";
                 }
 
                 return txt;

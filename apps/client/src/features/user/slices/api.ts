@@ -18,10 +18,10 @@ export type ChangeEmailFormT = ManageAccFormT & EmailFormT;
 export type ChangePwdFormT = ManageAccFormT & PwdFormT;
 
 export type Setup2FAReturnT = {
-  totp_secret: string;
-  totp_secret_qrcode: string;
-  backup_codes: string[];
-  zip_file: string;
+  totpSecret: string;
+  totpSecretQrCode: string;
+  backupCodes: string[];
+  zipFile: string;
 };
 
 export const userSliceAPI = apiSlice.injectEndpoints({

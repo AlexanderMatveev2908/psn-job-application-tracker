@@ -64,7 +64,9 @@ public class ProtectedTest {
 
       Map<String, Object> evilSub = Prs.jsonToMap((String) payload.get("sub"));
       String evilId = UUID.randomUUID().toString();
-      String evilJwt = parts[0] + Prs.mapToBase64(payload) + parts[2];
+      evilSub.put("userId", evilId);
+      payload.put("sub", evilSub);
+      String evilJwt = parts[0] + "." + Prs.mapToBase64(payload) + "." + parts[2];
 
       reqProtected.jwt(evilJwt);
     }

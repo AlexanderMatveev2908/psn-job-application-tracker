@@ -19,6 +19,7 @@ plugins {
 
 repositories {
     mavenCentral()
+       maven { url = uri("https://jitpack.io") }
 }
 
 // ! Python CLI depends on these markers //_s  //_e
@@ -64,6 +65,10 @@ dependencies {
     implementation(libs.jacksonDatatypeJdk8)
     implementation(libs.bcprovJdk18on)
     implementation(libs.datafaker)
+    implementation(libs.commonsCodec)
+    implementation(libs.javaOtp)
+    implementation(libs.core)
+    implementation(libs.javase)
 }
 //_e
 

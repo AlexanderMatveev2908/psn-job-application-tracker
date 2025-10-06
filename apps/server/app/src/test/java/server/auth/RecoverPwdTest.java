@@ -25,11 +25,11 @@ import server.models.token.etc.TokenT;
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
 public class RecoverPwdTest {
   private final static String URL = "/auth/recover-pwd";
+  private final static String newPwd = "wsyX!1}&i5$E&8YyN8K6";
 
   @Autowired
   private WebTestClient web;
   private ReqT mainReq;
-  private final static String newPwd = "wsyX!1}&i5$E&8YyN8K6";
 
   @BeforeEach
   void setup() {
