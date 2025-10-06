@@ -23,7 +23,7 @@ public class Setup2FASvc {
   public Mono<Rec2FA> mng(Api api) {
     var user = api.getUser();
 
-    return tfa.setup2FA(api).flatMap(rec -> userRepo.setTotpSecret(rec.recTOTP().encrypted(), user.getId())
+    return tfa.setup2FA(user).flatMap(rec -> userRepo.setTotpSecret(rec.recTOTP().encrypted(), user.getId())
         .thenMany(Flux.fromIterable(rec.recBkpCodes().hashed()).flatMap(code -> codesRepo.insert(user.getId(), code)))
         .collectList().doOnNext(saved -> MyLog.log("bkp codes inserted => " + saved.size())).thenReturn(rec));
   }

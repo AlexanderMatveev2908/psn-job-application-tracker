@@ -1,5 +1,7 @@
 package server.models.token.svc;
 
+import java.util.UUID;
+
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import server.lib.dev.MyLog;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
+import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
 import server.models.token.MyToken;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
@@ -33,6 +36,12 @@ public class TokenCombo {
       logDeleted(ids.size(), token.getTokenType());
       return repo.insertWithId(token);
     });
+  }
+
+  public Mono<String> insertCbcHmac(UUID userId, TokenT tokenT) {
+    RecCreateCbcHmacReturnT rec = tkMng.genCbcHmac(tokenT, userId);
+    return insertCbcHmac(rec.inst()).thenReturn(rec.clientToken());
+
   }
 
   public Mono<MyToken> insertJwe(MyToken token) {

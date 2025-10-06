@@ -8,15 +8,14 @@ import org.springframework.stereotype.Component;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.conf.db.database.DB;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.auth.paperwork.RegisterForm;
+import server.features.auth.services.LoginSvc;
 import server.features.auth.services.RegisterSvc;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.hash.MyHashMng;
 import server.models.token.etc.TokenT;
-import server.models.token.svc.TokenCombo;
 import server.models.token.svc.TokenSvc;
 import server.models.user.User;
 
@@ -25,10 +24,9 @@ public class PostAuthCtrl {
 
     private final MyHashMng hashMng;
     private final RegisterSvc registerSvc;
-    private final TokenCombo tokenCombo;
     private final MyCookies myCookies;
-    private final DB db;
     private final TokenSvc tokenSvc;
+    private final LoginSvc loginSvc;
 
     public Mono<ResponseEntity<ResAPI>> register(Api api) {
         RegisterForm form = api.getMappedData();
@@ -47,10 +45,12 @@ public class PostAuthCtrl {
     public Mono<ResponseEntity<ResAPI>> login(Api api) {
         var user = api.getUser();
 
-        return db.trxMono(cnt -> tokenCombo.genSessionTokens(user)).flatMap(tpl -> {
-            return new ResAPI(200).msg("user logged").cookie(tpl.getT1()).data(Map.of("accessToken", tpl.getT2()))
-                    .build();
-        });
+        return !user.use2FA()
+                ? loginSvc.simpleLogin(user)
+                        .flatMap(tpl -> new ResAPI(200).msg("user logged").cookie(tpl.getT1())
+                                .data(Map.of("accessToken", tpl.getT2())).build())
+                : loginSvc.firstStepLogin2FA(user).flatMap(clientToken -> new ResAPI(200).msg("password valid")
+                        .data(Map.of("cbcHmacToken", clientToken)).build());
     }
 
     public Mono<ResponseEntity<ResAPI>> logout(Api api) {
