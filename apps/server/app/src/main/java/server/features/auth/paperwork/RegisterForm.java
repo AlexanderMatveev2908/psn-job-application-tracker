@@ -5,12 +5,10 @@ import java.util.Map;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
 import server.paperwork.EmailCheck;
+import server.paperwork.NamesCheck;
 import server.paperwork.PairPwdCheck;
 
 @Data
@@ -22,14 +20,8 @@ public class RegisterForm {
     @Valid
     private final PairPwdCheck pairPwdCheck;
 
-    @NotBlank(message = "first name required") @Pattern(regexp = Reg.NAME, message = "first name invalid")
-    private final String firstName;
-
-    @NotBlank(message = "last name required") @Pattern(regexp = Reg.NAME, message = "last name invalid")
-    private final String lastName;
-
-    @NotBlank(message = "confirm password required")
-    private final String confirmPassword;
+    @Valid
+    private final NamesCheck namesCheck;
 
     @AssertTrue(message = "terms must be accepted")
     private final Boolean terms;
@@ -38,10 +30,16 @@ public class RegisterForm {
             Boolean terms) {
         this.emailCheck = new EmailCheck(email);
         this.pairPwdCheck = new PairPwdCheck(password, confirmPassword);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.confirmPassword = confirmPassword;
+        this.namesCheck = new NamesCheck(firstName, lastName);
         this.terms = terms;
+    }
+
+    public String getFirstName() {
+        return namesCheck.getFirstName();
+    }
+
+    public String getLastName() {
+        return namesCheck.getLastName();
     }
 
     public String getEmail() {

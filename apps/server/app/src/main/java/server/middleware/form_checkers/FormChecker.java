@@ -28,4 +28,16 @@ public class FormChecker {
 
         return Mono.error(new ErrAPI(errors.get(0).get("msg"), 422, Map.of("errs", errors)));
     }
+
+    public <T> void checkForm(T form) {
+        Set<ConstraintViolation<T>> errs = checker.validate(form);
+
+        if (errs.isEmpty())
+            return;
+
+        List<Map<String, String>> errors = errs.stream()
+                .map(err -> Map.of("field", err.getPropertyPath().toString(), "msg", err.getMessage())).toList();
+
+        throw new ErrAPI(errors.get(0).get("msg"), 422, Map.of("errs", errors));
+    }
 }

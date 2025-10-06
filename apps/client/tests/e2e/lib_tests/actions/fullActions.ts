@@ -20,7 +20,11 @@ export const getTokensLib = async (
     tokenType = TokenT.CONF_EMAIL,
     verifyUser = false,
     payload = genRegisterPayload(),
-  }: { tokenType?: TokenT; verifyUser?: boolean; payload?: PayloadRegisterT }
+  }: {
+    tokenType?: TokenT;
+    verifyUser?: boolean;
+    payload?: PayloadRegisterT | UserT;
+  }
 ): Promise<GetTokensReturnT> => {
   const page = await preTest(browser, "/");
 

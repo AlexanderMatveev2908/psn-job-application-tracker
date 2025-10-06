@@ -43,6 +43,7 @@ jobs:
       HKDF_MASTER: ${{secrets.HKDF_MASTER}}
       HKDF_SALT: ${{secrets.HKDF_SALT}}
       DB_HASH_KEY: ${{secrets.DB_HASH_KEY}}
+      GCM_KEY: ${{secrets.GCM_KEY}}
 
     steps:
       - name: 📂 clone code

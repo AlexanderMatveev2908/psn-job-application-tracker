@@ -57,7 +57,7 @@ export const changeEmailOk = async (browser: Browser) => {
   await getByTxt(page, genMailNoticeMsg("to change your email address"));
 
   return {
-    payload: user,
+    user,
   };
 };
 

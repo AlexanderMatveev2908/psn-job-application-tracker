@@ -98,9 +98,6 @@ public class User extends RootTable {
             String email = (String) arg.get("email");
             String password = (String) arg.get("password");
 
-            if (firstName == null || lastName == null || email == null || password == null)
-                throw new ErrAPI("missing user fields");
-
             return new User(firstName, lastName, email, password);
         } catch (Exception err) {
             throw new ErrAPI("invalid test data");
