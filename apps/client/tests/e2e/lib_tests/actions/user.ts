@@ -52,7 +52,7 @@ export const changeEmailOk = async (browser: Browser) => {
 
   await waitURL(page, "/notice");
 
-  await isToastOk(page, "email sent to new address");
+  await isToastOk(page, "email sent");
 
   await getByTxt(page, genMailNoticeMsg("to change your email address"));
 
