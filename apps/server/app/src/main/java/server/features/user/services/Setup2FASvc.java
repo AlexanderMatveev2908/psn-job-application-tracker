@@ -6,11 +6,17 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import server.decorators.flow.Api;
+import server.lib.security.tfa.My2FA;
+import server.lib.security.tfa.etc.Rec2FA;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class Setup2FASvc {
-  public Mono<Void> mng() {
+  private final My2FA tfa;
 
-    return Mono.empty();
+  public Mono<Rec2FA> mng(Api api) {
+
+    return tfa.setup2FA(api);
   }
+
 }

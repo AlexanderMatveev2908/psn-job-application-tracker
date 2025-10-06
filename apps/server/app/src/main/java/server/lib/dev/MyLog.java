@@ -104,7 +104,8 @@ public final class MyLog {
             return;
         }
 
-        logHeader(err.getMessage());
+        logHeader(null);
+        System.out.println(err.toString());
 
         System.out.println("\t");
 

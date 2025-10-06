@@ -19,6 +19,7 @@ plugins {
 
 repositories {
     mavenCentral()
+       maven { url = uri("https://jitpack.io") }
 }
 
 // ! Python CLI depends on these markers //_s  //_e
@@ -63,6 +64,11 @@ dependencies {
     testImplementation(libs.spotbugsAnnotations)
     implementation(libs.jacksonDatatypeJdk8)
     implementation(libs.bcprovJdk18on)
+    implementation(libs.datafaker)
+    implementation(libs.commonsCodec)
+    implementation(libs.javaOtp)
+    implementation(libs.core)
+    implementation(libs.javase)
 }
 //_e
 
@@ -136,14 +142,14 @@ tasks.named<Test>("test") {
 }
 
 testlogger {
-     theme = ThemeType.MOCHA
+    theme = ThemeType.MOCHA
     showPassed = false   
     showSkipped = false
     showFailed = true    
-    showExceptions = false
-    showCauses = false
-    showStackTraces = false
+    showExceptions = true
+    showCauses = true
     showStandardStreams = true
+    showStackTraces = false
 }
 
 tasks.named<BootJar>("bootJar") {

@@ -36,6 +36,8 @@ public class ServerApplication {
 
                 lifeSpawn.lifeCheck(e);
 
+                dev.mng();
+
             } catch (Exception err) {
                 MyLog.logErr(err);
             }

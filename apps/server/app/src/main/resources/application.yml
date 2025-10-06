@@ -18,6 +18,7 @@ app:
   hkdfMaster: ${HKDF_MASTER}
   hkdfSalt: ${HKDF_SALT}
   dbHashKey: ${DB_HASH_KEY}
+  gcmKey: ${GCM_KEY}
 
 server:
   address: 0.0.0.0

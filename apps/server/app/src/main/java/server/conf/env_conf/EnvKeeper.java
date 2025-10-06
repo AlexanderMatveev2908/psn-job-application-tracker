@@ -8,72 +8,53 @@ import lombok.Data;
 import server.conf.env_conf.etc.EnvMode;
 import server.conf.env_conf.etc.Resolved;
 
-@Data
-@Validated
-@ConfigurationProperties(prefix = "app")
+@Data @Validated @ConfigurationProperties(prefix = "app")
 public final class EnvKeeper {
 
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String appName;
 
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblEnv;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblBackUrl;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblBackUrlDev;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblBackUrlTest;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblFrontUrl;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblFrontUrlDev;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblFrontUrlTest;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String nextPblSmptFrom;
 
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String cloudName;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String cloudKey;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String cloudSecret;
 
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String redisUrl;
 
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String jwtSecret;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String jwePrivate;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String jwePublic;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String hkdfMaster;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String hkdfSalt;
-    @NotBlank
-    @Resolved
+    @NotBlank @Resolved
     private String dbHashKey;
+    @NotBlank @Resolved
+    private String gcmKey;
 
     public EnvMode getEnvMode() {
         return EnvMode.fromValue(this.nextPblEnv);
@@ -81,17 +62,17 @@ public final class EnvKeeper {
 
     public String getFrontUrl() {
         return switch (getEnvMode()) {
-            case DEV -> nextPblFrontUrlDev;
-            case TEST -> nextPblFrontUrlTest;
-            case PROD -> nextPblFrontUrl;
+        case DEV -> nextPblFrontUrlDev;
+        case TEST -> nextPblFrontUrlTest;
+        case PROD -> nextPblFrontUrl;
         };
     }
 
     public String getBackUrl() {
         return switch (getEnvMode()) {
-            case DEV -> nextPblBackUrlDev;
-            case TEST -> nextPblBackUrlTest;
-            case PROD -> nextPblBackUrl;
+        case DEV -> nextPblBackUrlDev;
+        case TEST -> nextPblBackUrlTest;
+        case PROD -> nextPblBackUrl;
         };
     }
 

@@ -22,6 +22,14 @@ public class Dev {
     // };
     // }
 
+    public void mng() {
+        try {
+
+        } catch (Exception err) {
+            MyLog.logErr(err);
+        }
+    }
+
     public void dropAll() {
         db.truncateAll().flatMap(count -> {
             return cmd.flushAll();

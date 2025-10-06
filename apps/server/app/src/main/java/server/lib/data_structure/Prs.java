@@ -115,6 +115,11 @@ public final class Prs {
         byte[] binaryBase64 = Base64.getEncoder().encode(binary);
 
         return binaryToUtf8(binaryBase64);
-
     }
+
+    public static String binaryToBase64(byte[] arg) {
+        byte[] binaryBase64 = Base64.getEncoder().encode(arg);
+        return binaryToUtf8(binaryBase64);
+    }
+
 }
