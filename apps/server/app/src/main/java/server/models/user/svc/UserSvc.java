@@ -11,6 +11,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.lib.dev.MyLog;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplRepo;
 import server.models.backup_code.BkpCodes;
@@ -54,10 +55,10 @@ public class UserSvc {
     }
 
     public Mono<Integer> hardDelete(UUID id) {
-        return userRepo.findById(id).flatMap(
-                user -> userRepo.delete(user).thenReturn(1).doOnSuccess(v -> System.out.println("🔪 deleted 1 column")))
+        return userRepo.findById(id)
+                .flatMap(user -> userRepo.delete(user).thenReturn(1).doOnSuccess(v -> MyLog.log("🔪 deleted 1 column")))
                 .switchIfEmpty(Mono.defer(() -> {
-                    System.out.println("🗑️ deleted 0 columns");
+                    MyLog.log("🗑️ deleted 0 columns");
                     return Mono.just(0);
                 }));
     }
@@ -65,12 +66,12 @@ public class UserSvc {
     public Flux<User> findAll() {
         AtomicInteger counter = new AtomicInteger(0);
         return userRepo.findAll().doOnNext(u -> counter.incrementAndGet())
-                .doOnComplete(() -> System.out.println("Total users: " + counter.get()));
+                .doOnComplete(() -> MyLog.log("Total users: " + counter.get()));
     }
 
     public Mono<Integer> verifyUser(UUID userId) {
         return userRepo.verifyUser(userId).map(res -> {
-            System.out.println("⚙️ rows updated => " + res);
+            MyLog.log("⚙️ rows updated => " + res);
 
             return res;
         });

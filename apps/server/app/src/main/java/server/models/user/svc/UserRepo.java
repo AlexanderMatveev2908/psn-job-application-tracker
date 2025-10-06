@@ -16,10 +16,10 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
     Mono<User> findByEmail(String email);
 
     @Query("""
-                INSERT INTO users (first_name, last_name, email, password)
-                VALUES (:#{#user.firstName}, :#{#user.lastName}, :#{#user.email}, :#{#user.password})
-                RETURNING *
-            """)
+            INSERT INTO users (first_name, last_name, email, password)
+            VALUES (:#{#user.firstName}, :#{#user.lastName}, :#{#user.email}, :#{#user.password})
+                                RETURNING *
+                            """)
     Mono<User> insert(User user);
 
     @Query("""
@@ -36,6 +36,15 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
             """)
 
     Mono<User> changePwd(UUID userId, String newPwd);
+
+    @Query("""
+            UPDATE users
+            SET tmp_email = :newEmail
+            WHERE id  = :userId
+            RETURNING *
+                        """)
+    Mono<User> setTmpEmail(UUID userId, String newEmail);
+
     // @Query("""
     // SELECT
     // us.*,

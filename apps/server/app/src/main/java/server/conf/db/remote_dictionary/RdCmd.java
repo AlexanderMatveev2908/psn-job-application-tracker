@@ -28,7 +28,7 @@ public class RdCmd {
                 return Mono.error(new ErrAPI("key not found => " + k, 404));
 
             return Mono.just(v.intValue());
-        }).doOnNext(v -> System.out.println("🔪 deleted " + v + " key"));
+        }).doOnNext(v -> MyLog.log("🔪 deleted " + v + " key"));
 
     }
 
@@ -110,7 +110,7 @@ public class RdCmd {
         default -> Mono.empty();
         })).collectMap(Map.Entry::getKey, Map.Entry::getValue).map(res -> {
             System.out.println("🗃️ rd cache => ");
-            res.forEach((k, v) -> System.out.println(String.format("🔑 %s => 🖍️ %s", k, v)));
+            res.forEach((k, v) -> MyLog.logKV(k, v));
             return res;
         });
     }
@@ -120,7 +120,7 @@ public class RdCmd {
             if (!"OK".equals(res))
                 throw new ErrAPI("rd flush all failed");
 
-            System.out.println("🔪 rd cleaned");
+            MyLog.log("🔪 rd cleaned");
 
             return res;
         }).onErrorMap(err -> new ErrAPI("rd flush all failed"));

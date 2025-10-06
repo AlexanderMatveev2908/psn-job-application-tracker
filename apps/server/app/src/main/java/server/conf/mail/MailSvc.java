@@ -35,15 +35,16 @@ public class MailSvc {
         mailSender.send(msg);
     }
 
-    public void sendHtmlMail(TokenT tokenT, User user, String clientToken) {
+    public void sendHtmlMail(TokenT tokenT, User user, String newEmail, String clientToken) {
         MimeMessage msg = mailSender.createMimeMessage();
 
+        var targetEmail = newEmail == null ? user.getEmail() : newEmail;
         try {
 
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
 
             helper.setFrom(envKeeper.getNextPblSmptFrom());
-            helper.setTo(user.getEmail());
+            helper.setTo(targetEmail);
             helper.setSubject(tokenT.getSubject());
             helper.setText(mailTmpl.replacePlaceholder(user.getFirstName(), clientToken), true);
 
@@ -58,16 +59,16 @@ public class MailSvc {
     public Mono<Void> sendRctTxtMail(String to, String subject, String text) {
         return Mono.fromRunnable(() -> sendTxtMail(to, subject, text)).subscribeOn(Schedulers.boundedElastic())
                 .doOnSuccess((nl) -> {
-                    System.out.println("📫 mail sent");
+                    MyLog.log("📫 mail sent");
                 }).onErrorResume((err) -> {
                     MyLog.logErr(err);
                     return Mono.empty();
                 }).then();
     }
 
-    public Mono<Void> sendRctHtmlMail(TokenT tokenT, User user, String clientToken) {
-        return Mono.fromRunnable(() -> sendHtmlMail(tokenT, user, clientToken)).doOnSuccess((nl) -> {
-            System.out.println("📫 mail sent");
+    public Mono<Void> sendRctHtmlMail(TokenT tokenT, User user, String newEmail, String clientToken) {
+        return Mono.fromRunnable(() -> sendHtmlMail(tokenT, user, newEmail, clientToken)).doOnSuccess((nl) -> {
+            MyLog.log("📫 mail sent");
         }).onErrorResume((err) -> {
 
             MyLog.logErr(err);

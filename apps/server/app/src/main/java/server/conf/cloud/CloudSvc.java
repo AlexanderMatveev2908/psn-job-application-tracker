@@ -22,6 +22,7 @@ import server.conf.env_conf.EnvKeeper;
 import server.decorators.AppFile;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
+import server.lib.dev.MyLog;
 
 @Service @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class CloudSvc {
@@ -126,7 +127,7 @@ public class CloudSvc {
                     String result = parsed.get("result").toString();
                     int count = "ok".equals(result) ? 1 : 0;
 
-                    System.out.println(String.format("✂️ deleted %d %s", count, resourceType));
+                    MyLog.log(String.format("✂️ deleted %d %s", count, resourceType));
 
                     return Mono.just(count);
                 });

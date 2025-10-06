@@ -1,0 +1,32 @@
+package server.features.user.middleware;
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.WebFilterChain;
+
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
+import server.decorators.flow.Api;
+import server.decorators.flow.ErrAPI;
+import server.middleware.BaseMdw;
+import server.models.token.etc.TokenT;
+import server.paperwork.EmailCheck;
+
+@Component @RequiredArgsConstructor
+public class ChangeEmailMdw extends BaseMdw {
+
+  @Override
+  public Mono<Void> handle(Api api, WebFilterChain chain) {
+    return isTarget(api, chain, "/user/change-email", () -> {
+      return limit(api).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)).then(grabBody(api).flatMap(body -> {
+        var form = EmailCheck.fromBody(body);
+
+        return checkForm(api, form).then(Mono.defer(() -> {
+          if (api.getUser().getEmail().equals(form.getEmail()))
+            return Mono.error(new ErrAPI("new email must be different from old one", 400));
+
+          return chain.filter(api);
+        }));
+      }));
+    });
+  }
+}
