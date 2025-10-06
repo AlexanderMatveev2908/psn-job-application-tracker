@@ -48,7 +48,7 @@ const BodySwapSetup2FA: FC<PropsType> = ({ res2FA, isCurr, swapMode }) => {
           <CpyPaste
             {...{
               portalConf,
-              testID: "cpy_backupCodes__btn",
+              testID: "cpy_backup_codes__btn",
               txt: (() => {
                 let txt = "";
 
