@@ -62,6 +62,8 @@ public class GetUserTestSvc {
     var defUser = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
         "8cLS4XY!{2Wdvl4*l^4");
 
+    // ! up to you to send plain text pwd if u want it back for logic needed
+    // ! code does not check pwd for tests so manage as u think better
     return api.getBd(new TypeReference<Map<String, Object>>() {
     }).map(body -> {
       if (body.get("existingPayload") instanceof Map userMap) {

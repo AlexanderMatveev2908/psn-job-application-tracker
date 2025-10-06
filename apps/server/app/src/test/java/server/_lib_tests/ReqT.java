@@ -41,8 +41,13 @@ public class ReqT {
         if (this.body == null) {
             this.body = body;
         } else {
-            if (body instanceof Map argMap && this.body instanceof Map existingMap)
-                (existingMap).putAll(argMap);
+            if (body instanceof Map argMap && this.body instanceof Map existingMap) {
+                var newBody = new HashMap<>();
+                newBody.putAll(existingMap);
+                newBody.putAll(argMap);
+
+                this.body = newBody;
+            }
         }
 
         return this;

@@ -8,7 +8,6 @@ import lombok.Data;
 import server.decorators.flow.ErrAPI;
 import server.paperwork.EmailCheck;
 import server.paperwork.NamesCheck;
-import server.paperwork.PwdCheck;
 
 @Data
 public class UserTestForm {
@@ -17,14 +16,10 @@ public class UserTestForm {
   private final EmailCheck emailCheck;
 
   @Valid
-  private final PwdCheck pwdCheck;
-
-  @Valid
   private final NamesCheck namesCheck;
 
   public UserTestForm(String firstName, String lastName, String email, String password) {
     this.emailCheck = new EmailCheck(email);
-    this.pwdCheck = new PwdCheck(password);
     this.namesCheck = new NamesCheck(firstName, lastName);
   }
 
@@ -38,10 +33,6 @@ public class UserTestForm {
 
   public String getEmail() {
     return emailCheck.getEmail();
-  }
-
-  public String getPassword() {
-    return pwdCheck.getPassword();
   }
 
   public static UserTestForm fromMap(Map<String, Object> bd) {
