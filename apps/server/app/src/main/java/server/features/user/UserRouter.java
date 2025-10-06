@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
@@ -16,7 +17,7 @@ import server.features.user.controllers.PatchUserCtrl;
 import server.features.user.controllers.PostUserCtrl;
 import server.router.RouterAPI;
 
-@RouterAPI("/api/v1/user") @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @RouterAPI("/api/v1/user") @RequiredArgsConstructor
 public class UserRouter {
 
     private final GetUserCtrl getCtrl;
@@ -47,5 +48,10 @@ public class UserRouter {
     @PatchMapping("/change-email")
     public Mono<ResponseEntity<ResAPI>> changeEmail(Api api) {
         return patchCtrl.changeEmail(api);
+    }
+
+    @PatchMapping("/2FA")
+    public Mono<ResponseEntity<ResAPI>> setup2FA(Api api) {
+        return patchCtrl.setup2FA(api);
     }
 }

@@ -24,4 +24,8 @@ public class PatchUserCtrl {
   public Mono<ResponseEntity<ResAPI>> changeEmail(Api api) {
     return changeMailSvc.mng(api).then(new ResAPI(200).msg("email sent").build());
   }
+
+  public Mono<ResponseEntity<ResAPI>> setup2FA(Api api) {
+    return new ResAPI(200).msg("").build();
+  }
 }
