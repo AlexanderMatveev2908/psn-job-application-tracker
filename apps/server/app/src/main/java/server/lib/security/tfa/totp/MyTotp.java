@@ -37,7 +37,7 @@ public class MyTotp {
     String uri = String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=SHA1&digits=6&period=30", issuer,
         userEmail, secret, issuer);
 
-    return new RecTotpSecret(secret, uri, gcmMng.encrypt(secret));
+    return new RecTotpSecret(secret, uri, gcmMng.encrypt(secret.getBytes(StandardCharsets.US_ASCII)));
   }
 
   public int genCode(String secret) throws Exception {

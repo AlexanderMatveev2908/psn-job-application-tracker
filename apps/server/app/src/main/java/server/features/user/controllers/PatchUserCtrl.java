@@ -28,6 +28,6 @@ public class PatchUserCtrl {
   }
 
   public Mono<ResponseEntity<ResAPI>> setup2FA(Api api) {
-    return setup2FASVC.mng(api).flatMap(rec -> new ResAPI(200).msg("setup 2FA").data(rec.toMap()).build());
+    return setup2FASVC.mng(api).flatMap(rec -> new ResAPI(200).msg("setup 2FA").data(rec.forClient()).build());
   }
 }

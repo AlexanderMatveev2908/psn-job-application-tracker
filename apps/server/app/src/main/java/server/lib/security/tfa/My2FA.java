@@ -38,11 +38,11 @@ public class My2FA {
     var userEmail = api.getUser().getEmail();
     RecTotpSecret recTOTP = genTotpSecret(userEmail);
 
-    return genBkpCodes().flatMap(recBkp -> genQrBinary(userEmail)
+    return genBkpCodes().flatMap(recBkp -> genQrBinary(recTOTP.uri())
         .flatMap(qrBinary -> genZipBase64(recTOTP.uri(), recBkp.clientCodes(), qrBinary).map(zipBinary -> {
           saveLocally(api, zipBinary);
 
-          return Rec2FA.parsing(zipBinary, qrBinary, recTOTP.uri(), recBkp.clientCodes());
+          return Rec2FA.parsing(zipBinary, qrBinary, recTOTP, recBkp);
         })));
   }
 

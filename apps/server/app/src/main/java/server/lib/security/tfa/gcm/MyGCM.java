@@ -26,7 +26,7 @@ public class MyGCM {
     return new SecretKeySpec(Prs.hexToBinary(envKeeper.getGcmKey()), "AES");
   }
 
-  public String encrypt(String plainText) {
+  public String encrypt(byte[] data) {
     try {
       byte[] iv = new byte[IV_LEN];
       new SecureRandom().nextBytes(iv);
@@ -35,7 +35,7 @@ public class MyGCM {
       GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LEN, iv);
       cipher.init(Cipher.ENCRYPT_MODE, getKey(), spec);
 
-      byte[] cipherText = cipher.doFinal(plainText.getBytes());
+      byte[] cipherText = cipher.doFinal(data);
       byte[] combined = new byte[iv.length + cipherText.length];
 
       System.arraycopy(iv, 0, combined, 0, iv.length);
