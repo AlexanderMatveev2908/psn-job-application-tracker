@@ -40,23 +40,44 @@ public class MyTotp {
     return new RecTotpSecret(secret, uri, gcmMng.encrypt(secret.getBytes(StandardCharsets.US_ASCII)));
   }
 
-  public int genCode(String secret) throws Exception {
-    byte[] keyBytes = Base32.decode(secret);
+  // public int genCode(String secret) throws Exception {
+  // byte[] keyBytes = Base32.decode(secret);
 
-    SecretKey key = new SecretKeySpec(keyBytes, "HmacSHA1");
+  // SecretKey key = new SecretKeySpec(keyBytes, "HmacSHA1");
 
-    TimeBasedOneTimePasswordGenerator totp = new TimeBasedOneTimePasswordGenerator(Duration.ofSeconds(30));
+  // TimeBasedOneTimePasswordGenerator totp = new
+  // TimeBasedOneTimePasswordGenerator(Duration.ofSeconds(30));
 
-    Instant now = Instant.now();
-    int code = totp.generateOneTimePassword(key, now);
+  // Instant now = Instant.now();
+  // int code = totp.generateOneTimePassword(key, now);
 
-    return code;
+  // return code;
+  // }
+
+  public String plainB32FromEncHex(String hexEncrypt) {
+    byte[] plainBinary = gcmMng.decrypt(hexEncrypt);
+
+    return new String(plainBinary, StandardCharsets.US_ASCII);
   }
 
-  public boolean checkTotp(String secret, int code) {
-
+  public boolean checkTotp(String encryptedHex, int code) {
     try {
-      return genCode(secret) == code;
+      String plainB32 = plainB32FromEncHex(encryptedHex);
+      byte[] keyBytes = Base32.decode(plainB32);
+      SecretKey key = new SecretKeySpec(keyBytes, "HmacSHA1");
+
+      TimeBasedOneTimePasswordGenerator totp = new TimeBasedOneTimePasswordGenerator(Duration.ofSeconds(30));
+      Instant now = Instant.now();
+
+      for (int offset = -1; offset <= 1; offset++) {
+        Instant moment = now.plusSeconds(offset * 30);
+        int currCode = totp.generateOneTimePassword(key, moment);
+
+        if (currCode == code)
+          return true;
+      }
+
+      return false;
     } catch (Exception err) {
       throw new ErrAPI("totp_invalid", 401);
     }

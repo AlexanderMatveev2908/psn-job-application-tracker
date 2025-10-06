@@ -47,19 +47,23 @@ public class MyGCM {
     }
   }
 
-  public String decrypt(String encrypted) throws Exception {
-    byte[] decoded = Prs.hexToBinary(encrypted);
+  public byte[] decrypt(String encrypted) {
+    try {
+      byte[] decoded = Prs.hexToBinary(encrypted);
 
-    byte[] iv = Arrays.copyOfRange(decoded, 0, IV_LEN);
-    byte[] cipherText = Arrays.copyOfRange(decoded, IV_LEN, decoded.length);
+      byte[] iv = Arrays.copyOfRange(decoded, 0, IV_LEN);
+      byte[] cipherText = Arrays.copyOfRange(decoded, IV_LEN, decoded.length);
 
-    Cipher cipher = Cipher.getInstance(ALG);
-    GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LEN, iv);
-    cipher.init(Cipher.DECRYPT_MODE, getKey(), spec);
+      Cipher cipher = Cipher.getInstance(ALG);
+      GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LEN, iv);
+      cipher.init(Cipher.DECRYPT_MODE, getKey(), spec);
 
-    byte[] plain = cipher.doFinal(cipherText);
+      byte[] plain = cipher.doFinal(cipherText);
 
-    return Prs.binaryToUtf8(plain);
+      return plain;
+    } catch (Exception err) {
+      throw new ErrAPI("invalid encrypted text", 401);
+    }
   }
 
 }
