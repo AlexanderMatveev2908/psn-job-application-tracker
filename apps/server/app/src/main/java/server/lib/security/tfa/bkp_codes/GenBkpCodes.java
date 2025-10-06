@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,7 +14,7 @@ import server.lib.data_structure.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.tfa.bkp_codes.etc.RecBkpCodes;
 
-@Service @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @Service @RequiredArgsConstructor
 public class GenBkpCodes {
 
   private final static SecureRandom random = new SecureRandom();

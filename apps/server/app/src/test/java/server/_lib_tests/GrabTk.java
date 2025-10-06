@@ -7,10 +7,12 @@ import java.util.Map;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import server._lib_tests.shapes.ExpArgT;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
 
+@SuppressFBWarnings({ "EI2", })
 public class GrabTk {
   private final WebTestClient web;
   private final List<ExpArgT> expired = new ArrayList<>();
@@ -63,7 +65,7 @@ public class GrabTk {
       if (exp != null)
         req.addQuery("expired[]", exp.getValue());
 
-    if (existingPayload instanceof User)
+    if (existingPayload != null)
       req.body(Map.of("existingPayload", existingPayload));
 
     return req.send();

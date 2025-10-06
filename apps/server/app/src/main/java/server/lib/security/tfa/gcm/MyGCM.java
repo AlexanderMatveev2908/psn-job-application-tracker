@@ -10,16 +10,18 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
 
-@Service @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2", "REC_CATCH_EXCEPTION" }) @Service @RequiredArgsConstructor
 public class MyGCM {
   private static final String ALG = "AES/GCM/NoPadding";
   private static final int GCM_TAG_LEN = 128;
   private static final int IV_LEN = 12;
+  private static final SecureRandom random = new SecureRandom();
   private final EnvKeeper envKeeper;
 
   private SecretKey getKey() {
@@ -29,7 +31,7 @@ public class MyGCM {
   public String encrypt(byte[] data) {
     try {
       byte[] iv = new byte[IV_LEN];
-      new SecureRandom().nextBytes(iv);
+      random.nextBytes(iv);
 
       Cipher cipher = Cipher.getInstance(ALG);
       GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LEN, iv);

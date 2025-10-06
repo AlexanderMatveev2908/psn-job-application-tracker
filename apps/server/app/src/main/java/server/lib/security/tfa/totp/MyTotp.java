@@ -13,22 +13,24 @@ import org.springframework.stereotype.Service;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.flow.ErrAPI;
 import server.lib.security.tfa.gcm.MyGCM;
 import server.lib.security.tfa.totp.etc.RecTotpSecret;
 
-@Service @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2", }) @Service @RequiredArgsConstructor
 public class MyTotp {
 
+  private static final SecureRandom random = new SecureRandom();
   private final MyGCM gcmMng;
   private final EnvKeeper envKeeper;
 
   public RecTotpSecret genSecret(String userEmail) {
 
     byte[] randomBytes = new byte[20];
-    new SecureRandom().nextBytes(randomBytes);
+    random.nextBytes(randomBytes);
 
     byte[] encoded = Base32.encode(randomBytes);
     String secret = new String(encoded, StandardCharsets.US_ASCII).replace("=", "");

@@ -10,6 +10,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -27,7 +28,7 @@ import server.lib.security.tfa.qr_code.MyQrCode;
 import server.lib.security.tfa.totp.MyTotp;
 import server.lib.security.tfa.totp.etc.RecTotpSecret;
 
-@Service @RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2", "REC_CATCH_EXCEPTION" }) @Service @RequiredArgsConstructor
 public class My2FA {
   private final GenBkpCodes bkpCodesMng;
   private final MyQrCode qqCodeMng;

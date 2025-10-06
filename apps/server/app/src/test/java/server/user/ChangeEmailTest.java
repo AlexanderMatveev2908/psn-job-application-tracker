@@ -26,11 +26,11 @@ import server.models.token.etc.TokenT;
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
 public class ChangeEmailTest {
   private final static String URL = "/user/change-email";
+  private final static Faker faker = new Faker();
 
   @Autowired
   private WebTestClient web;
   private ReqT mainReq;
-  private final static Faker faker = new Faker();
 
   @BeforeEach
   void setup() {
