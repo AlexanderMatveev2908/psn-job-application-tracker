@@ -11,11 +11,13 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ResAPI;
 import server.features.verify.services.VerifyMailSvc;
+import server.features.verify.services.VerifyNewEmailSvc;
 
 @SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
 public class GetVerifyCtrl {
 
   private final VerifyMailSvc verifyMailSvc;
+  private final VerifyNewEmailSvc verifyNewMailSvc;
 
   public Mono<ResponseEntity<ResAPI>> verifyEmail(Api api) {
     return verifyMailSvc.mng(api).flatMap(tpl -> new ResAPI(200).msg("user verified").cookie(tpl.getT1())
@@ -24,5 +26,10 @@ public class GetVerifyCtrl {
 
   public Mono<ResponseEntity<ResAPI>> verifyRecoverPwd(Api api) {
     return new ResAPI(200).msg("token verified").build();
+  }
+
+  public Mono<ResponseEntity<ResAPI>> confNewEmail(Api api) {
+    return verifyNewMailSvc.mgn(api).flatMap(tpl -> new ResAPI(200).msg("email changed")
+        .data(Map.of("accessToken", tpl.getT2())).cookie(tpl.getT1()).build());
   }
 }

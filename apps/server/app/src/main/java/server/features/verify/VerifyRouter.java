@@ -23,4 +23,9 @@ public class VerifyRouter {
   public Mono<ResponseEntity<ResAPI>> verifyRecoverPwd(Api api) {
     return getCtrl.verifyRecoverPwd(api);
   }
+
+  @GetMapping("/new-email")
+  public Mono<ResponseEntity<ResAPI>> confNewEmail(Api api) {
+    return getCtrl.confNewEmail(api);
+  }
 }

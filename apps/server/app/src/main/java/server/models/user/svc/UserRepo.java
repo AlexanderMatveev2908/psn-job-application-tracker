@@ -54,6 +54,14 @@ public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
                 """)
     Mono<User> setTotpSecret(String totpSecret, UUID userId);
 
+    @Query("""
+            UPDATE users
+            SET email = tmp_email,
+                tmp_email = NULL
+            WHERE id = :userId
+            RETURNING *;
+                    """)
+    Mono<User> toggleEmails(UUID userId);
     // @Query("""
     // SELECT
     // us.*,

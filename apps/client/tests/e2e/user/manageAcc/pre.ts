@@ -1,3 +1,3 @@
-import { Browser } from "@playwright/test";
+// import { Browser } from "@playwright/test";
 
-const preMngAcc = async (browser: Browser) => {};
+// const preMngAcc = async (browser: Browser) => {};

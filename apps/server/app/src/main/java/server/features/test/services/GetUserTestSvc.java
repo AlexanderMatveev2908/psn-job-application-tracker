@@ -17,6 +17,7 @@ import net.datafaker.Faker;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import server.decorators.flow.Api;
+import server.features.test.paperwork.UserTestForm;
 import server.lib.dev.MyLog;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
@@ -24,6 +25,7 @@ import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturn
 import server.lib.security.mng_tokens.tokens.jwe.MyJwe;
 import server.lib.security.mng_tokens.tokens.jwe.etc.RecCreateJweReturnT;
 import server.lib.security.mng_tokens.tokens.jwt.MyJwt;
+import server.middleware.form_checkers.FormChecker;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
@@ -39,6 +41,7 @@ public class GetUserTestSvc {
   private final MyJwt myJwt;
   private final MyJwe myJwe;
   private final MyCbcHmac myCbcHmac;
+  private final FormChecker formCk;
 
   public Mono<Map<String, Object>> getUserTest(Api api) {
     Map<String, Object> query = api.getParsedQuery().orElse(Map.of("tokenT", "conf_email"));
@@ -61,8 +64,11 @@ public class GetUserTestSvc {
 
     return api.getBd(new TypeReference<Map<String, Object>>() {
     }).map(body -> {
-      if (body.get("existingPayload") instanceof Map userMap)
-        return User.fromTestPayload((Map<String, Object>) userMap);
+      if (body.get("existingPayload") instanceof Map userMap) {
+        var form = UserTestForm.fromMap(userMap);
+        formCk.checkForm(form);
+        return User.fromTestPayload(userMap);
+      }
       return defUser;
     }).defaultIfEmpty(defUser);
   }
