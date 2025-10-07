@@ -56,7 +56,7 @@ public class ConfirmEmailTest {
     ResT resTk = GrabTk.with(web).send();
 
     if (msg.contains("already verified"))
-      ReqT.withUrl(web, "/verify/confirm-email").method(HttpMethod.GET).addCbcHmac(resTk.getCbcHmac()).send();
+      ReqT.withUrl(web, "/verify/confirm-email").method(HttpMethod.GET).addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     var email = status == 404 ? faker.internet().emailAddress() : resTk.getUser().getEmail();
     mainReq.body(Map.of(status == 400 ? "mail" : "email", email));

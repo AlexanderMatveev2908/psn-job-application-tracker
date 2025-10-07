@@ -42,7 +42,7 @@ public class ConfirmEmailTest {
   void ok() {
     ResT resTk = GrabTk.with(web).tokenT(TokenT.CONF_EMAIL).send();
 
-    ResT resVerify = mainReq.addCbcHmac(resTk.getCbcHmac()).send();
+    ResT resVerify = mainReq.addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     MyAssrt.base(resVerify, 200, "user verified");
     MyAssrt.hasTokens(resVerify);
@@ -72,7 +72,7 @@ public class ConfirmEmailTest {
 
     if (!msg.equals("cbc_hmac_not_provided"))
       if (!msg.equals("cbc_hmac_invalid")) {
-        mainReq.addCbcHmac(resTk.getCbcHmac());
+        mainReq.addQueryCbcHmac(resTk.getCbcHmac());
       } else {
         String parts[] = resTk.getCbcHmac().split("\\.");
         Map<String, Object> map = Prs.hexToMap(parts[0]);
@@ -83,7 +83,7 @@ public class ConfirmEmailTest {
             .concat(Stream.of(evilPart), Arrays.stream(Arrays.copyOfRange(parts, 1, parts.length)))
             .collect(Collectors.joining("."));
 
-        mainReq.addCbcHmac(evilCbcHmac);
+        mainReq.addQueryCbcHmac(evilCbcHmac);
 
       }
 
