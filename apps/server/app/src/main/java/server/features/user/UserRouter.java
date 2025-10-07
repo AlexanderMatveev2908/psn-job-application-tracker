@@ -54,4 +54,9 @@ public class UserRouter {
     public Mono<ResponseEntity<ResAPI>> setup2FA(Api api) {
         return patchCtrl.setup2FA(api);
     }
+
+    @PostMapping("/manage-account-2FA")
+    public Mono<ResponseEntity<ResAPI>> manageAcc2FA(Api api) {
+        return postCtrl.manageAcc2FA(api);
+    }
 }

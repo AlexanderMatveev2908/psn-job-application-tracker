@@ -49,6 +49,13 @@ public interface ApiInfo {
     return getExch().getRequest().getPath().toString();
   }
 
+  default boolean isSamePath(String arg) {
+    if (arg == null)
+      return false;
+
+    return getPath().equals(arg.split("\\?", 2)[0]);
+  }
+
   default HttpMethod getMethod() {
     return getExch().getRequest().getMethod();
   }

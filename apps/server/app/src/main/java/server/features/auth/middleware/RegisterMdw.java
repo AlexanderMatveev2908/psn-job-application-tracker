@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.features.auth.paperwork.RegisterForm;
-import server.middleware.BaseMdw;
+import server.middleware.base_mdw.BaseMdw;
 
 @Component @RequiredArgsConstructor
 public class RegisterMdw extends BaseMdw {

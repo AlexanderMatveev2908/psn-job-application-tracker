@@ -2,7 +2,6 @@ package server.features.auth.controllers;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,6 @@ import server.features.auth.services.LoginSvc;
 import server.features.auth.services.RegisterSvc;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.hash.MyHashMng;
-import server.models.backup_code.etc.RecInfoBkp;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenSvc;
 import server.models.user.User;
@@ -68,14 +66,12 @@ public class PostAuthCtrl {
     }
 
     public Mono<ResponseEntity<ResAPI>> login2FA(Api api) {
-        Optional<RecInfoBkp> recInfo = api.getInfoBkp();
 
         return loginSvc.login2FA(api).flatMap(tpl -> {
 
             Map<String, Object> data = new HashMap<>();
             data.put("accessToken", tpl.getT2());
-            if (recInfo.isPresent())
-                data.put("codesLeft", recInfo.get().codesCount() - 1);
+            api.putCodesLeftIfPresent(data);
 
             return new ResAPI(200).msg("user logged").data(data).cookie(tpl.getT1()).build();
         });

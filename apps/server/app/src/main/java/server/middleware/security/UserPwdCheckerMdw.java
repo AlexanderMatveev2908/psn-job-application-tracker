@@ -10,7 +10,7 @@ import server.decorators.flow.api.Api;
 import server.lib.security.hash.MyHashMng;
 
 @Service @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
-public class CheckUserPwdMdw {
+public class UserPwdCheckerMdw {
   private final MyHashMng hashMng;
 
   public Mono<Void> checkUserPwd(Api api, String plainText, boolean mustMatch) {
