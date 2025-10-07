@@ -48,8 +48,8 @@ export const getTokensLib = async (
 };
 
 export interface ResUser2FA {
-  payload: PayloadRegisterT;
-  user: UserT;
+  user: PayloadRegisterT;
+  plainPwd: string;
   totpSecret: string;
   backupCodes: string[];
   accessToken: string;
@@ -67,7 +67,7 @@ export const getUser2FA = async (
   const page = await preTest(browser, "/");
 
   const res = await page.request.post(
-    `${BASE_URL}/test/get-user-2FA?cbc_hmac_t=${tokenType}`
+    `${BASE_URL}/test/user?tokenT=${tokenType}&use2FA=true`
   );
   const data = await res.json();
 

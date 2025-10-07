@@ -57,16 +57,16 @@ export const use2FAForm = <T>({
   const mainCb = useCallback(
     async ({
       totpCode,
-      backup_code,
+      backupCode,
     }: {
       totpCode?: string;
-      backup_code?: string;
+      backupCode?: string;
     }) => {
       const res = await wrapAPI({
         cbAPI: () =>
           mutationTrigger({
             cbcHmacToken: userState.cbcHmacToken,
-            ...(totpCode ? { totpCode } : { backup_code }),
+            ...(totpCode ? { totpCode } : { backupCode }),
           }),
         pushNotice: [401],
       });
@@ -98,7 +98,7 @@ export const use2FAForm = <T>({
 
   const handleSaveBackupCode = submitBackupCode(async (data) => {
     await mainCb({
-      backup_code: data.backupCode,
+      backupCode: data.backupCode,
     });
   }, logFormErrs);
 
