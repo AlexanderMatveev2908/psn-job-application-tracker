@@ -5,7 +5,7 @@ import org.springframework.web.server.WebFilterChain;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
+import server.decorators.flow.api.Api;
 import server.features.auth.paperwork.RegisterForm;
 import server.middleware.BaseMdw;
 

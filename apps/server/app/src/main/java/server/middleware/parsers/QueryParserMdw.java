@@ -9,7 +9,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
+import server.decorators.flow.api.Api;
 
 @Component @Order(30)
 public class QueryParserMdw implements WebFilter {

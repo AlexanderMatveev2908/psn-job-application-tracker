@@ -7,8 +7,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.conf.db.database.DB;
-import server.decorators.flow.Api;
-import server.decorators.flow.ResAPI;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenCombo;
 

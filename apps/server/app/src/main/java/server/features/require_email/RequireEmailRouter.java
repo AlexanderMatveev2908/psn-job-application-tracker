@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
-import server.decorators.flow.ResAPI;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 import server.features.require_email.controllers.PostRequireEmail;
 import server.router.RouterAPI;
 

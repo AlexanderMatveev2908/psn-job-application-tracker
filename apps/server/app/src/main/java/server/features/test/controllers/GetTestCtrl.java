@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
-import server.decorators.flow.ResAPI;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 
 @Component @RequiredArgsConstructor
 public class GetTestCtrl {

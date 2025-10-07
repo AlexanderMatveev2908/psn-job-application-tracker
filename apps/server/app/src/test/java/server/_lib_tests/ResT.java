@@ -3,8 +3,10 @@ package server._lib_tests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import server.decorators.RootCls;
+import server.decorators.flow.ErrAPI;
 import server.models.user.User;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -47,8 +49,20 @@ public class ResT implements RootCls {
         return null;
     }
 
+    public <T> T getCasting(String key, Class<T> type) {
+        Object val = getBd().get(key);
+
+        if (val == null)
+            throw new ErrAPI("called get on null for => " + key);
+
+        if (!type.isInstance(val))
+            throw new ErrAPI("invalid type for => " + key);
+
+        return type.cast(val);
+    }
+
     public String getJwt() {
-        return (String) getBd().get("accessToken");
+        return getCasting("accessToken", String.class);
     }
 
     public String getJwe() {
@@ -56,29 +70,28 @@ public class ResT implements RootCls {
     }
 
     public String getCbcHmac() {
-        return (getBd().get("cbcHmacToken") instanceof String token) ? token : "";
+        return getCasting("cbcHmacToken", String.class);
     }
 
     public String getPlainPwd() {
-        if (getBd().get("plainPwd") instanceof String strPwd)
-            return strPwd;
-
-        return "";
+        return getCasting("plainPwd", String.class);
     }
 
     public String getMsg() {
-        return (String) getBd().get("msg");
+        return getCasting("msg", String.class);
     }
 
     public String getTotpSecret() {
-        return (String) getBd().get("totpSecret");
+        return getCasting("totpSecret", String.class);
+    }
+
+    @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
+    public List<String> getBkpCodes() {
+        return (List<String>) getCasting("bkpCodes", List.class);
     }
 
     @SuppressWarnings({ "unchecked", })
     public User getUser() {
-        if (getBd().get("user") instanceof Map userMap)
-            return User.fromTestPayload(userMap);
-
-        return null;
+        return User.fromTestPayload(getCasting("user", Map.class));
     }
 }

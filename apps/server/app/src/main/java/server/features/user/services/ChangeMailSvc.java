@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
+import server.decorators.flow.api.Api;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenCombo;
 import server.models.user.svc.UserRepo;

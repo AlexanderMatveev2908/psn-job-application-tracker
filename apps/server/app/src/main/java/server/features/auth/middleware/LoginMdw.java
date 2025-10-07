@@ -5,8 +5,8 @@ import org.springframework.web.server.WebFilterChain;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.decorators.flow.api.Api;
 import server.features.auth.paperwork.LoginForm;
 import server.middleware.BaseMdw;
 import server.models.user.svc.UserSvc;
