@@ -30,6 +30,11 @@ public class AuthRouter {
         return postCtrl.login(api);
     }
 
+    @PostMapping("/login-2FA")
+    public Mono<ResponseEntity<ResAPI>> login2FA(Api api) {
+        return postCtrl.login2FA(api);
+    }
+
     @PostMapping("/logout")
     public Mono<ResponseEntity<ResAPI>> logout(Api api) {
         return postCtrl.logout(api);

@@ -63,4 +63,8 @@ public class PostAuthCtrl {
 
         return tokenSvc.deleteByUserIdAndTokenT(us.getId(), TokenT.REFRESH).then(res.build());
     }
+
+    public Mono<ResponseEntity<ResAPI>> login2FA(Api api) {
+        return new ResAPI(200).msg("").build();
+    }
 }

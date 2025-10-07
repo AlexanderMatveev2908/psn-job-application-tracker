@@ -42,20 +42,6 @@ public class MyTotp {
     return new RecTotpSecret(secret, uri, gcmMng.encrypt(secret.getBytes(StandardCharsets.US_ASCII)));
   }
 
-  // public int genCode(String secret) throws Exception {
-  // byte[] keyBytes = Base32.decode(secret);
-
-  // SecretKey key = new SecretKeySpec(keyBytes, "HmacSHA1");
-
-  // TimeBasedOneTimePasswordGenerator totp = new
-  // TimeBasedOneTimePasswordGenerator(Duration.ofSeconds(30));
-
-  // Instant now = Instant.now();
-  // int code = totp.generateOneTimePassword(key, now);
-
-  // return code;
-  // }
-
   public String plainB32FromEncHex(String hexEncrypt) {
     byte[] plainBinary = gcmMng.decrypt(hexEncrypt);
 
@@ -64,6 +50,7 @@ public class MyTotp {
 
   public boolean checkTotp(String encryptedHex, int code) {
     try {
+      // ? when i grab secret from database as user prop
       String plainB32 = plainB32FromEncHex(encryptedHex);
       byte[] keyBytes = Base32.decode(plainB32);
       SecretKey key = new SecretKeySpec(keyBytes, "HmacSHA1");

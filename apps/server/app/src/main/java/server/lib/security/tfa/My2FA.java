@@ -47,6 +47,11 @@ public class My2FA {
         })));
   }
 
+  public boolean checkTotp(String encryptedSecret, String totpStr) {
+    int parsed = Integer.parseInt(totpStr);
+    return totpMng.checkTotp(encryptedSecret, parsed);
+  }
+
   private Mono<RecBkpCodes> genBkpCodes() {
     return bkpCodesMng.getCodes();
   }

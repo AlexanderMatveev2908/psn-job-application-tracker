@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.middleware.form_checkers.FormChecker;
+import server.middleware.security.Check2FAMdw;
 import server.middleware.security.CheckTokenMdw;
 import server.middleware.security.CheckUserPwdMdw;
 import server.middleware.security.RateLimit;
@@ -32,6 +33,8 @@ public abstract class BaseMdw implements WebFilter {
     private CheckTokenMdw tokenCk;
     @Autowired
     private CheckUserPwdMdw checkUserMdw;
+    @Autowired
+    private Check2FAMdw tfaCheck;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -88,6 +91,12 @@ public abstract class BaseMdw implements WebFilter {
 
     protected Mono<User> checkBodyCbcHmacLogged(Api api, TokenT tokenT) {
         return checkJwtMandatory(api).then(checkBodyCbcHmac(api, tokenT));
+    }
+
+    protected Mono<Void> check2FA(Api api, TokenT tokenT) {
+        return checkBodyCbcHmac(api, tokenT).flatMap(user -> grabBody(api).flatMap(body -> {
+            return tfaCheck.check2FA(user, body);
+        }));
     }
 
     protected Mono<String> checkPwdReg(Api api) {
