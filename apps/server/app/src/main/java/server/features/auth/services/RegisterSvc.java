@@ -26,7 +26,7 @@ public class RegisterSvc {
         .switchIfEmpty(userRepo.insert(us).flatMap(dbUser -> {
 
           return tokenComboSvc.insertCbcHmacWithMail(dbUser, TokenT.CONF_EMAIL)
-              .then(tokenComboSvc.genSessionTokens(dbUser));
+              .then(tokenComboSvc.genSessionTokens(dbUser.getId()));
         }));
   }
 

@@ -80,7 +80,7 @@ public class ReqT {
         return this;
     }
 
-    public ReqT addCbcHmac(String token) {
+    public ReqT addQueryCbcHmac(String token) {
         this.addQuery("cbcHmacToken", token);
         return this;
     }
@@ -124,6 +124,6 @@ public class ReqT {
     }
 
     public static ResT verifyMailWithToken(WebTestClient web, String token) {
-        return ReqT.withUrl(web, "/verify/confirm-email").method(HttpMethod.GET).addCbcHmac(token).send();
+        return ReqT.withUrl(web, "/verify/confirm-email").method(HttpMethod.GET).addQueryCbcHmac(token).send();
     }
 }

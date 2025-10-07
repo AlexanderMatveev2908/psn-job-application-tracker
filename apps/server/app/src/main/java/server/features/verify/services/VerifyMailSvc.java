@@ -27,6 +27,6 @@ public class VerifyMailSvc {
 
     return userRepo.verifyUser(user.getId())
         .then(tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.CONF_EMAIL).then())
-        .then(tokenComboSvc.genSessionTokens(user));
+        .then(tokenComboSvc.genSessionTokens(user.getId()));
   }
 }

@@ -38,7 +38,7 @@ public class RecoverPwdTest {
   void ok() {
     ResT resTk = GrabTk.with(web).tokenT(TokenT.RECOVER_PWD).send();
 
-    ResT mainRes = mainReq.addCbcHmac(resTk.getCbcHmac()).send();
+    ResT mainRes = mainReq.addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     MyAssrt.base(mainRes, 200);
   }
@@ -54,7 +54,7 @@ public class RecoverPwdTest {
         .expired(ExpArgT.fromSplit(msg)).send();
 
     if (!msg.equals("cbc_hmac_not_provided"))
-      mainReq.addCbcHmac(resTk.getCbcHmac());
+      mainReq.addQueryCbcHmac(resTk.getCbcHmac());
 
     ResT res = mainReq.send();
 

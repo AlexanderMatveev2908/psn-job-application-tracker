@@ -38,7 +38,7 @@ public class DelAccTest {
   void ok() {
     ResT resTk = GrabTk.with(web).tokenT(TokenT.MANAGE_ACC).send();
 
-    ResT res = mainReq.jwt(resTk.getJwt()).addCbcHmac(resTk.getCbcHmac()).send();
+    ResT res = mainReq.jwt(resTk.getJwt()).addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     MyAssrt.base(res, 200, "account deleted");
   }
@@ -53,7 +53,7 @@ public class DelAccTest {
     ResT resTk = GrabTk.with(web).tokenT(TokenT.MANAGE_ACC).expired(ExpArgT.fromSplit(msg)).send();
 
     if (!msg.equals("cbc_hmac_not_provided"))
-      mainReq.addCbcHmac(resTk.getCbcHmac());
+      mainReq.addQueryCbcHmac(resTk.getCbcHmac());
 
     if (!msg.equals("jwt_not_provided"))
       mainReq.jwt(resTk.getJwt());

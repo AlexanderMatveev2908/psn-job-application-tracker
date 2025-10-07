@@ -23,7 +23,7 @@ public class LoginSvc {
   private final BkpCodesRepo bkpCodesRepo;
 
   public Mono<Tuple2<ResponseCookie, String>> simpleLogin(User user) {
-    return tokenCombo.genSessionTokens(user);
+    return tokenCombo.genSessionTokens(user.getId());
   }
 
   public Mono<String> firstStepLogin2FA(User user) {

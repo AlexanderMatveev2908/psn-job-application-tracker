@@ -48,7 +48,7 @@ public class VerifyNewEmailTest {
 
     ResT resTk = GrabTk.with(web).existingPayload(rootResTk.getUser()).tokenT(TokenT.CHANGE_EMAIL).send();
 
-    ResT resChange = mainReq.addCbcHmac(resTk.getCbcHmac()).send();
+    ResT resChange = mainReq.addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     MyAssrt.base(resChange, 200, "email changed");
     MyAssrt.hasTokens(resChange);
@@ -66,7 +66,7 @@ public class VerifyNewEmailTest {
     ResT resTk = GrabTk.with(web).existingPayload(rootResTk.getUser()).expired(ExpArgT.fromSplit(msg)).tokenT(tokenT)
         .send();
 
-    ResT resChange = mainReq.addCbcHmac(resTk.getCbcHmac()).send();
+    ResT resChange = mainReq.addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     MyAssrt.base(resChange, status, msg);
   }
