@@ -8,6 +8,7 @@ import lombok.Data;
 import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.ShapeCheck;
+import server.lib.dev.MyLog;
 import server.paperwork.tfa.annotations.TFAFormMatch;
 
 @Data @TFAFormMatch({ "totpCode", "backupCode" })
@@ -24,12 +25,15 @@ public class TFAForm {
       Object rawTotp = map.get("totpCode");
       String totpCode = null;
 
-      if (rawTotp instanceof Integer intCode)
-        totpCode = intCode.toString();
-      else if (rawTotp instanceof String strCode)
-        totpCode = strCode;
+      if (rawTotp != null)
+        totpCode = rawTotp.toString().trim();
 
-      return new TFAForm(totpCode, map.get("backupCode") instanceof String strCode ? strCode : null);
+      Object rawBkp = map.get("backupCode");
+      String bkpCode = ShapeCheck.isStr(rawBkp) ? (String) rawBkp : null;
+
+      MyLog.log(totpCode, bkpCode);
+
+      return new TFAForm(totpCode, bkpCode);
     } catch (Exception err) {
       throw new ErrAPI("invalid 2FA data", 401);
     }
