@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import server.conf.mail.MailSvc;
-import server.lib.dev.MyLog;
 import server.lib.security.cookies.MyCookies;
 import server.lib.security.mng_tokens.TkMng;
 import server.lib.security.mng_tokens.etc.RecSessionTokensReturnT;
@@ -27,13 +26,8 @@ public class TokenCombo {
   private final MailSvc mailSvc;
   private final MyCookies ckMng;
 
-  private void logDeleted(int count, TokenT tokenT) {
-    MyLog.log(String.format("🧹 deleted %d %s tokens", count, tokenT));
-  }
-
   private Mono<MyToken> insertCbcHmac(MyToken token) {
     return repo.delByUserIdAndTokenT(token.getUserId(), token.getTokenType()).collectList().flatMap(ids -> {
-      logDeleted(ids.size(), token.getTokenType());
       return repo.insertWithId(token);
     });
   }
@@ -46,7 +40,6 @@ public class TokenCombo {
 
   public Mono<MyToken> insertJwe(MyToken token) {
     return repo.delByUserIdAndTokenT(token.getUserId(), TokenT.REFRESH).collectList().flatMap(ids -> {
-      logDeleted(ids.size(), token.getTokenType());
       return repo.insert(token);
     });
   }

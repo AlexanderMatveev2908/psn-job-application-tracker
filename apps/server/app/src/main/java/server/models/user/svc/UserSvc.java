@@ -55,10 +55,8 @@ public class UserSvc {
     }
 
     public Mono<Integer> hardDelete(UUID id) {
-        return userRepo.findById(id)
-                .flatMap(user -> userRepo.delete(user).thenReturn(1).doOnSuccess(v -> MyLog.log("🔪 deleted 1 column")))
+        return userRepo.findById(id).flatMap(user -> userRepo.delete(user).thenReturn(1))
                 .switchIfEmpty(Mono.defer(() -> {
-                    MyLog.log("🗑️ deleted 0 columns");
                     return Mono.just(0);
                 }));
     }

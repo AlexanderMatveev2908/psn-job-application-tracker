@@ -114,8 +114,6 @@ public class ReqT {
 
         MyLog.startLog();
         System.out.println("🚦 " + url + " => " + res.getStatus());
-        System.out.println("📜 " + res.getHdrs());
-        System.out.println("🍪 " + res.getCks());
         res.getBd().forEach((k, v) -> MyLog.logKV(k, v));
         MyLog.endLog();
         MyLog.wOk(res);

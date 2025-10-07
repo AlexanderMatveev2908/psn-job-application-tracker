@@ -18,7 +18,6 @@ import server.conf.env_conf.EnvKeeper;
 import server.conf.env_conf.etc.EnvMode;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
-import server.lib.dev.MyLog;
 import server.lib.paths.Hiker;
 import server.lib.security.tfa.bkp_codes.GenBkpCodes;
 import server.lib.security.tfa.bkp_codes.etc.RecBkpCodes;
@@ -118,7 +117,6 @@ public class My2FA {
 
       Files.write(filePath, binaryZip, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-      MyLog.log("🗃️ saved ZIP => " + filePath.toString());
     } catch (Exception err) {
       throw new ErrAPI("err saving local zip");
     }

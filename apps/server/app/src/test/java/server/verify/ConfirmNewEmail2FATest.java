@@ -24,7 +24,7 @@ import server.lib.security.tfa.totp.MyTotp;
 import server.models.token.etc.TokenT;
 
 @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
-public class ConfirmNewEmailTest {
+public class ConfirmNewEmail2FATest {
   private final static String URL = "/verify/new-email-2FA";
   private final static Faker faker = new Faker();
 

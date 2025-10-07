@@ -26,20 +26,7 @@ public class Dev {
     // }
 
     public void mng() {
-        // try {
 
-        // var extracted = totp.plainB32FromEncHex(
-        // "fdc7ec429c1cd966d8c4e980a903ede472370d62e5f007c7195d6dcf82c094b82c46bf1db35fa8935f6ef595a5665b3f24ab594d6a94566b36cba54c");
-        // var original = "YD5IRLBFP34FNPFGXHRHNJWMXV2KFXOQ";
-
-        // MyLog.log(extracted, original, extracted.equals(original));
-
-        // MyLog.log(totp.checkTotp(
-        // "fdc7ec429c1cd966d8c4e980a903ede472370d62e5f007c7195d6dcf82c094b82c46bf1db35fa8935f6ef595a5665b3f24ab594d6a94566b36cba54c",
-        // 429673));
-        // } catch (Exception err) {
-        // MyLog.logErr(err);
-        // }
     }
 
     public void dropAll() {

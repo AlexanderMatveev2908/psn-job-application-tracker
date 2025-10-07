@@ -33,11 +33,8 @@ public class ServerApplication {
         return e -> {
 
             try {
-
                 lifeSpawn.lifeCheck(e);
-
                 dev.mng();
-
             } catch (Exception err) {
                 MyLog.logErr(err);
             }

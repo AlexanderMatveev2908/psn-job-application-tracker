@@ -20,7 +20,6 @@ import reactor.util.function.Tuple2;
 import server.decorators.flow.api.Api;
 import server.features.test.paperwork.UserTestForm;
 import server.features.test.services.get_user_test.etc.RecUserTest;
-import server.lib.dev.MyLog;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
@@ -69,7 +68,6 @@ public class GetUserTestSvc {
 
       return userRepo.findByEmail(userPayload.getEmail()).flatMap(dbUser -> {
         return tokenRepo.delByUserId(dbUser.getId()).collectList().flatMap(ids -> {
-          MyLog.log("🧹 tokens deleted deleted => " + ids.size());
 
           // ! if u sent a plain text will have again plain text
           // ! else if you do not need it
@@ -109,7 +107,6 @@ public class GetUserTestSvc {
         .flatMap(rec -> userRepo.setTotpSecret(rec.recTOTP().encrypted(), user.getId())
             .flatMap(updatedUser -> Flux.fromIterable(rec.recBkpCodes().hashed())
                 .flatMap(code -> bkpCodesRepo.insert(user.getId(), code)).collectList()
-                .doOnNext(saved -> MyLog.log("bkp codes inserted => " + saved.size()))
                 .then(Mono.just(new RecUserTest(updatedUser, tpl.getT2(), rec)))));
 
   }

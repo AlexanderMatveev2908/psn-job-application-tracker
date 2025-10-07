@@ -11,7 +11,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
-import server.lib.dev.MyLog;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.tfa.My2FA;
 import server.models.backup_code.etc.RecInfoBkp;
@@ -56,9 +55,7 @@ public class Check2FAMdw {
               : Mono.just(matches.get(0)))
           .flatMap(m -> {
 
-            return bkpCodesRepo.delById(m.getId()).collectList().doOnNext(ids -> {
-              MyLog.log("🧹 deleted bkp => " + ids.get(0));
-            }).thenReturn(new RecInfoBkp(m, codes.size()));
+            return bkpCodesRepo.delById(m.getId()).collectList().thenReturn(new RecInfoBkp(m, codes.size()));
           });
 
     });

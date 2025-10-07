@@ -116,12 +116,11 @@ tasks.withType<SpotBugsTask> {
 }
 
 tasks.named("check") {
-    dependsOn(
-        "checkstyleMain",
-        "pmdMain",
-        "spotbugsMain"
-    )
+    dependsOn(tasks.withType<Checkstyle>())
+    dependsOn(tasks.withType<Pmd>())
+    dependsOn(tasks.withType<SpotBugsTask>())
 }
+
 
 tasks.named<Test>("test") {
     useJUnitPlatform()

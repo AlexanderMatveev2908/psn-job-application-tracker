@@ -13,7 +13,6 @@ import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
-import server.lib.dev.MyLog;
 
 @Component
 public class DB {
@@ -66,9 +65,7 @@ public class DB {
 
             String joined = String.join(", ", tables);
             String truncateSql = "TRUNCATE TABLE " + joined + " RESTART IDENTITY CASCADE";
-            return dbLow.sql(truncateSql).fetch().rowsUpdated().doOnNext((res) -> {
-                MyLog.log(String.format("🪓 truncated %d tables", tables.size()));
-            }).thenReturn(tables.size());
+            return dbLow.sql(truncateSql).fetch().rowsUpdated().thenReturn(tables.size());
         }).onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 

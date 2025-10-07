@@ -9,7 +9,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import server.lib.dev.MyLog;
 import server.models.token.MyToken;
 import server.models.token.etc.TokenT;
 
@@ -28,14 +27,12 @@ public class TokenSvc {
 
     public Mono<Integer> deleteByUserIdAndTokenT(UUID userId, TokenT tokenT) {
         return repo.delByUserIdAndTokenT(userId, tokenT).collectList().flatMap(ids -> {
-            MyLog.log("🧹 tokens deleted => " + ids.size());
             return Mono.just(ids.size());
         });
     }
 
     public Mono<Integer> delById(UUID id) {
         return repo.delById(id).map(res -> {
-            MyLog.log("🧹 token deleted => " + res);
             return 1;
         }).defaultIfEmpty(0);
     }

@@ -61,8 +61,7 @@ public class MailSvc {
                 .doOnSuccess((nl) -> {
                     MyLog.log("📫 mail sent");
                 }).onErrorResume((err) -> {
-                    MyLog.logErr(err);
-                    return Mono.empty();
+                    return Mono.error(new ErrAPI("err sending mail"));
                 }).then();
     }
 
@@ -70,9 +69,6 @@ public class MailSvc {
         return Mono.fromRunnable(() -> sendHtmlMail(tokenT, user, newEmail, clientToken)).doOnSuccess((nl) -> {
             MyLog.log("📫 mail sent");
         }).onErrorResume((err) -> {
-
-            MyLog.logErr(err);
-
             return Mono.error(new ErrAPI("err sending mail"));
         }).then();
     }

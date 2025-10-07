@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
-import server.lib.dev.MyLog;
 import server.lib.security.tfa.My2FA;
 import server.lib.security.tfa.etc.Rec2FA;
 import server.models.backup_code.svc.BkpCodesRepo;
@@ -25,7 +24,7 @@ public class Setup2FASvc {
 
     return tfa.setup2FA(user).flatMap(rec -> userRepo.setTotpSecret(rec.recTOTP().encrypted(), user.getId())
         .thenMany(Flux.fromIterable(rec.recBkpCodes().hashed()).flatMap(code -> codesRepo.insert(user.getId(), code)))
-        .collectList().doOnNext(saved -> MyLog.log("bkp codes inserted => " + saved.size())).thenReturn(rec));
+        .collectList().thenReturn(rec));
   }
 
 }

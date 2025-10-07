@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import server.decorators.flow.api.Api;
-import server.lib.dev.MyLog;
 import server.models.backup_code.etc.RecInfoBkp;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.etc.TokenT;
@@ -30,8 +29,7 @@ public class VerifyNewEmailSvc {
   public Mono<Tuple2<ResponseCookie, String>> simpleFlow(Api api) {
     var user = api.getUser();
     return userRepo.toggleEmails(user.getId())
-        .then(tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.CHANGE_EMAIL).collectList()
-            .doOnNext(ids -> MyLog.log("🧹 tokens deleted => " + ids.size())))
+        .then(tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.CHANGE_EMAIL).collectList())
         .then(tokenCombo.genSessionTokens(user.getId()));
   }
 
