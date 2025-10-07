@@ -10,7 +10,7 @@ import server.decorators.flow.Api;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenCombo;
 import server.models.user.svc.UserRepo;
-import server.paperwork.EmailCheck;
+import server.paperwork.EmailForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class ChangeMailSvc {
@@ -20,7 +20,7 @@ public class ChangeMailSvc {
   public Mono<Void> mng(Api api) {
 
     var user = api.getUser();
-    EmailCheck mailForm = api.getMappedData();
+    EmailForm mailForm = api.getMappedData();
 
     return userRepo.setTmpEmail(user.getId(), mailForm.getEmail())
         .then(tokenCombo.insertCbcHmacWithMail(api.getUser(), mailForm.getEmail(), TokenT.CHANGE_EMAIL));

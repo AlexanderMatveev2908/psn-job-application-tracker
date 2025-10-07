@@ -14,7 +14,7 @@ import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenCombo;
 import server.models.token.svc.TokenRepo;
 import server.models.user.svc.UserRepo;
-import server.paperwork.PwdCheck;
+import server.paperwork.PwdForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class RecoverPwdSvc {
@@ -24,7 +24,7 @@ public class RecoverPwdSvc {
   private final MyHashMng hashMng;
 
   public Mono<Tuple2<ResponseCookie, String>> mng(Api api) {
-    PwdCheck form = api.getMappedData();
+    PwdForm form = api.getMappedData();
     var user = api.getUser();
 
     return hashMng.argonHash(form.getPassword()).flatMap(hashed -> userRepo.changePwd(user.getId(), hashed))

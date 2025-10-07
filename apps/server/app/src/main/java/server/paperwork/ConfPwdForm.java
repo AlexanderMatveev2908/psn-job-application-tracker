@@ -7,13 +7,13 @@ import lombok.Data;
 import server.decorators.flow.ErrAPI;
 
 @Data
-public class ConfPwdCheck {
+public class ConfPwdForm {
   @NotBlank(message = "confirm password required")
   private final String confirmPassword;
 
-  public static ConfPwdCheck fromBody(Map<String, Object> body) {
+  public static ConfPwdForm fromBody(Map<String, Object> body) {
     if (body.get("confirmPassword") instanceof String pwdStr)
-      return new ConfPwdCheck(pwdStr);
+      return new ConfPwdForm(pwdStr);
 
     throw new ErrAPI("confirm password invalid", 400);
   }

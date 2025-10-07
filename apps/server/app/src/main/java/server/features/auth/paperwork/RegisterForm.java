@@ -7,30 +7,30 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 import server.decorators.flow.ErrAPI;
-import server.paperwork.EmailCheck;
-import server.paperwork.NamesCheck;
-import server.paperwork.PairPwdCheck;
+import server.paperwork.EmailForm;
+import server.paperwork.NamesForm;
+import server.paperwork.pair_pwd_form.PairPwdForm;
 
 @Data
 public class RegisterForm {
 
     @Valid
-    private final EmailCheck emailCheck;
+    private final EmailForm emailCheck;
 
     @Valid
-    private final PairPwdCheck pairPwdCheck;
+    private final PairPwdForm pairPwdCheck;
 
     @Valid
-    private final NamesCheck namesCheck;
+    private final NamesForm namesCheck;
 
     @AssertTrue(message = "terms must be accepted")
     private final Boolean terms;
 
     public RegisterForm(String firstName, String lastName, String email, String password, String confirmPassword,
             Boolean terms) {
-        this.emailCheck = new EmailCheck(email);
-        this.pairPwdCheck = new PairPwdCheck(password, confirmPassword);
-        this.namesCheck = new NamesCheck(firstName, lastName);
+        this.emailCheck = new EmailForm(email);
+        this.pairPwdCheck = new PairPwdForm(password, confirmPassword);
+        this.namesCheck = new NamesForm(firstName, lastName);
         this.terms = terms;
     }
 

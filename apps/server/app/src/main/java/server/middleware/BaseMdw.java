@@ -21,7 +21,8 @@ import server.middleware.security.CheckUserPwdMdw;
 import server.middleware.security.RateLimit;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
-import server.paperwork.PwdCheck;
+import server.paperwork.PwdForm;
+import server.paperwork.tfa.TFAForm;
 
 public abstract class BaseMdw implements WebFilter {
 
@@ -95,13 +96,16 @@ public abstract class BaseMdw implements WebFilter {
 
     protected Mono<Void> check2FA(Api api, TokenT tokenT) {
         return checkBodyCbcHmac(api, tokenT).flatMap(user -> grabBody(api).flatMap(body -> {
-            return tfaCheck.check2FA(user, body);
+
+            var form = TFAForm.fromMap(body);
+
+            return checkForm(api, form).then(tfaCheck.check2FA(user, form));
         }));
     }
 
     protected Mono<String> checkPwdReg(Api api) {
         return grabBody(api).flatMap(body -> {
-            var form = PwdCheck.fromBody(body);
+            var form = PwdForm.fromBody(body);
             return checkForm(api, form).thenReturn(form.getPassword());
         });
     }

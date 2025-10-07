@@ -9,24 +9,22 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.conf.Reg;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.lib.data_structure.ShapeCheck;
 import server.lib.security.tfa.My2FA;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.user.User;
+import server.paperwork.tfa.TFAForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2", "REC_CATCH_EXCEPTION" })
 public class Check2FAMdw {
   private final BkpCodesRepo bkpCodesRepo;
   private final My2FA tfa;
 
-  public Mono<Void> check2FA(User user, Map<String, Object> body) {
-    if (body.get("totpCode") instanceof String totpCode)
-      return checkTotpCode(user, totpCode);
-    else if (body.get("backupCode") instanceof String backupCode)
-      return checkBkpCode(user, backupCode);
+  public Mono<Void> check2FA(User user, TFAForm form) {
 
-    return Mono.error(new ErrAPI("credentials not provided", 401));
+    return ShapeCheck.isStr(form.getTotpCode()) ? checkTotpCode(user, form.getTotpCode())
+        : checkBkpCode(user, form.getBackupCode());
   }
 
   private Mono<Void> checkTotpCode(User user, String totpCode) {
