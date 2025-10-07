@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.lib.dev.MyLog;
 import server.middleware.form_checkers.FormChecker;
 import server.middleware.security.Check2FAMdw;
 import server.middleware.security.CheckTokenMdw;
@@ -96,14 +97,16 @@ public abstract class BaseMdw implements WebFilter {
 
     protected Mono<Void> check2FA(Api api, TokenT tokenT) {
         return checkBodyCbcHmac(api, tokenT).flatMap(user -> grabBody(api).flatMap(body -> {
-
             var form = TFAForm.fromMap(body);
 
-            return checkForm(api, form).then(tfaCheck.check2FA(user, form));
+            MyLog.log("run");
+
+            return checkForm(api, form).then(tfaCheck.check2FA(api, form));
         }));
     }
 
     protected Mono<String> checkPwdReg(Api api) {
+
         return grabBody(api).flatMap(body -> {
             var form = PwdForm.fromBody(body);
             return checkForm(api, form).thenReturn(form.getPassword());

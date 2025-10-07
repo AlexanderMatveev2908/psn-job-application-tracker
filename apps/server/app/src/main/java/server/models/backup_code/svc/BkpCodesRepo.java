@@ -29,4 +29,11 @@ public interface BkpCodesRepo extends ReactiveCrudRepository<BkpCodes, UUID> {
         RETURNING id
       """)
   Flux<String> delByUserId(UUID userId);
+
+  @Query("""
+      DELETE FROM backup_codes
+      WHERE id = :id
+      RETURNING id
+      """)
+  Flux<String> delById(UUID id);
 }

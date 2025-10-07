@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import server.lib.dev.MyLog;
+import server.models.backup_code.etc.RecInfoBkp;
 import server.models.user.User;
 
 @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch" })
@@ -188,6 +190,16 @@ public final class Api extends ServerWebExchangeDecorator {
 
     public void setUserAttr(User user) {
         setAttr("user", user);
+    }
+
+    public void setInfoBkp(RecInfoBkp rec) {
+        setAttr("recInfoBkp", rec);
+    }
+
+    public Optional<RecInfoBkp> getInfoBkp() {
+        RecInfoBkp rec = getAttribute("recInfoBkp");
+
+        return Optional.ofNullable(rec);
     }
 
     // ? the middleware FormChecker after parsed the body to Map<String,Object>
