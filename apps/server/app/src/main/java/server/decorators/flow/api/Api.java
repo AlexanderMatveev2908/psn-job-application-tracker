@@ -61,20 +61,6 @@ public final class Api extends ServerWebExchangeDecorator implements ApiInfo, Ap
         };
     }
 
-    public boolean isSamePath(String arg) {
-        if (arg == null)
-            return false;
-
-        return getPath().equals(arg.split("\\?", 2)[0]);
-    }
-
-    public String getQueryCbcHmac() {
-        if (getParsedQuery().orElse(Map.of()).get("cbcHmacToken") instanceof String cbcHmac)
-            return cbcHmac;
-
-        return "";
-    }
-
     public Mono<String> getBdCbcHmac() {
         return getBd(new TypeReference<Map<String, Object>>() {
         }).flatMap(body -> {
@@ -112,4 +98,5 @@ public final class Api extends ServerWebExchangeDecorator implements ApiInfo, Ap
     public boolean isResCmt() {
         return getResponse().isCommitted();
     }
+
 }

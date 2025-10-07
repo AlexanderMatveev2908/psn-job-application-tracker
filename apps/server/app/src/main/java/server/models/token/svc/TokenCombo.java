@@ -31,7 +31,7 @@ public class TokenCombo {
     MyLog.log(String.format("🧹 deleted %d %s tokens", count, tokenT));
   }
 
-  public Mono<MyToken> insertCbcHmac(MyToken token) {
+  private Mono<MyToken> insertCbcHmac(MyToken token) {
     return repo.delByUserIdAndTokenT(token.getUserId(), token.getTokenType()).collectList().flatMap(ids -> {
       logDeleted(ids.size(), token.getTokenType());
       return repo.insertWithId(token);

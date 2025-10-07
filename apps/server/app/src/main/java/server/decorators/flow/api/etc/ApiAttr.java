@@ -41,6 +41,13 @@ public interface ApiAttr {
     return Optional.ofNullable(rec);
   }
 
+  default void putCodesLeftIfPresent(Map<String, Object> data) {
+    Optional<RecInfoBkp> rec = getInfoBkp();
+
+    if (rec.isPresent())
+      data.put("codesLeft", rec.get().codesCount() - 1);
+  }
+
   // ? instance form parsed in mdw and set before svc or ctrl
   default <T> void setMappedDataAttr(T data) {
     setAttr("mappedData", data);
@@ -60,6 +67,13 @@ public interface ApiAttr {
     Map<String, Object> val = getExch().getAttribute("parsedQuery");
 
     return val != null ? Optional.of(val) : Optional.empty();
+  }
+
+  default String getQueryCbcHmac() {
+    if (getParsedQuery().orElse(Map.of()).get("cbcHmacToken") instanceof String cbcHmac)
+      return cbcHmac;
+
+    return "";
   }
 
   // ? parsed form
