@@ -29,7 +29,14 @@ public class GetVerifyCtrl {
   }
 
   public Mono<ResponseEntity<ResAPI>> confNewEmail(Api api) {
-    return verifyNewMailSvc.mgn(api).flatMap(tpl -> new ResAPI(200).msg("email changed")
-        .data(Map.of("accessToken", tpl.getT2())).cookie(tpl.getT1()).build());
+
+    var user = api.getUser();
+
+    return !user.use2FA()
+        ? verifyNewMailSvc.simpleFlow(api)
+            .flatMap(tpl -> new ResAPI(200).msg("email changed").data(Map.of("accessToken", tpl.getT2()))
+                .cookie(tpl.getT1()).build())
+        : verifyNewMailSvc.firstSetp2FA(api).flatMap(
+            clientToken -> new ResAPI(200).msg("first step passed").data(Map.of("cbcHmacToken", clientToken)).build());
   }
 }

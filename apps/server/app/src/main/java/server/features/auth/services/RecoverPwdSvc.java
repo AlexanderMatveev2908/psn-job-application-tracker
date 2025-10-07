@@ -29,6 +29,6 @@ public class RecoverPwdSvc {
 
     return hashMng.argonHash(form.getPassword()).flatMap(hashed -> userRepo.changePwd(user.getId(), hashed))
         .then(tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.RECOVER_PWD).then())
-        .then(tokenCombo.genSessionTokens(user));
+        .then(tokenCombo.genSessionTokens(user.getId()));
   }
 }

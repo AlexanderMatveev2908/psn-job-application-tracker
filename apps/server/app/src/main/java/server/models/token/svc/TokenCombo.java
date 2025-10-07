@@ -63,9 +63,9 @@ public class TokenCombo {
     return insertCbcHmacWithMail(user, null, tokenT);
   }
 
-  public Mono<Tuple2<ResponseCookie, String>> genSessionTokens(User user) {
+  public Mono<Tuple2<ResponseCookie, String>> genSessionTokens(UUID userId) {
 
-    RecSessionTokensReturnT rec = tkMng.genSessionTokens(user.getId());
+    RecSessionTokensReturnT rec = tkMng.genSessionTokens(userId);
     ResponseCookie jweCookie = ckMng.jweCookie(rec.jwe().clientToken());
 
     return insertJwe(rec.jwe().inst()).thenReturn(Tuples.of(jweCookie, rec.jwt()));

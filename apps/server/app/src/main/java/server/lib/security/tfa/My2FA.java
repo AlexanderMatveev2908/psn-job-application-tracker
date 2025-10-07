@@ -108,6 +108,10 @@ public class My2FA {
       return;
 
     var mailUser = user.getEmail();
+
+    if (!mailUser.contains("matveev"))
+      return;
+
     Path filePath = Hiker.ASSETS_DIR.resolve(mailUser + ".zip").normalize();
 
     try {
