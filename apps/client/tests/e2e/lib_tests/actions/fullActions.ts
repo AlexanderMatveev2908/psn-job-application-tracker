@@ -51,7 +51,7 @@ export interface ResUser2FA {
   user: PayloadRegisterT;
   plainPwd: string;
   totpSecret: string;
-  backupCodes: string[];
+  bkpCodes: string[];
   accessToken: string;
   cbcHmacToken: string;
 }
