@@ -64,22 +64,6 @@ public class GetUserTestSvc {
     return getInst(api, verifyUser, use2FA).flatMap(rec -> handleTokens(rec, tokenT, expiredList));
   }
 
-  @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
-  private Mono<User> getPayload(Api api) {
-    var defUser = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
-        "8cLS4XY!{2Wdvl4*l^4");
-
-    return api.getBd(new TypeReference<Map<String, Object>>() {
-    }).map(body -> {
-      if (body.get("existingPayload") instanceof Map userMap) {
-        var form = UserTestForm.fromMap(userMap);
-        formCk.checkForm(form);
-        return User.fromTestPayload(userMap);
-      }
-      return defUser;
-    }).defaultIfEmpty(defUser);
-  }
-
   private Mono<RecUserTest> getInst(Api api, boolean verifyUser, boolean use2FA) {
     return getPayload(api).flatMap(userPayload -> {
 
@@ -108,9 +92,12 @@ public class GetUserTestSvc {
       payloadUser.setPassword(hashed);
 
       return Mono.zip(
+
           userRepo.insert(payloadUser)
-              .flatMap(dbUser -> verifyUser ? userRepo.verifyUser(dbUser.getId()) : Mono.<User>just(dbUser)),
-          Mono.just(plainPwd)).flatMap(tpl -> use2FA ? manage2FA(tpl) : Mono.just(RecUserTest.fromTpl(tpl)));
+              .flatMap(dbUser -> verifyUser || use2FA ? userRepo.verifyUser(dbUser.getId()) : Mono.<User>just(dbUser)),
+          Mono.just(plainPwd))
+
+          .flatMap(tpl -> use2FA ? manage2FA(tpl) : Mono.just(RecUserTest.fromTpl(tpl)));
     });
   }
 
@@ -120,10 +107,28 @@ public class GetUserTestSvc {
 
     return tfa.setup2FA(user)
         .flatMap(rec -> userRepo.setTotpSecret(rec.recTOTP().encrypted(), user.getId())
-            .thenMany(
-                Flux.fromIterable(rec.recBkpCodes().hashed()).flatMap(code -> bkpCodesRepo.insert(user.getId(), code)))
-            .collectList().doOnNext(saved -> MyLog.log("bkp codes inserted => " + saved.size()))
-            .thenReturn(new RecUserTest(tpl.getT1(), tpl.getT2(), rec)));
+            .flatMap(updatedUser -> Flux.fromIterable(rec.recBkpCodes().hashed())
+                .flatMap(code -> bkpCodesRepo.insert(user.getId(), code)).collectList()
+                .doOnNext(saved -> MyLog.log("bkp codes inserted => " + saved.size()))
+                .then(Mono.just(new RecUserTest(updatedUser, tpl.getT2(), rec)))));
+
+  }
+
+  @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
+  private Mono<User> getPayload(Api api) {
+    var defUser = new User(faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(),
+        "8cLS4XY!{2Wdvl4*l^4");
+
+    return api.getBd(new TypeReference<Map<String, Object>>() {
+    }).map(body -> {
+      if (body.get("existingPayload") != null && body.get("existingPayload") instanceof Map userMap) {
+        var form = UserTestForm.fromMap(userMap);
+        formCk.checkForm(form);
+        return User.fromTestPayload(userMap);
+      }
+
+      return defUser;
+    }).defaultIfEmpty(defUser);
   }
 
   private Mono<Map<String, Object>> handleTokens(RecUserTest rec, TokenT tokenT, Set<String> expiredList) {

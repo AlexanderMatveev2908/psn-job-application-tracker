@@ -70,6 +70,10 @@ public class ResT implements RootCls {
         return (String) getBd().get("msg");
     }
 
+    public String getTotpSecret() {
+        return (String) getBd().get("totpSecret");
+    }
+
     @SuppressWarnings({ "unchecked", })
     public User getUser() {
         if (getBd().get("user") instanceof Map userMap)

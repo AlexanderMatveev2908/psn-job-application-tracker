@@ -19,9 +19,17 @@ public class TFAForm {
   public static TFAForm fromMap(Map<String, Object> map) {
 
     try {
-      return new TFAForm((String) map.get("totpCode"), (String) map.get("backupCode"));
+      var rawTotp = map.get("totpCode");
+      var totpCode = rawTotp instanceof Integer intCode ? intCode.toString()
+          : rawTotp instanceof String strCode ? strCode : null;
+
+      return new TFAForm(totpCode, (String) map.get("backupCode") instanceof String strCode ? strCode : null);
     } catch (Exception err) {
       throw new ErrAPI("invalid 2FA data", 401);
     }
+  }
+
+  public Integer getTotpInt() {
+    return Integer.parseInt(totpCode);
   }
 }

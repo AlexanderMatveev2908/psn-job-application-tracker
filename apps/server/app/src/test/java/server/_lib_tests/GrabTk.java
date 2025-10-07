@@ -19,6 +19,7 @@ public class GrabTk {
   private User existingPayload;
   private TokenT tokenT;
   private boolean verifyUser;
+  private boolean use2FA;
 
   private GrabTk(WebTestClient web) {
     this.web = web;
@@ -32,6 +33,10 @@ public class GrabTk {
     return new GrabTk(web).verifyUser();
   }
 
+  public static GrabTk with2FA(WebTestClient web) {
+    return new GrabTk(web).use2FA();
+  }
+
   public GrabTk tokenT(TokenT tokenT) {
     this.tokenT = tokenT;
     return this;
@@ -39,6 +44,12 @@ public class GrabTk {
 
   public GrabTk verifyUser() {
     this.verifyUser = true;
+    return this;
+  }
+
+  public GrabTk use2FA() {
+    this.verifyUser = true;
+    this.use2FA = true;
     return this;
   }
 
@@ -60,6 +71,8 @@ public class GrabTk {
 
     if (verifyUser)
       req.addQuery("verifyUser", "true");
+    if (use2FA)
+      req.addQuery("use2FA", "true");
 
     for (ExpArgT exp : expired)
       if (exp != null)

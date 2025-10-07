@@ -7,7 +7,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import server.conf.Reg;
 import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.ShapeCheck;
@@ -28,14 +27,11 @@ public class Check2FAMdw {
   public Mono<Void> check2FA(Api api, TFAForm form) {
     var user = api.getUser();
 
-    return ShapeCheck.isStr(form.getTotpCode()) ? checkTotpCode(user, form.getTotpCode())
+    return ShapeCheck.isStr(form.getTotpCode()) ? checkTotpCode(user, form.getTotpInt())
         : checkBkpCode(user, form.getBackupCode()).flatMap(rec -> Mono.fromRunnable(() -> api.setInfoBkp(rec)));
   }
 
-  private Mono<Void> checkTotpCode(User user, String totpCode) {
-    if (!Reg.isTotpCode(totpCode))
-      return Mono.error(new ErrAPI("totp_code_invalid", 401));
-
+  private Mono<Void> checkTotpCode(User user, Integer totpCode) {
     var resCheck = tfa.checkTotp(user.getTotpSecret(), totpCode);
 
     if (!resCheck)
