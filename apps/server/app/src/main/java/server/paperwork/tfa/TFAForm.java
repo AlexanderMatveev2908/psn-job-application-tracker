@@ -26,7 +26,7 @@ public class TFAForm {
       String totpCode = null;
 
       if (rawTotp != null)
-        totpCode = rawTotp.toString().trim();
+        totpCode = rawTotp.toString();
 
       Object rawBkp = map.get("backupCode");
       String bkpCode = ShapeCheck.isStr(rawBkp) ? (String) rawBkp : null;

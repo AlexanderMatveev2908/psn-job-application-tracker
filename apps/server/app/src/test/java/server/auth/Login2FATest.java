@@ -2,9 +2,11 @@ package server.auth;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,7 +23,7 @@ import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
 import server.lib.security.tfa.totp.MyTotp;
 
-@SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
+@SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor @Timeout(value = 60, unit = TimeUnit.SECONDS)
 public class Login2FATest {
   private final static String URL = "/auth/login-2FA";
 
