@@ -1,9 +1,14 @@
 package server.auth;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,12 +47,22 @@ public class Login2FATest {
     mainReq = ReqT.withUrl(web, URL).method(HttpMethod.POST);
   }
 
-  @Test
-  void ok() {
+  static Stream<Arguments> goodCases() {
+    return Stream.of(Arguments.of("totp"), Arguments.of("bkp_code"));
+  }
 
-    var code = totp.genTestTOTP(resTk.getTotpSecret());
+  @ParameterizedTest @MethodSource("goodCases")
+  void ok(String approach) {
 
-    var body = Map.of("cbcHmacToken", resFirstStep.getCbcHmac(), "totpCode", code);
+    var body = new HashMap<>();
+    body.put("cbcHmacToken", resFirstStep.getCbcHmac());
+
+    if (approach.equals("totp")) {
+      var code = totp.genTestTOTP(resTk.getTotpSecret());
+      body.put("totpCode", code);
+    } else {
+      body.put("backupCode", resTk.getBkpCodes().get(0));
+    }
 
     ResT res = mainReq.body(body).send();
 
