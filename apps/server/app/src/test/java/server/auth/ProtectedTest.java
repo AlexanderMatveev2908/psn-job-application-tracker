@@ -21,7 +21,7 @@ import server._lib_tests.MyAssrt;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
 import server._lib_tests.shapes.ExpArgT;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 
 @SuppressWarnings({ "unused", "UseSpecificCatch",
     "CallToPrintStackTrace" }) @SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor

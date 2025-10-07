@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.res_api.ResAPI;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 import server.lib.dev.MyLog;
 
 @Component @Order(-1)

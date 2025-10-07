@@ -21,7 +21,7 @@ import server.conf.cloud.etc.CloudResourceT;
 import server.conf.env_conf.EnvKeeper;
 import server.decorators.AppFile;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 import server.lib.dev.MyLog;
 
 @Service @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })

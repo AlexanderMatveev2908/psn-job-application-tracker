@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.hkdf.Hkdf;
 import server.lib.security.mng_tokens.etc.MyTkPayload;

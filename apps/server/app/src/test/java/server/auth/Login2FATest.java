@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +35,11 @@ public class Login2FATest {
   private ReqT mainReq;
   private ResT resTk;
   private ResT resFirstStep;
+
+  @BeforeAll
+  static void setupGlobalTimer() {
+    System.setProperty("reactor.blocking.timeout", "60s");
+  }
 
   @BeforeEach
   void setup() {

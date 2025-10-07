@@ -2,7 +2,7 @@ package server.lib.security.tfa.etc;
 
 import java.util.Map;
 
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 import server.lib.security.tfa.bkp_codes.etc.RecBkpCodes;
 import server.lib.security.tfa.totp.etc.RecTotpSecret;
 

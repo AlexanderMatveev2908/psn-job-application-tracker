@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 import server.models.token.etc.AlgT;
 import server.models.token.etc.TokenT;
 

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import server.decorators.flow.ErrAPI;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
 
 public record MyTkPayload(UUID userId, long iat, long exp) {

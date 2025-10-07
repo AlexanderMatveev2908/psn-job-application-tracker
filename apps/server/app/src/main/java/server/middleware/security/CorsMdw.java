@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.lib.combo.Kit;
-import server.lib.data_structure.Prs;
+import server.lib.data_structure.parser.Prs;
 
 @Component @Order(10) @RequiredArgsConstructor
 public class CorsMdw implements WebFilter {

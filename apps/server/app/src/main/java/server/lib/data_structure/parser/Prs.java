@@ -1,4 +1,4 @@
-package server.lib.data_structure;
+package server.lib.data_structure.parser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
