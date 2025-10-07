@@ -49,11 +49,11 @@ public class ResT implements RootCls {
         return null;
     }
 
-    public <T> T getCasting(String key, Class<T> type) {
+    public <T> T getCasting(String key, Class<T> type, T def) {
         Object val = getBd().get(key);
 
         if (val == null)
-            throw new ErrAPI("called get on null for => " + key);
+            return def;
 
         if (!type.isInstance(val))
             throw new ErrAPI("invalid type for => " + key);
@@ -62,7 +62,7 @@ public class ResT implements RootCls {
     }
 
     public String getJwt() {
-        return getCasting("accessToken", String.class);
+        return getCasting("accessToken", String.class, "");
     }
 
     public String getJwe() {
@@ -70,28 +70,28 @@ public class ResT implements RootCls {
     }
 
     public String getCbcHmac() {
-        return getCasting("cbcHmacToken", String.class);
+        return getCasting("cbcHmacToken", String.class, "");
     }
 
     public String getPlainPwd() {
-        return getCasting("plainPwd", String.class);
+        return getCasting("plainPwd", String.class, "");
     }
 
     public String getMsg() {
-        return getCasting("msg", String.class);
+        return getCasting("msg", String.class, "");
     }
 
     public String getTotpSecret() {
-        return getCasting("totpSecret", String.class);
+        return getCasting("totpSecret", String.class, "");
     }
 
     @SuppressWarnings({ "unused", "unchecked", "UseSpecificCatch", "CallToPrintStackTrace" })
     public List<String> getBkpCodes() {
-        return (List<String>) getCasting("bkpCodes", List.class);
+        return (List<String>) getCasting("bkpCodes", List.class, List.of());
     }
 
     @SuppressWarnings({ "unchecked", })
     public User getUser() {
-        return User.fromTestPayload(getCasting("user", Map.class));
+        return User.fromTestPayload(getCasting("user", Map.class, Map.of()));
     }
 }
