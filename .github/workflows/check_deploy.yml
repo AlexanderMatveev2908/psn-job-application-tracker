@@ -79,11 +79,11 @@ jobs:
       - name: 🔧 make gradlew executable
         run: chmod +x apps/server/gradlew
 
-      #   # ? ~ 1.5 minutes
-      # - name: 🔎 lint && types check
-      #   run: yarn check
+        # ? ~ 1.5 minutes
+      - name: 🔎 lint && types check
+        run: yarn check
 
-      # ? ~ 1 minute
+        # ? ~ 1 minute
       - name: 🛠️ build app
         run: yarn build
 
@@ -101,9 +101,10 @@ jobs:
             http-get://localhost:3000/api/v1/test \
             http-get://localhost:3001
 
-      #   # ? ~ 3 minutes
-      # - name: 💻 run test client
-      #   run: yarn workspace client test
+        # ? ~ 3 minutes
+      - name: 💻 run test client
+        run: yarn workspace client test
+
       - name: 🛑 stop server
         run: kill $SERVER_PID || true
 
