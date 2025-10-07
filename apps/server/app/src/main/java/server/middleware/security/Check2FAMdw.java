@@ -1,5 +1,7 @@
 package server.middleware.security;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,7 +11,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
-import server.lib.data_structure.ShapeCheck;
 import server.lib.dev.MyLog;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.tfa.My2FA;
@@ -26,8 +27,9 @@ public class Check2FAMdw {
 
   public Mono<Void> check2FA(Api api, TFAForm form) {
     var user = api.getUser();
+    Optional<Integer> optTotp = form.getTotpInt();
 
-    return ShapeCheck.isStr(form.getTotpCode()) ? checkTotpCode(user, form.getTotpInt())
+    return optTotp.isPresent() ? checkTotpCode(user, optTotp.get())
         : checkBkpCode(user, form.getBackupCode()).flatMap(rec -> Mono.fromRunnable(() -> api.setInfoBkp(rec)));
   }
 

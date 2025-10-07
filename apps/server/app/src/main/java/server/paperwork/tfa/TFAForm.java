@@ -1,11 +1,13 @@
 package server.paperwork.tfa;
 
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
+import server.lib.data_structure.ShapeCheck;
 import server.paperwork.tfa.annotations.TFAFormMatch;
 
 @Data @TFAFormMatch({ "totpCode", "backupCode" })
@@ -19,17 +21,25 @@ public class TFAForm {
   public static TFAForm fromMap(Map<String, Object> map) {
 
     try {
-      var rawTotp = map.get("totpCode");
-      var totpCode = rawTotp instanceof Integer intCode ? intCode.toString()
-          : rawTotp instanceof String strCode ? strCode : null;
+      Object rawTotp = map.get("totpCode");
+      String totpCode = null;
 
-      return new TFAForm(totpCode, (String) map.get("backupCode") instanceof String strCode ? strCode : null);
+      if (rawTotp instanceof Integer intCode)
+        totpCode = intCode.toString();
+      else if (rawTotp instanceof String strCode)
+        totpCode = strCode;
+
+      return new TFAForm(totpCode, map.get("backupCode") instanceof String strCode ? strCode : null);
     } catch (Exception err) {
       throw new ErrAPI("invalid 2FA data", 401);
     }
   }
 
-  public Integer getTotpInt() {
-    return Integer.parseInt(totpCode);
+  public Optional<Integer> getTotpInt() {
+
+    if (ShapeCheck.isStr(totpCode))
+      return Optional.of(Integer.parseInt(totpCode));
+
+    return Optional.empty();
   }
 }
