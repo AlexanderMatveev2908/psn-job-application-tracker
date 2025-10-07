@@ -11,11 +11,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
-import server.decorators.flow.ResAPI;
-import server.features.test.services.GetUserTestSvc;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 import server.features.test.services.PostFormSvc;
+import server.features.test.services.get_user_test.GetUserTestSvc;
 import server.lib.data_structure.ShapeCheck;
 import server.lib.security.cookies.MyCookies;
 

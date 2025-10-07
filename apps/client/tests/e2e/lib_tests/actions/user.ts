@@ -96,7 +96,7 @@ export const getAccessManageAccVerified = async (browser: Browser) => {
 };
 
 export const goFormPreManageAcc2FA = async (browser: Browser) => {
-  const { page, payload, ...rst } = await getUser2FA(browser, {});
+  const { page, plainPwd, ...rst } = await getUser2FA(browser, {});
 
   await page.goto("/user/manage-account");
 
@@ -104,7 +104,7 @@ export const goFormPreManageAcc2FA = async (browser: Browser) => {
 
   const form = await getByID(page, "manage_acc__form");
 
-  await (await getByID(form, "password")).fill(payload.password);
+  await (await getByID(form, "password")).fill(plainPwd);
 
   await clickByID(form, "manage_acc__form__submit");
 
@@ -115,7 +115,7 @@ export const goFormPreManageAcc2FA = async (browser: Browser) => {
   return {
     ...rst,
     page,
-    payload,
+    plainPwd,
     form2FA,
   };
 };

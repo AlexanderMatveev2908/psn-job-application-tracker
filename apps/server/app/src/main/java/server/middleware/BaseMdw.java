@@ -12,15 +12,17 @@ import org.springframework.web.server.WebFilterChain;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.decorators.flow.api.Api;
 import server.middleware.form_checkers.FormChecker;
+import server.middleware.security.Check2FAMdw;
 import server.middleware.security.CheckTokenMdw;
 import server.middleware.security.CheckUserPwdMdw;
 import server.middleware.security.RateLimit;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
-import server.paperwork.PwdCheck;
+import server.paperwork.PwdForm;
+import server.paperwork.tfa.TFAForm;
 
 public abstract class BaseMdw implements WebFilter {
 
@@ -32,6 +34,8 @@ public abstract class BaseMdw implements WebFilter {
     private CheckTokenMdw tokenCk;
     @Autowired
     private CheckUserPwdMdw checkUserMdw;
+    @Autowired
+    private Check2FAMdw tfaCheck;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -90,9 +94,19 @@ public abstract class BaseMdw implements WebFilter {
         return checkJwtMandatory(api).then(checkBodyCbcHmac(api, tokenT));
     }
 
+    protected Mono<Void> check2FA(Api api, TokenT tokenT) {
+        return checkBodyCbcHmac(api, tokenT).flatMap(user -> grabBody(api).flatMap(body -> {
+
+            var form = TFAForm.fromMap(body);
+
+            return checkForm(api, form).then(tfaCheck.check2FA(api, form));
+        }));
+    }
+
     protected Mono<String> checkPwdReg(Api api) {
+
         return grabBody(api).flatMap(body -> {
-            var form = PwdCheck.fromBody(body);
+            var form = PwdForm.fromBody(body);
             return checkForm(api, form).thenReturn(form.getPassword());
         });
     }

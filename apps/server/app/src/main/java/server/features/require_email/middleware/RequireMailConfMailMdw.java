@@ -6,11 +6,11 @@ import org.springframework.web.server.WebFilterChain;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.decorators.flow.api.Api;
 import server.middleware.BaseMdw;
 import server.models.user.svc.UserSvc;
-import server.paperwork.EmailCheck;
+import server.paperwork.EmailForm;
 
 @SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
 public class RequireMailConfMailMdw extends BaseMdw {
@@ -21,7 +21,7 @@ public class RequireMailConfMailMdw extends BaseMdw {
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/require-email/confirm-email", () -> {
       return limitAndRef(api).flatMap(body -> {
-        EmailCheck form = EmailCheck.fromBody(body);
+        EmailForm form = EmailForm.fromBody(body);
 
         return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())
             .switchIfEmpty(Mono.error(new ErrAPI("user not found", 404))).flatMap(dbUser -> {

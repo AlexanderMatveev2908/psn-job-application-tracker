@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
-import server.decorators.flow.ResAPI;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 import server.features.verify.controllers.GetVerifyCtrl;
 import server.router.RouterAPI;
 

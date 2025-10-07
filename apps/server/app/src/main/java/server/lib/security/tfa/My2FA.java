@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import server.conf.env_conf.EnvKeeper;
 import server.conf.env_conf.etc.EnvMode;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.Prs;
 import server.lib.dev.MyLog;
@@ -27,6 +26,7 @@ import server.lib.security.tfa.etc.Rec2FA;
 import server.lib.security.tfa.qr_code.MyQrCode;
 import server.lib.security.tfa.totp.MyTotp;
 import server.lib.security.tfa.totp.etc.RecTotpSecret;
+import server.models.user.User;
 
 @SuppressFBWarnings({ "EI2", "REC_CATCH_EXCEPTION" }) @Service @RequiredArgsConstructor
 public class My2FA {
@@ -35,16 +35,20 @@ public class My2FA {
   private final MyTotp totpMng;
   private final EnvKeeper envKeeper;
 
-  public Mono<Rec2FA> setup2FA(Api api) {
-    var userEmail = api.getUser().getEmail();
+  public Mono<Rec2FA> setup2FA(User user) {
+    var userEmail = user.getEmail();
     RecTotpSecret recTOTP = genTotpSecret(userEmail);
 
     return genBkpCodes().flatMap(recBkp -> genQrBinary(recTOTP.uri())
         .flatMap(qrBinary -> genZipBase64(recTOTP.uri(), recBkp.clientCodes(), qrBinary).map(zipBinary -> {
-          saveLocally(api, zipBinary);
+          saveLocally(user, zipBinary);
 
           return Rec2FA.parsing(zipBinary, qrBinary, recTOTP, recBkp);
         })));
+  }
+
+  public boolean checkTotp(String encryptedSecret, Integer totpCode) {
+    return totpMng.checkTotp(encryptedSecret, totpCode);
   }
 
   private Mono<RecBkpCodes> genBkpCodes() {
@@ -98,12 +102,12 @@ public class My2FA {
   }
 
   // ! DEV ONLY
-  private void saveLocally(Api api, byte[] binaryZip) {
+  private void saveLocally(User user, byte[] binaryZip) {
 
     if (envKeeper.getEnvMode().equals(EnvMode.PROD))
       return;
 
-    var mailUser = api.getUser().getEmail();
+    var mailUser = user.getEmail();
     Path filePath = Hiker.ASSETS_DIR.resolve(mailUser + ".zip").normalize();
 
     try {

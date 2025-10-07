@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
-import server.decorators.flow.ResAPI;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 import server.features.verify.services.VerifyMailSvc;
 import server.features.verify.services.VerifyNewEmailSvc;
 

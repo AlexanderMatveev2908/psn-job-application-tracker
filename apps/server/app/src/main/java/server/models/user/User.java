@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.decorators.flow.ErrAPI;
+import server.lib.data_structure.ShapeCheck;
 import server.models.RootTable;
 
 @Data @EqualsAndHashCode(callSuper = true) @Table("users")
@@ -51,6 +52,10 @@ public class User extends RootTable {
     @Override
     public String toString() {
         return reflectiveToString();
+    }
+
+    public boolean use2FA() {
+        return ShapeCheck.isStr(totpSecret);
     }
 
     public Map<String, Object> forClient() {

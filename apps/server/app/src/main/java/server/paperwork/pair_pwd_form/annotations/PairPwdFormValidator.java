@@ -1,4 +1,4 @@
-package server.paperwork.pair_pwd_annt;
+package server.paperwork.pair_pwd_form.annotations;
 
 import java.lang.reflect.Method;
 
@@ -7,7 +7,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 @SuppressFBWarnings({ "REC_CATCH_EXCEPTION" })
-public class PairPwdValidator implements ConstraintValidator<PairPwdMatch, Object> {
+public class PairPwdFormValidator implements ConstraintValidator<PairPwdFormMatch, Object> {
 
     @Override
     public boolean isValid(Object form, ConstraintValidatorContext ctx) {

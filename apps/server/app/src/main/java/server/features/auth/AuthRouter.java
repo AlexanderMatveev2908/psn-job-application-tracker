@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
-import server.decorators.flow.ResAPI;
+import server.decorators.flow.api.Api;
+import server.decorators.flow.res_api.ResAPI;
 import server.features.auth.controllers.GetAuthCtrl;
 import server.features.auth.controllers.PatchAuthCtrl;
 import server.features.auth.controllers.PostAuthCtrl;
@@ -28,6 +28,11 @@ public class AuthRouter {
     @PostMapping("/login")
     public Mono<ResponseEntity<ResAPI>> login(Api api) {
         return postCtrl.login(api);
+    }
+
+    @PostMapping("/login-2FA")
+    public Mono<ResponseEntity<ResAPI>> login2FA(Api api) {
+        return postCtrl.login2FA(api);
     }
 
     @PostMapping("/logout")

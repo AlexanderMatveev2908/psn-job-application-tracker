@@ -13,12 +13,10 @@ import org.springframework.web.server.WebFilterChain;
 
 import reactor.core.publisher.Mono;
 import server.decorators.AppFile;
-import server.decorators.flow.Api;
+import server.decorators.flow.api.Api;
 import server.lib.dev.MyLog;
 
-@Component
-@Order(100)
-@SuppressWarnings({ "unchecked" })
+@Component @Order(100) @SuppressWarnings({ "unchecked" })
 public class LogMdw implements WebFilter {
 
     @Override
@@ -34,15 +32,12 @@ public class LogMdw implements WebFilter {
         arg.put("parsedQuery", api.getParsedQuery().orElse(null));
         arg.put("parsedForm", handleParsedForm(api));
 
-        return api.getBdStr()
-                .defaultIfEmpty("")
-                .doOnNext(body -> {
+        return api.getBdStr().defaultIfEmpty("").doOnNext(body -> {
 
-                    arg.put("body", api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body));
+            arg.put("body", api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body));
 
-                    MyLog.wOk(arg);
-                })
-                .then(chain.filter(api));
+            MyLog.wOk(arg);
+        }).then(chain.filter(api));
 
     }
 
@@ -61,12 +56,8 @@ public class LogMdw implements WebFilter {
         if (parsedForm == null || parsedForm.isEmpty())
             return null;
 
-        Map<String, Object> cpyForm = parsedForm.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (oldVal, newVal) -> newVal,
-                        LinkedHashMap::new));
+        Map<String, Object> cpyForm = parsedForm.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
+                Map.Entry::getValue, (oldVal, newVal) -> newVal, LinkedHashMap::new));
 
         List<AppFile> images = (List<AppFile>) cpyForm.get("images");
         List<AppFile> videos = (List<AppFile>) cpyForm.get("videos");

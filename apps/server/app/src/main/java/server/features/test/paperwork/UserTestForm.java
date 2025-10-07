@@ -6,21 +6,21 @@ import java.util.Map;
 import jakarta.validation.Valid;
 import lombok.Data;
 import server.decorators.flow.ErrAPI;
-import server.paperwork.EmailCheck;
-import server.paperwork.NamesCheck;
+import server.paperwork.EmailForm;
+import server.paperwork.NamesForm;
 
 @Data
 public class UserTestForm {
 
   @Valid
-  private final EmailCheck emailCheck;
+  private final EmailForm emailCheck;
 
   @Valid
-  private final NamesCheck namesCheck;
+  private final NamesForm namesCheck;
 
   public UserTestForm(String firstName, String lastName, String email, String password) {
-    this.emailCheck = new EmailCheck(email);
-    this.namesCheck = new NamesCheck(firstName, lastName);
+    this.emailCheck = new EmailForm(email);
+    this.namesCheck = new NamesForm(firstName, lastName);
   }
 
   public String getFirstName() {

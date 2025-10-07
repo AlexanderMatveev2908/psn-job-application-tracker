@@ -41,7 +41,7 @@ export const submitFormTOTP = async (
 ) => {
   const form = await getByID(page, "totp_code__form");
 
-  const firstSquare = await getByID(form, "totp_code.0");
+  const firstSquare = await getByID(form, "totpCode.0");
   await firstSquare.click();
 
   await expect(firstSquare).toBeFocused();
@@ -61,16 +61,16 @@ export const submitFormTOTP = async (
 
 export const submitFormBackupCode = async (
   page: Page,
-  { backupCodes, url }: { backupCodes: string[]; url: string }
+  { bkpCodes, url }: { bkpCodes: string[]; url: string }
 ) => {
   await clickByID(page, "btns_swapper_next_swap");
 
   const form = await getByID(page, "backup_code__form");
-  const codeInput = await getByID(form, "backup_code");
+  const codeInput = await getByID(form, "backupCode");
 
   await checkIsFocused(codeInput);
 
-  await codeInput.fill(backupCodes[0]);
+  await codeInput.fill(bkpCodes[0]);
 
   await clickByID(form, "backup_code__form__submit");
 

@@ -6,7 +6,7 @@ import lombok.Data;
 import server.conf.Reg;
 
 @Data
-public class NamesCheck {
+public class NamesForm {
   @NotBlank(message = "first name required") @Pattern(regexp = Reg.NAME, message = "first name invalid")
   private final String firstName;
 

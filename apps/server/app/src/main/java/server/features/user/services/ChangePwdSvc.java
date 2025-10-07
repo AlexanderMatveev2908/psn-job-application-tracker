@@ -6,10 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.Api;
+import server.decorators.flow.api.Api;
 import server.lib.security.hash.MyHashMng;
 import server.models.user.svc.UserRepo;
-import server.paperwork.PwdCheck;
+import server.paperwork.PwdForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class ChangePwdSvc {
@@ -18,7 +18,7 @@ public class ChangePwdSvc {
 
   public Mono<Void> mng(Api api) {
     var user = api.getUser();
-    PwdCheck form = api.getMappedData();
+    PwdForm form = api.getMappedData();
 
     return hashMng.argonHash(form.getPassword()).flatMap(hashed -> useRepo.changePwd(user.getId(), hashed)).then();
 

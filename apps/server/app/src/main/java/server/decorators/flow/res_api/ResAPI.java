@@ -1,4 +1,4 @@
-package server.decorators.flow;
+package server.decorators.flow.res_api;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import reactor.core.publisher.Mono;
+import server.decorators.flow.res_api.etc.ResApiJson;
 import server.decorators.messages.ActT;
 import server.decorators.messages.MapperMsg;
 

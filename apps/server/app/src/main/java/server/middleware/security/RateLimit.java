@@ -11,11 +11,10 @@ import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import reactor.core.publisher.Mono;
 import server.conf.db.remote_dictionary.RD;
 import server.conf.env_conf.EnvKeeper;
-import server.decorators.flow.Api;
 import server.decorators.flow.ErrAPI;
+import server.decorators.flow.api.Api;
 
-@Component
-@SuppressFBWarnings({ "EI2" })
+@Component @SuppressFBWarnings({ "EI2" })
 public class RateLimit {
     private final RedisReactiveCommands<String, String> cmd;
     private final EnvKeeper envKeeper;
@@ -50,10 +49,8 @@ public class RateLimit {
         String key = String.format("rl:%s:%s__%s", ip, path, method);
         String val = now + ":" + UUID.randomUUID();
 
-        return cmd.zremrangebyscore(key, Range.create(0, now - windowMs))
-                .then(cmd.zadd(key, now, val))
-                .then(cmd.zcard(key))
-                .flatMap(count -> cmd.pexpire(key, windowMs + 1).thenReturn(count))
+        return cmd.zremrangebyscore(key, Range.create(0, now - windowMs)).then(cmd.zadd(key, now, val))
+                .then(cmd.zcard(key)).flatMap(count -> cmd.pexpire(key, windowMs + 1).thenReturn(count))
                 .flatMap(count -> {
                     int remaining = Math.max(0, limit - count.intValue());
 
@@ -65,17 +62,14 @@ public class RateLimit {
                     if (count < limit)
                         return Mono.empty();
 
-                    return cmd.zrangeWithScores(key, 0, 0)
-                            .singleOrEmpty()
-                            .flatMap(tuple -> {
-                                long oldest = (long) tuple.getScore();
-                                long resetMs = Math.max(0, (windowMs - (now - oldest)));
-                                api.addHeader("RateLimit-Reset", resetMs);
+                    return cmd.zrangeWithScores(key, 0, 0).singleOrEmpty().flatMap(tuple -> {
+                        long oldest = (long) tuple.getScore();
+                        long resetMs = Math.max(0, (windowMs - (now - oldest)));
+                        api.addHeader("RateLimit-Reset", resetMs);
 
-                                return Mono.error(new ErrAPI(
-                                        "🐹 Our hamster-powered server took a break — try again later!",
-                                        429));
-                            });
+                        return Mono.error(
+                                new ErrAPI("🐹 Our hamster-powered server took a break — try again later!", 429));
+                    });
                 });
     }
 
