@@ -26,9 +26,14 @@ public class PostUserCtrl {
   public Mono<ResponseEntity<ResAPI>> getAccessMngAcc(Api api) {
 
     var user = api.getUser();
-    RecCreateCbcHmacReturnT rec = tkMng.genCbcHmac(TokenT.MANAGE_ACC, user.getId());
+    var tokenT = user.use2FA() ? TokenT.MANAGE_ACC_2FA : TokenT.MANAGE_ACC;
+    RecCreateCbcHmacReturnT rec = tkMng.genCbcHmac(tokenT, user.getId());
 
     return db.trxMono(cnt -> tkCombo.insertCbcHmac(rec.inst()))
         .then(new ResAPI(200).msg("ok").data(Map.of("cbcHmacToken", rec.clientToken())).build());
+  }
+
+  public Mono<ResponseEntity<ResAPI>> manageAcc2FA(Api api) {
+    return new ResAPI(200).msg("").build();
   }
 }

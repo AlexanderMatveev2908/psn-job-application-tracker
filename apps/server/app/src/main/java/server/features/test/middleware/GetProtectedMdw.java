@@ -6,7 +6,7 @@ import org.springframework.web.server.WebFilterChain;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
-import server.middleware.BaseMdw;
+import server.middleware.base_mdw.BaseMdw;
 
 @Component @RequiredArgsConstructor
 public class GetProtectedMdw extends BaseMdw {

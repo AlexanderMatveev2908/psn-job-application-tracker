@@ -9,12 +9,12 @@ import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
 
 @Component @RequiredArgsConstructor
-public class GetUserInfoMdw extends BaseMdw {
+public class ManageAcc2FAMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isTarget(api, chain, "/user/profile", () -> {
-      return checkJwtOptional(api).then(chain.filter(api));
+    return isTarget(api, chain, "/user/manage-account-2FA", () -> {
+      return limit(api).then(chain.filter(api));
     });
   }
 }

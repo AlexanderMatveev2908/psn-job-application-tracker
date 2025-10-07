@@ -20,7 +20,7 @@ import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
 @SuppressFBWarnings({ "EI2" }) @Service @RequiredArgsConstructor
-public class CheckTokenMdw {
+public class TokenCheckerMdw {
 
   private final UserSvc userSvc;
   private final TkMng tkMng;

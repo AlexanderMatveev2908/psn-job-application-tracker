@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.features.auth.paperwork.LoginForm;
-import server.middleware.BaseMdw;
+import server.middleware.base_mdw.BaseMdw;
 import server.models.user.svc.UserSvc;
 
 @Component @RequiredArgsConstructor
