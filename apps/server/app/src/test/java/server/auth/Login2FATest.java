@@ -69,12 +69,31 @@ public class Login2FATest {
     MyAssrt.hasTokens(res);
   }
 
-  // static Stream<Arguments> badCases() {
-  // return Stream.of(Arguments.of());
-  // }
-  //
-  // @ParameterizedTest @MethodSource("badCases")
-  // void err(String msg, int status) {
-  //
-  // }
+  static Stream<Arguments> badCases() {
+    return Stream.of(Arguments.of("totp_code_invalid", 401), Arguments.of("backup_code_invalid", 401),
+        Arguments.of("cbc_hmac_not_provided", 401));
+  }
+
+  @ParameterizedTest @MethodSource("badCases")
+  void err(String msg, int status) {
+
+    var body = new HashMap<>();
+
+    if (!msg.equals("cbc_hmac_not_provided"))
+      body.put("cbcHmacToken", resFirstStep.getCbcHmac());
+
+    if (msg.contains("totp")) {
+      var code = msg.equals("totp_code_invalid") ? "123456" : totp.genTestTOTP(resTk.getTotpSecret());
+
+      body.put("totpCode", code);
+    } else {
+      var code = msg.equals("backup_code_invalid") ? "AAAA-1111" : resTk.getBkpCodes().get(0);
+
+      body.put("backupCode", code);
+    }
+
+    ResT res = mainReq.body(body).send();
+
+    MyAssrt.base(res, status, msg);
+  }
 }
