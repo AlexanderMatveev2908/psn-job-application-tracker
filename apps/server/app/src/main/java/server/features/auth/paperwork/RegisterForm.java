@@ -4,17 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import server.paperwork.user_validation.NamesInt;
-import server.paperwork.user_validation.email_form.EmailInt;
-import server.paperwork.user_validation.pair_pwd_form.PairPwdForm;
+import server.paperwork.user_validation.NamesSpec;
+import server.paperwork.user_validation.email_form.EmailSpec;
+import server.paperwork.user_validation.pair_pwd_form.PairPwdSpec;
+import server.paperwork.user_validation.pair_pwd_form.annotations.PairPwdFormMatch;
 
-@Data @EqualsAndHashCode(callSuper = true) @JsonIgnoreProperties(ignoreUnknown = true)
-public class RegisterForm extends PairPwdForm implements NamesInt, EmailInt {
+@Data @PairPwdFormMatch @JsonIgnoreProperties(ignoreUnknown = true)
+public class RegisterForm implements NamesSpec, EmailSpec, PairPwdSpec {
 
     private String firstName;
     private String lastName;
     private String email;
+    private String password;
+    private String confirmPassword;
 
     @AssertTrue(message = "terms must be accepted")
     private Boolean terms;

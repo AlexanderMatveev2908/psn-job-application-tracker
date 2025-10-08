@@ -5,6 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
-public class PwdForm implements PwdInt {
+public class PwdForm implements PwdSpec {
   private String password;
 }

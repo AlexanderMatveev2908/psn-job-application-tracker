@@ -5,6 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
-public class EmailForm implements EmailInt {
+public class EmailForm implements EmailSpec {
   private String email;
 }
