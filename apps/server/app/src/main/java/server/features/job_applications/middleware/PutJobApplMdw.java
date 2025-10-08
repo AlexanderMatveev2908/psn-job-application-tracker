@@ -4,6 +4,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.WebFilterChain;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
@@ -12,7 +13,9 @@ import server.middleware.base_mdw.BaseMdw;
 import server.models.applications.svc.JobApplRepo;
 import server.paperwork.job_application.JobApplForm;
 
-@Component @RequiredArgsConstructor
+@Component
+@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" })
 public class PutJobApplMdw extends BaseMdw {
 
   private final JobApplRepo jobRepo;
