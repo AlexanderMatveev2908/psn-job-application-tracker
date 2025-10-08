@@ -2,6 +2,7 @@ package server.features.job_applications;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,11 @@ public class JobApplicationsRouter {
   @PostMapping
   public Mono<ResponseEntity<ResAPI>> create(Api api) {
     return postCtrl.create(api);
+  }
+
+  @PutMapping("/{applicationId}")
+  public Mono<ResponseEntity<ResAPI>> putApplication(Api api) {
+    return putCtrl.putApplication(api);
   }
 
 }
