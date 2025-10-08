@@ -12,13 +12,13 @@ import server.lib.security.mng_tokens.expiry_mng.etc.RecExpTplSec;
 public class ExpMng {
 
     private final static int EXP_JWT = 1;
-    private final static int EXP_JWE = 15;
-    private final static int EXP_CBC_HMAC = 5;
+    private final static int EXP_JWE = 30;
+    private final static int EXP_CBC_HMAC = 10;
 
     private RecExpTplSec genTpl(int arg) {
         Instant now = Instant.now();
-        long exp = now.plus(arg, ChronoUnit.SECONDS).getEpochSecond();
-        // long exp = now.plus(arg, ChronoUnit.MINUTES).getEpochSecond();
+        // long exp = now.plus(arg, ChronoUnit.SECONDS).getEpochSecond();
+        long exp = now.plus(arg, ChronoUnit.MINUTES).getEpochSecond();
 
         return new RecExpTplSec(now.getEpochSecond(), exp);
 
