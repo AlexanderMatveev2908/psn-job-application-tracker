@@ -1,7 +1,5 @@
 package server.features.verify.services;
 
-import java.util.Optional;
-
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import server.decorators.flow.api.Api;
-import server.models.backup_code.etc.RecInfoBkp;
-import server.models.backup_code.svc.BkpCodesRepo;
+import server.models.backup_code.svc.BkpCombo;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenCombo;
 import server.models.token.svc.TokenRepo;
@@ -24,7 +21,7 @@ public class VerifyNewEmailSvc {
   private final UserRepo userRepo;
   private final TokenRepo tokenRepo;
   private final TokenCombo tokenCombo;
-  private final BkpCodesRepo bkpRepo;
+  private final BkpCombo bkpCombo;
 
   public Mono<Tuple2<ResponseCookie, String>> simpleFlow(Api api) {
     var user = api.getUser();
@@ -42,11 +39,8 @@ public class VerifyNewEmailSvc {
 
   public Mono<Tuple2<ResponseCookie, String>> finalStep2FA(Api api) {
     var user = api.getUser();
-    Optional<RecInfoBkp> recBkp = api.getInfoBkp();
 
-    return tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.CHANGE_EMAIL_2FA).collectList()
-        .then(userRepo.toggleEmails(user.getId())
-            .then((recBkp.isEmpty() ? Mono.empty() : bkpRepo.delById(recBkp.get().bkpMatch().getId()).collectList())
-                .then(tokenCombo.genSessionTokens(user.getId()))));
+    return tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.CHANGE_EMAIL_2FA).collectList().then(userRepo
+        .toggleEmails(user.getId()).then(bkpCombo.delMatchIfUsed(api)).then(tokenCombo.genSessionTokens(user.getId())));
   }
 }

@@ -7,7 +7,7 @@ import type { FC } from "react";
 
 const Page: FC = () => {
   const { handleSave, isLoading, formCtx } = useRecoverPwd({
-    strategy_2FA: true,
+    strategy2FA: true,
   });
   return (
     <FormResetPwd

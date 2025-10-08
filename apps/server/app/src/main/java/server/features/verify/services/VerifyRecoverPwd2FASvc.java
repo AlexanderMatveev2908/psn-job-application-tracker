@@ -1,4 +1,4 @@
-package server.features.user.services;
+package server.features.verify.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,25 +13,15 @@ import server.models.token.svc.TokenCombo;
 import server.models.token.svc.TokenRepo;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
-public class AccessManageAccSvc {
-
-  private final TokenCombo tkCombo;
+public class VerifyRecoverPwd2FASvc {
   private final TokenRepo tokenRepo;
   private final BkpCombo bkpCombo;
+  private final TokenCombo tokenCombo;
 
-  public Mono<String> simpleAccess(Api api) {
-    var user = api.getUser();
-    var tokenT = user.use2FA() ? TokenT.MANAGE_ACC_2FA : TokenT.MANAGE_ACC;
-
-    return tkCombo.insertCbcHmac(user.getId(), tokenT);
-  }
-
-  public Mono<String> access2FA(Api api) {
+  public Mono<String> mng(Api api) {
     var user = api.getUser();
 
-    return tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.MANAGE_ACC_2FA)
-        .then(tkCombo.insertCbcHmac(user.getId(), TokenT.MANAGE_ACC).flatMap(clientToken -> {
-          return bkpCombo.delMatchIfUsed(api).thenReturn(clientToken);
-        }));
+    return tokenRepo.delByUserIdAndTokenT(user.getId(), TokenT.RECOVER_PWD).collectList()
+        .then(bkpCombo.delMatchIfUsed(api)).then(tokenCombo.insertCbcHmac(user.getId(), TokenT.RECOVER_PWD_2FA));
   }
 }

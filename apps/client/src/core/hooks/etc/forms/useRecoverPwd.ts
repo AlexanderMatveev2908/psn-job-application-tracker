@@ -7,17 +7,17 @@ import { useUser } from "@/features/user/hooks/useUser";
 import { logFormErrs } from "@/core/lib/forms";
 
 type Params = {
-  strategy_2FA: boolean;
+  strategy2FA: boolean;
 };
 
-export const useRecoverPwd = ({ strategy_2FA }: Params) => {
+export const useRecoverPwd = ({ strategy2FA }: Params) => {
   const { formCtx } = usePwdsForm();
   const { handleSubmit } = formCtx;
 
   const { userState, loginUser, delCbcHmac } = useUser();
   const { nav, wrapAPI } = useKitHooks();
 
-  const [mutate, { isLoading }] = strategy_2FA
+  const [mutate, { isLoading }] = strategy2FA
     ? authSliceAPI.useRecoverPwdAuthReset2FAMutation()
     : authSliceAPI.useRecoverPwdAuthMutation();
 
@@ -37,7 +37,7 @@ export const useRecoverPwd = ({ strategy_2FA }: Params) => {
   }, logFormErrs);
 
   useCheckTypeCbcHmac({
-    tokenType: strategy_2FA ? TokenT.RECOVER_PWD_2FA : TokenT.RECOVER_PWD,
+    tokenType: strategy2FA ? TokenT.RECOVER_PWD_2FA : TokenT.RECOVER_PWD,
   });
 
   return {

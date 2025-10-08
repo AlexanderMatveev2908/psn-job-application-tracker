@@ -25,7 +25,8 @@ public class GetVerifyCtrl {
   }
 
   public Mono<ResponseEntity<ResAPI>> verifyRecoverPwd(Api api) {
-    return new ResAPI(200).msg("token verified").build();
+    var user = api.getUser();
+    return new ResAPI(200).msg("token verified").data(Map.of("strategy2FA", user.use2FA())).build();
   }
 
   public Mono<ResponseEntity<ResAPI>> confNewEmail(Api api) {

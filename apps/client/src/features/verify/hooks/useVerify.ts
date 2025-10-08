@@ -67,7 +67,7 @@ export const useVerify = () => {
 
         saveCbcHmac(cbcHmacToken);
         nav.replace(
-          res.strategy_2FA
+          res.strategy2FA
             ? "/verify/recover-password-2FA"
             : "/auth/recover-password"
         );
