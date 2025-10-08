@@ -59,12 +59,23 @@ public class AuthRecoverPwd2FATest {
     MyAssrt.base(res, 200);
   }
 
-  // static Stream<Arguments> badCases() {
-  // return Stream.of(Arguments.of());
-  // }
-  //
-  // @ParameterizedTest @MethodSource("badCases")
-  // void err(String msg, int status) {
-  //
-  // }
+  static Stream<Arguments> badCases() {
+    return Stream.of(Arguments.of("cbc_hmac_wrong_type", 401),
+        Arguments.of("new password must be different from old one", 400));
+  }
+
+  @ParameterizedTest @MethodSource("badCases")
+  void err(String msg, int status) {
+    var body = new HashMap<>();
+
+    var token = msg.equals("cbc_hmac_wrong_type") ? resTk.getCbcHmac() : firstCall.getCbcHmac();
+    var pwd = msg.contains("different from old one") ? resTk.getPlainPwd() : "wsyX!1}&i5$E&8YyN8K6";
+
+    body.put("cbcHmacToken", token);
+    body.put("password", pwd);
+
+    ResT res = mainReq.body(body).send();
+
+    MyAssrt.base(res, status, msg);
+  }
 }
