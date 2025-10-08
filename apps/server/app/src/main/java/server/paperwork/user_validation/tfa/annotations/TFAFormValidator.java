@@ -1,4 +1,4 @@
-package server.paperwork.tfa.annotations;
+package server.paperwork.user_validation.tfa.annotations;
 
 import org.springframework.beans.BeanUtils;
 

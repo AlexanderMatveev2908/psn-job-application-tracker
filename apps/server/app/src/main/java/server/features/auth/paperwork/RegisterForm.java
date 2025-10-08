@@ -7,9 +7,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 import server.decorators.flow.ErrAPI;
-import server.paperwork.EmailForm;
-import server.paperwork.NamesForm;
-import server.paperwork.pair_pwd_form.PairPwdForm;
+import server.paperwork.user_validation.EmailForm;
+import server.paperwork.user_validation.NamesForm;
+import server.paperwork.user_validation.pair_pwd_form.PairPwdForm;
 
 @Data
 public class RegisterForm {

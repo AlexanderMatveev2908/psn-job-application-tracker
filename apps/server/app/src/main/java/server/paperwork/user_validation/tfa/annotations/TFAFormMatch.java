@@ -1,4 +1,4 @@
-package server.paperwork.tfa.annotations;
+package server.paperwork.user_validation.tfa.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

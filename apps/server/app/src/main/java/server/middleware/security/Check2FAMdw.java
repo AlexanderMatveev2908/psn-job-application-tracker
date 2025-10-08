@@ -16,7 +16,7 @@ import server.lib.security.tfa.My2FA;
 import server.models.backup_code.etc.RecInfoBkp;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.user.User;
-import server.paperwork.tfa.TFAForm;
+import server.paperwork.user_validation.tfa.TFAForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2", "REC_CATCH_EXCEPTION" })
 public class Check2FAMdw {

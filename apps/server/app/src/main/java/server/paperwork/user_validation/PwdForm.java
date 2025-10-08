@@ -1,16 +1,17 @@
-package server.paperwork;
+package server.paperwork.user_validation;
 
 import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
 
 @Data
 public class PwdForm {
-  @NotBlank(message = "password required") @Pattern(regexp = Reg.PWD, message = "password invalid")
+  @NotBlank(message = "password required") @Pattern(regexp = Reg.PWD, message = "password invalid") @Size(max = 100, message = "password must be within 100 chars")
   private final String password;
 
   public static PwdForm fromBody(Map<String, Object> body) {

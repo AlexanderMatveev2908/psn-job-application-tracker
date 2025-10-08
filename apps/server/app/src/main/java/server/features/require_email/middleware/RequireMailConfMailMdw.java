@@ -10,7 +10,7 @@ import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.user.svc.UserSvc;
-import server.paperwork.EmailForm;
+import server.paperwork.user_validation.EmailForm;
 
 @SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
 public class RequireMailConfMailMdw extends BaseMdw {

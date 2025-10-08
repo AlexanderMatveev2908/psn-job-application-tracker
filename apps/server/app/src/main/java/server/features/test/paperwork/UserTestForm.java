@@ -6,8 +6,8 @@ import java.util.Map;
 import jakarta.validation.Valid;
 import lombok.Data;
 import server.decorators.flow.ErrAPI;
-import server.paperwork.EmailForm;
-import server.paperwork.NamesForm;
+import server.paperwork.user_validation.EmailForm;
+import server.paperwork.user_validation.NamesForm;
 
 @Data
 public class UserTestForm {

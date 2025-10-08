@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
-import server.paperwork.PwdForm;
+import server.paperwork.user_validation.PwdForm;
 
 @Component @RequiredArgsConstructor
 public class GetAccessMngAccMdw extends BaseMdw {

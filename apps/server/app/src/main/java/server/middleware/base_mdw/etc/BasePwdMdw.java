@@ -5,7 +5,7 @@ import java.util.Map;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.middleware.security.UserPwdCheckerMdw;
-import server.paperwork.PwdForm;
+import server.paperwork.user_validation.PwdForm;
 
 public interface BasePwdMdw {
 

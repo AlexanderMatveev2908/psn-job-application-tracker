@@ -1,4 +1,4 @@
-package server.paperwork.tfa;
+package server.paperwork.user_validation.tfa;
 
 import java.util.Map;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.ShapeCheck;
 import server.lib.data_structure.parser.Prs;
-import server.paperwork.tfa.annotations.TFAFormMatch;
+import server.paperwork.user_validation.tfa.annotations.TFAFormMatch;
 
 @Data @TFAFormMatch({ "totpCode", "backupCode" })
 public class TFAForm {

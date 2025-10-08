@@ -4,8 +4,8 @@ import java.util.Map;
 
 import jakarta.validation.Valid;
 import lombok.Data;
-import server.paperwork.EmailForm;
-import server.paperwork.PwdForm;
+import server.paperwork.user_validation.EmailForm;
+import server.paperwork.user_validation.PwdForm;
 
 @Data
 public class LoginForm {

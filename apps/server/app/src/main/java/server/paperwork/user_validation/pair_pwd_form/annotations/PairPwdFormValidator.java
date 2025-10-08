@@ -1,4 +1,4 @@
-package server.paperwork.pair_pwd_form.annotations;
+package server.paperwork.user_validation.pair_pwd_form.annotations;
 
 import java.lang.reflect.Method;
 

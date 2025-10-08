@@ -10,7 +10,7 @@ import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.token.etc.TokenT;
 import server.models.user.svc.UserSvc;
-import server.paperwork.EmailForm;
+import server.paperwork.user_validation.EmailForm;
 
 @Component @RequiredArgsConstructor
 public class ChangeEmailMdw extends BaseMdw {

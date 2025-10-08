@@ -1,12 +1,12 @@
-package server.paperwork.pair_pwd_form;
+package server.paperwork.user_validation.pair_pwd_form;
 
 import java.util.Map;
 
 import jakarta.validation.Valid;
 import lombok.Data;
-import server.paperwork.ConfPwdForm;
-import server.paperwork.PwdForm;
-import server.paperwork.pair_pwd_form.annotations.PairPwdFormMatch;
+import server.paperwork.user_validation.ConfPwdForm;
+import server.paperwork.user_validation.PwdForm;
+import server.paperwork.user_validation.pair_pwd_form.annotations.PairPwdFormMatch;
 
 @Data @PairPwdFormMatch
 public class PairPwdForm {

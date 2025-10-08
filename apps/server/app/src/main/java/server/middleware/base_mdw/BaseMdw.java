@@ -22,7 +22,7 @@ import server.middleware.security.TokenCheckerMdw;
 import server.middleware.security.UserPwdCheckerMdw;
 import server.middleware.security.RateLimit;
 import server.models.token.etc.TokenT;
-import server.paperwork.tfa.TFAForm;
+import server.paperwork.user_validation.tfa.TFAForm;
 
 public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, BaseLimitMdw {
 

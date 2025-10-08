@@ -1,4 +1,4 @@
-package server.paperwork;
+package server.paperwork.user_validation;
 
 import java.util.Map;
 
