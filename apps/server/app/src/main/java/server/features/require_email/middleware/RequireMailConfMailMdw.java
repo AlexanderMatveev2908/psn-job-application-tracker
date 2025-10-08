@@ -21,7 +21,7 @@ public class RequireMailConfMailMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/require-email/confirm-email", () -> {
-      return limitWithRefBody(api).flatMap(body -> {
+      return limitWithRefBody(api, 5, 15).flatMap(body -> {
         EmailForm form = Prs.fromMapToT(body, EmailForm.class);
 
         return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())

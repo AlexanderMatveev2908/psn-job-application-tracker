@@ -21,7 +21,7 @@ public class ChangeEmailMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/change-email", () -> {
-      return limit(api).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)).then(grabBody(api).flatMap(body -> {
+      return limit(api, 3, 15).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)).then(grabBody(api).flatMap(body -> {
         EmailForm form = Prs.fromMapToT(body, EmailForm.class);
 
         return checkForm(api, form).then(Mono.defer(() -> {

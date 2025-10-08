@@ -10,6 +10,7 @@ import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.server.ServerWebExchange;
 
 import server.conf.Reg;
+import server.lib.data_structure.ShapeCheck;
 
 public interface ApiInfo {
 
@@ -30,8 +31,8 @@ public interface ApiInfo {
         .orElse("");
   }
 
-  // ? path var
-  default Optional<UUID> getPathIdVar(String key) {
+  // ? path var available at endpoint level
+  default Optional<UUID> getPathVarId(String key) {
     Map<String, String> vars = getExch().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
     if (vars == null)
@@ -42,6 +43,15 @@ public interface ApiInfo {
       return Optional.empty();
 
     return Optional.of(UUID.fromString(pathId));
+  }
+
+  default Optional<UUID> getPathVarId() {
+    String path = getPath();
+    String[] parts = path.split("\\/");
+    int lastIdx = parts.length - 1;
+    String pathId;
+
+    return ShapeCheck.isV4((pathId = parts[lastIdx])) ? Optional.of(UUID.fromString(pathId)) : Optional.empty();
   }
 
   // ? query
@@ -65,21 +75,31 @@ public interface ApiInfo {
 
   // ? general
   default String getPath() {
-    return getExch().getRequest().getPath().toString();
+    return getExch().getRequest().getPath().toString().split("\\?", 2)[0];
   }
 
   default boolean isSamePath(String arg) {
     if (arg == null)
       return false;
 
-    return getPath().equals(arg.split("\\?", 2)[0]);
+    String endpoint = getPath();
+
+    var pathId = getPathVarId();
+    if (pathId.isPresent())
+      endpoint = endpoint.replace("/" + pathId.get().toString(), "");
+
+    return endpoint.equals(arg);
+  }
+
+  default boolean isSamePath(String arg, HttpMethod method) {
+    return isSamePath(arg) && getMethod().equals(method);
   }
 
   default boolean isProtected(String arg) {
     if (arg == null)
       return false;
 
-    return getPath().startsWith(arg.split("\\?", 2)[0]);
+    return getPath().startsWith(arg);
   }
 
   default HttpMethod getMethod() {

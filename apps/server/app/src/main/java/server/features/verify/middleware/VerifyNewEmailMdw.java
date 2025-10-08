@@ -19,7 +19,7 @@ public class VerifyNewEmailMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/verify/new-email", () -> {
-      return limit(api).then(checkQueryCbcHmac(api, TokenT.CHANGE_EMAIL).flatMap(user -> {
+      return limit(api, 5, 15).then(checkQueryCbcHmac(api, TokenT.CHANGE_EMAIL).flatMap(user -> {
         return userSvc.findByEmail(user.getTmpEmail())
             .flatMap(existing -> Mono.<Void>error(new ErrAPI("an account with this email already exists", 409)))
             .switchIfEmpty(chain.filter(api));

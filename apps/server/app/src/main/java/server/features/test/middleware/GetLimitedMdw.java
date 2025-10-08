@@ -20,7 +20,7 @@ public class GetLimitedMdw extends BaseMdw {
         if (!api.isSamePath("/api/v1/test/limited"))
             return chain.filter(api);
 
-        return rl.limit(api).then(chain.filter(api));
+        return rl.limit(api, 3, 15).then(chain.filter(api));
 
     }
 }

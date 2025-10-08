@@ -16,7 +16,7 @@ public class RegisterMdw extends BaseMdw {
     @Override
     public Mono<Void> handle(Api api, WebFilterChain chain) {
         return isTarget(api, chain, "/auth/register", () -> {
-            return limitWithRefBody(api).flatMap(bd -> {
+            return limitWithRefBody(api, 10, 15).flatMap(bd -> {
                 RegisterForm form = Prs.fromMapToT(bd, RegisterForm.class);
                 return checkForm(api, form).then(chain.filter(api));
             });

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
+import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.etc.interfaces.BaseLimitMdw;
 import server.middleware.base_mdw.etc.interfaces.BasePwdMdw;
 import server.middleware.base_mdw.etc.interfaces.BaseTokensMdw;
@@ -71,6 +73,11 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
         return formCk.checkForm(api, form);
     }
 
+    public <T> Mono<T> parseBodyCheckForm(Api api, Class<T> cls) {
+        return grabBody(api).map(body -> Prs.fromMapToT(body, cls))
+                .flatMap(parsed -> checkForm(api, parsed).thenReturn(parsed));
+    }
+
     protected Mono<Void> check2FA(Api api, TokenT tokenT) {
         return checkBodyCbcHmac(api, tokenT).flatMap(user -> grabBody(api).flatMap(body -> {
             var form = TFAForm.fromMap(body);
@@ -89,8 +96,13 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
         return checkJwtMandatory(api).flatMap(user -> checkUserPwdToMatch(api, plainText));
     }
 
-    protected Mono<Void> isTarget(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
-        return !api.isSamePath("/api/v1" + p) ? chain.filter(api) : cb.get();
+    protected Mono<Void> isTarget(Api api, WebFilterChain chain, String path, Supplier<Mono<Void>> cb) {
+        return !api.isSamePath("/api/v1" + path) ? chain.filter(api) : cb.get();
+    }
+
+    protected Mono<Void> isTarget(Api api, WebFilterChain chain, String path, HttpMethod method,
+            Supplier<Mono<Void>> cb) {
+        return !api.isSamePath("/api/v1" + path, method) ? chain.filter(api) : cb.get();
     }
 
     protected Mono<Void> isProtected(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {

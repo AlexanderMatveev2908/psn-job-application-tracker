@@ -15,7 +15,7 @@ public class ChangePwdMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/change-pwd", () -> {
-      return limit(api).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)
+      return limit(api, 5, 15).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)
           .then(checkPwdReg(api).flatMap(plainTxt -> checkUserPwdToNotMatch(api, plainTxt).then(chain.filter(api)))));
     });
   }

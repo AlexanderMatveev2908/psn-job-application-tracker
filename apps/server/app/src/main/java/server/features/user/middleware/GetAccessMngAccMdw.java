@@ -16,7 +16,7 @@ public class GetAccessMngAccMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/manage-account", () -> {
-      return limitWithRefBody(api, 10, 30)
+      return limitWithRefBody(api, 10, 15)
           .flatMap(body -> checkUserLoggedPwdToMatch(api, Prs.fromMapToT(body, PwdForm.class).getPassword())
               .then(chain.filter(api)));
     });
