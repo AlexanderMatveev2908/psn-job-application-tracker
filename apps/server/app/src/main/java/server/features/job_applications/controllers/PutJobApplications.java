@@ -8,13 +8,15 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.decorators.flow.res_api.ResAPI;
+import server.lib.dev.MyLog;
 
-@SuppressFBWarnings({ "EI2" }) 
-@Component 
-@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor
 public class PutJobApplications {
 
-  public Mono<ResponseEntity<ResAPI>> example(Api api) {
+  public Mono<ResponseEntity<ResAPI>> putApplication(Api api) {
+
+    MyLog.log(api.getPathIdVar("applicationId").get());
+
     return new ResAPI(200).msg("Put JobApplications endpoint").build();
   }
 }

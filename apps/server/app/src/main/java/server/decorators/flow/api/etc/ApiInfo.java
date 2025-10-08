@@ -1,10 +1,15 @@
 package server.decorators.flow.api.etc;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.server.ServerWebExchange;
+
+import server.conf.Reg;
 
 public interface ApiInfo {
 
@@ -23,6 +28,20 @@ public interface ApiInfo {
   default String getCookie(String name) {
     return Optional.ofNullable(getExch().getRequest().getCookies().getFirst(name)).map(cookie -> cookie.getValue())
         .orElse("");
+  }
+
+  // ? path var
+  default Optional<UUID> getPathIdVar(String key) {
+    Map<String, String> vars = getExch().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
+    if (vars == null)
+      return Optional.empty();
+
+    String pathId = null;
+    if (!Reg.isUUID((pathId = vars.get(key))))
+      return Optional.empty();
+
+    return Optional.of(UUID.fromString(pathId));
   }
 
   // ? query
