@@ -9,14 +9,14 @@ import { JobApplicationT } from "../types";
 const jobApplicationsAdapter = createEntityAdapter<JobApplicationT>();
 
 const initState = jobApplicationsAdapter.getInitialState({
-  n_hits: 0,
+  nHits: 0,
   pages: 0,
 });
 
 export type PayloadSetState = {
-  n_hits: number;
+  nHits: number;
   pages: number;
-  job_applications: JobApplicationT[];
+  jobApplications: JobApplicationT[];
 };
 
 export const jobApplicationsSlice = createSlice({
@@ -29,12 +29,12 @@ export const jobApplicationsSlice = createSlice({
     setJobs: jobApplicationsAdapter.setAll,
 
     setData: (state, action: PayloadAction<PayloadSetState>) => {
-      const { job_applications, n_hits, pages } = action.payload;
+      const { jobApplications, nHits, pages } = action.payload;
 
-      state.n_hits = n_hits;
+      state.nHits = nHits;
       state.pages = pages;
 
-      jobApplicationsAdapter.setAll(state, job_applications);
+      jobApplicationsAdapter.setAll(state, jobApplications);
     },
 
     insertJobAt: (

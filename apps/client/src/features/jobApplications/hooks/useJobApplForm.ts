@@ -69,10 +69,10 @@ export const useJobApplForm = <T extends Record<string, any>>({
       if (!(getValuesRead("txtFields") ?? []).some((el) => el.name === f.name))
         appendReadForm({ ...f, val: "" });
 
-    formCtxRead.setValue("txtFields.0.val", res.job_application.companyName, {
+    formCtxRead.setValue("txtFields.0.val", res.jobApplication.companyName, {
       shouldValidate: true,
     });
-    formCtxRead.setValue("txtFields.1.val", res.job_application.positionName, {
+    formCtxRead.setValue("txtFields.1.val", res.jobApplication.positionName, {
       shouldValidate: true,
     });
 

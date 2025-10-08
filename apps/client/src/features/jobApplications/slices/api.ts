@@ -9,11 +9,11 @@ const BASE = "/job-applications";
 export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addJobApplication: builder.mutation<
-      ResApiT<{ job_application: JobApplicationT }>,
+      ResApiT<{ jobApplication: JobApplicationT }>,
       FormData
     >({
       query: (data) => ({
-        url: `${BASE}/`,
+        url: `${BASE}`,
         method: "POST",
         data,
       }),
@@ -23,8 +23,8 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
 
     readJobApplications: builder.query<
       ResApiT<{
-        job_applications: JobApplicationT[];
-        n_hits: number;
+        jobApplications: JobApplicationT[];
+        nHits: number;
         pages: number;
       }>,
       string
@@ -36,8 +36,8 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
 
       providesTags: (res) => {
         return [
-          ...(res?.job_applications?.length
-            ? res.job_applications.map((el) => ({
+          ...(res?.jobApplications?.length
+            ? res.jobApplications.map((el) => ({
                 type: TagAPI.JOB_APPLICATIONS,
                 id: el.id,
               }))
@@ -50,14 +50,14 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const {
-            data: { n_hits, job_applications, pages },
+            data: { nHits, jobApplications, pages },
           } = await queryFulfilled;
 
           dispatch(
             jobApplicationsSlice.actions.setData({
-              n_hits,
+              nHits,
               pages,
-              job_applications,
+              jobApplications,
             })
           );
         } catch {}
@@ -65,7 +65,7 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
     }),
 
     putJobApplication: builder.mutation<
-      ResApiT<{ job_application: JobApplicationT }>,
+      ResApiT<{ jobApplication: JobApplicationT }>,
       { applicationID: string; data: FormData }
     >({
       query: (data) => ({
@@ -77,7 +77,7 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
       invalidatesTags: (res, err, arg) => [
         {
           type: TagAPI.JOB_APPLICATIONS,
-          id: res?.job_application.id ?? arg.applicationID,
+          id: res?.jobApplication.id ?? arg.applicationID,
         },
       ],
     }),

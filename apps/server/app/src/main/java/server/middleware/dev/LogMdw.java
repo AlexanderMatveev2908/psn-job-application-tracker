@@ -14,6 +14,8 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import server.decorators.AppFile;
 import server.decorators.flow.api.Api;
+import server.lib.data_structure.ShapeCheck;
+import server.lib.data_structure.parser.Prs;
 import server.lib.dev.MyLog;
 
 @Component @Order(100) @SuppressWarnings({ "unchecked" })
@@ -34,7 +36,13 @@ public class LogMdw implements WebFilter {
 
         return api.getBdStr().defaultIfEmpty("").doOnNext(body -> {
 
-            arg.put("body", api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body));
+            var norm = api.getContentType().contains("multipart/form-data") ? null : normalizeEmpty(body);
+
+            try {
+                arg.put("body", ShapeCheck.isStr(norm) ? Prs.jsonToMap((String) norm) : norm);
+            } catch (Exception err) {
+                MyLog.logErr(err);
+            }
 
             MyLog.wOk(arg);
         }).then(chain.filter(api));
@@ -48,6 +56,7 @@ public class LogMdw implements WebFilter {
             return null;
         if (obj instanceof Map<?, ?> map && map.isEmpty())
             return null;
+
         return obj;
     }
 

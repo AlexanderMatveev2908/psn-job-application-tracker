@@ -21,7 +21,7 @@ public class PostJobApplications {
 
     return createSvc.mng(api).flatMap(saved -> {
 
-      Map<String, Object> body = Map.of("application", saved);
+      Map<String, Object> body = Map.of("jobApplication", saved);
 
       return new ResAPI(201).msg("application created").data(body).build();
     });
