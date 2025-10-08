@@ -108,7 +108,7 @@ jobs:
       - name: 🛑 stop server
         run: kill $SERVER_PID || true
 
-        # ? ~ 4 minutes
+        # ? ~ 5 minutes
       - name: ☕ run test server
         run: yarn workspace server test
 

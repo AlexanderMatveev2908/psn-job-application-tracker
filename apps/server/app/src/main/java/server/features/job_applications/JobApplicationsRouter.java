@@ -1,7 +1,6 @@
 package server.features.job_applications;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
