@@ -1,6 +1,7 @@
 package server.middleware.base_mdw;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import server.middleware.base_mdw.etc.services_mdw.RateLimitSvcMdw;
 import server.middleware.base_mdw.etc.services_mdw.TokenCheckerSvcMdw;
 import server.middleware.base_mdw.etc.services_mdw.UserPwdCheckerSvcMdw;
 import server.models.token.etc.TokenT;
+import server.paperwork.user_validation.pwd_form.PwdForm;
 import server.paperwork.user_validation.tfa.TFAForm;
 
 public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, BaseLimitMdw {
@@ -68,14 +70,30 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
         }).switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400)));
     }
 
-    @Override
-    public <T> Mono<Void> checkForm(Api api, T form) {
-        return formCk.checkForm(api, form);
+    private <T> Mono<Void> checkForm(Api api, T form) {
+        return formCk.check(api, form);
     }
 
-    public <T> Mono<T> parseBodyCheckForm(Api api, Class<T> cls) {
-        return grabBody(api).map(body -> Prs.fromMapToT(body, cls))
-                .flatMap(parsed -> checkForm(api, parsed).thenReturn(parsed));
+    private <T> Mono<T> extractAndCheckForm(Api api, Map<String, Object> arg, Class<T> cls) {
+        T form = Prs.fromMapToT(arg, cls);
+
+        return checkForm(api, form).thenReturn(form);
+    }
+
+    protected <T> Mono<T> checkBodyForm(Api api, Class<T> cls) {
+        return grabBody(api).flatMap(body -> extractAndCheckForm(api, body, cls));
+    }
+
+    protected <T> Mono<T> checkMultipartForm(Api api, Class<T> cls) {
+        Optional<Map<String, Object>> parsedFormData = api.getParsedForm();
+
+        return Mono.defer(() -> parsedFormData.isPresent() ? Mono.just(parsedFormData.get()) : grabBody(api))
+                .flatMap(mapArg -> extractAndCheckForm(api, mapArg, cls));
+
+    }
+
+    protected Mono<String> checkPwdForm(Api api) {
+        return checkBodyForm(api, PwdForm.class).map(form -> form.getPassword());
     }
 
     protected Mono<Void> check2FA(Api api, TokenT tokenT) {
@@ -86,10 +104,7 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
     }
 
     protected Mono<Void> checkLogged2FA(Api api, TokenT tokenT) {
-        return checkJwtMandatory(api).then(checkBodyCbcHmac(api, tokenT).flatMap(user -> grabBody(api).flatMap(body -> {
-            var form = TFAForm.fromMap(body);
-            return checkForm(api, form).then(tfaCheck.check2FA(api, form));
-        })));
+        return checkJwtMandatory(api).then(check2FA(api, tokenT));
     }
 
     protected Mono<Void> checkUserLoggedPwdToMatch(Api api, String plainText) {

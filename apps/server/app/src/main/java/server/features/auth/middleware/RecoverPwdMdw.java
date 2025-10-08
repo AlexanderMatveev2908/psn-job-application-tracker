@@ -16,7 +16,7 @@ public class RecoverPwdMdw extends BaseMdw {
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/auth/recover-pwd", () -> {
       return limit(api, 5, 15).then(checkBodyCbcHmac(api, TokenT.RECOVER_PWD)
-          .then(checkPwdReg(api).flatMap(plainTxt -> checkUserPwdToNotMatch(api, plainTxt)).then(chain.filter(api))));
+          .then(checkPwdForm(api).flatMap(plainTxt -> checkUserPwdToNotMatch(api, plainTxt)).then(chain.filter(api))));
     });
   }
 }

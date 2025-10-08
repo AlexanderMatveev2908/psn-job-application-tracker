@@ -17,7 +17,7 @@ import server.decorators.flow.api.Api;
 public class FormCheckerSvcMdw {
     private final Validator checker;
 
-    public <T> Mono<Void> checkForm(Api api, T form) {
+    public <T> Mono<Void> check(Api api, T form) {
         Set<ConstraintViolation<T>> errs = checker.validate(form);
 
         if (errs.isEmpty())
@@ -29,7 +29,7 @@ public class FormCheckerSvcMdw {
         return Mono.error(new ErrAPI(errors.get(0).get("msg"), 422, Map.of("errs", errors)));
     }
 
-    public <T> void checkForm(T form) {
+    public <T> void checkFormTest(T form) {
         Set<ConstraintViolation<T>> errs = checker.validate(form);
 
         if (errs.isEmpty())

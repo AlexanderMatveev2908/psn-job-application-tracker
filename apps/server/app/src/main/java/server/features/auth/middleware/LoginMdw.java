@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.features.auth.paperwork.LoginForm;
-import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.user.svc.UserSvc;
 
@@ -20,15 +19,13 @@ public class LoginMdw extends BaseMdw {
     @Override
     public Mono<Void> handle(Api api, WebFilterChain chain) {
         return isTarget(api, chain, "/auth/login", () -> {
-            return limitWithRefBody(api, 5, 15).flatMap(bd -> {
-                LoginForm form = Prs.fromMapToT(bd, LoginForm.class);
-
-                return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())
-                        .switchIfEmpty(Mono.error(new ErrAPI("user not found", 404))).flatMap(user -> {
+            return limit(api, 5, 15).then(checkBodyForm(api, LoginForm.class).flatMap(form -> {
+                return userSvc.findByEmail(form.getEmail()).switchIfEmpty(Mono.error(new ErrAPI("user not found", 404)))
+                        .flatMap(user -> {
                             api.setUserAttr(user);
                             return checkUserPwdToMatch(api, form.getPassword()).then(chain.filter(api));
-                        }));
-            });
+                        });
+            }));
         });
     }
 }

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
-import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.user.svc.UserSvc;
 import server.paperwork.user_validation.email_form.EmailForm;
@@ -21,19 +20,16 @@ public class RequireMailConfMailMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/require-email/confirm-email", () -> {
-      return limitWithRefBody(api, 5, 15).flatMap(body -> {
-        EmailForm form = Prs.fromMapToT(body, EmailForm.class);
+      return limit(api, 5, 15).then(checkBodyForm(api, EmailForm.class).flatMap(form -> {
 
-        return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())
-            .switchIfEmpty(Mono.error(new ErrAPI("user not found", 404))).flatMap(dbUser -> {
+        return userSvc.findByEmail(form.getEmail()).switchIfEmpty(Mono.error(new ErrAPI("user not found", 404)))
+            .flatMap(dbUser -> {
               if (dbUser.isVerified())
                 return Mono.error(new ErrAPI("user already verified", 409));
-
               api.setUserAttr(dbUser);
-
               return chain.filter(api);
-            }));
-      });
+            });
+      }));
     });
   }
 }

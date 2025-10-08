@@ -121,7 +121,7 @@ public class GetUserTestSvc {
     }).map(body -> {
       if (body.get("existingPayload") != null && body.get("existingPayload") instanceof Map userMap) {
         var form = Prs.fromMapToT(userMap, UserTestForm.class);
-        formCk.checkForm(form);
+        formCk.checkFormTest(form);
         return User.fromTestPayload(userMap);
       }
 

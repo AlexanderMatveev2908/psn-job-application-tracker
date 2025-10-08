@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
+import server.paperwork.user_validation.email_form.EmailForm;
 
 @Component @RequiredArgsConstructor
 public class RequireMailConfMailLoggedMdw extends BaseMdw {
@@ -15,16 +16,16 @@ public class RequireMailConfMailLoggedMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/require-email/confirm-email-logged", () -> {
-      return limitWithRefBody(api, 5, 15).flatMap(body -> {
-        return checkJwtMandatory(api).flatMap(dbUser -> {
-          if (!dbUser.getEmail().equals(body.get("email")))
+      return limit(api, 5, 15).then(checkJwtMandatory(api).flatMap(dbUser -> {
+        return checkBodyForm(api, EmailForm.class).flatMap(form -> {
+          if (!dbUser.getEmail().equals(form.getEmail()))
             return Mono.error(new ErrAPI("email sent is different from account one", 409));
           else if (dbUser.isVerified())
             return Mono.error(new ErrAPI("user already verified", 409));
           else
             return chain.filter(api);
         });
-      });
+      }));
     });
   }
 }
