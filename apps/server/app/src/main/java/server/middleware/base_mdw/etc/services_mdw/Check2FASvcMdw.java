@@ -1,4 +1,4 @@
-package server.middleware.security;
+package server.middleware.base_mdw.etc.services_mdw;
 
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ import server.models.user.User;
 import server.paperwork.user_validation.tfa.TFAForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2", "REC_CATCH_EXCEPTION" })
-public class Check2FAMdw {
+public class Check2FASvcMdw {
   private final BkpCodesRepo bkpCodesRepo;
   private final My2FA tfa;
   private final MyHashMng hashMng;

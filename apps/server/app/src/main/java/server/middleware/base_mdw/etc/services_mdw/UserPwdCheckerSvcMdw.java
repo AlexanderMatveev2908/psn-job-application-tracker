@@ -1,4 +1,4 @@
-package server.middleware.security;
+package server.middleware.base_mdw.etc.services_mdw;
 
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import server.decorators.flow.api.Api;
 import server.lib.security.hash.MyHashMng;
 
 @Service @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
-public class UserPwdCheckerMdw {
+public class UserPwdCheckerSvcMdw {
   private final MyHashMng hashMng;
 
   public Mono<Void> checkUserPwd(Api api, String plainText, boolean mustMatch) {

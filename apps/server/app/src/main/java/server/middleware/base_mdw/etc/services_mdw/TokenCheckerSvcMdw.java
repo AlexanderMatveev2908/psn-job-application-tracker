@@ -1,4 +1,4 @@
-package server.middleware.security;
+package server.middleware.base_mdw.etc.services_mdw;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +20,7 @@ import server.models.user.User;
 import server.models.user.svc.UserSvc;
 
 @SuppressFBWarnings({ "EI2" }) @Service @RequiredArgsConstructor
-public class TokenCheckerMdw {
+public class TokenCheckerSvcMdw {
 
   private final UserSvc userSvc;
   private final TkMng tkMng;

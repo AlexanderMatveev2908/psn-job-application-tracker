@@ -1,4 +1,4 @@
-package server.middleware.form_checkers;
+package server.middleware.base_mdw.etc.services_mdw;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,7 @@ import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 
 @Service @RequiredArgsConstructor
-public class FormChecker {
+public class FormCheckerSvcMdw {
     private final Validator checker;
 
     public <T> Mono<Void> checkForm(Api api, T form) {

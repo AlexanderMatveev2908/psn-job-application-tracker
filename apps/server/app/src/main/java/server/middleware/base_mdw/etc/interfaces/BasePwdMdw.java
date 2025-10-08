@@ -1,15 +1,15 @@
-package server.middleware.base_mdw.etc;
+package server.middleware.base_mdw.etc.interfaces;
 
 import java.util.Map;
 
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
-import server.middleware.security.UserPwdCheckerMdw;
+import server.middleware.base_mdw.etc.services_mdw.UserPwdCheckerSvcMdw;
 import server.paperwork.user_validation.PwdForm;
 
 public interface BasePwdMdw {
 
-  UserPwdCheckerMdw useUserPwdChecker();
+  UserPwdCheckerSvcMdw useUserPwdChecker();
 
   Mono<Map<String, Object>> grabBody(Api api);
 

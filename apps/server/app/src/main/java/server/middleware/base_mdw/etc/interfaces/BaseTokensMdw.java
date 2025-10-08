@@ -1,14 +1,14 @@
-package server.middleware.base_mdw.etc;
+package server.middleware.base_mdw.etc.interfaces;
 
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
-import server.middleware.security.TokenCheckerMdw;
+import server.middleware.base_mdw.etc.services_mdw.TokenCheckerSvcMdw;
 import server.models.token.etc.TokenT;
 import server.models.user.User;
 
 public interface BaseTokensMdw {
 
-  TokenCheckerMdw useTokenChecker();
+  TokenCheckerSvcMdw useTokenChecker();
 
   // ? session tokens
   default Mono<User> checkJwtMandatory(Api api) {

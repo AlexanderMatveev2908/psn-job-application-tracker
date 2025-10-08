@@ -27,7 +27,7 @@ import server.lib.security.mng_tokens.tokens.jwe.MyJwe;
 import server.lib.security.mng_tokens.tokens.jwe.etc.RecCreateJweReturnT;
 import server.lib.security.mng_tokens.tokens.jwt.MyJwt;
 import server.lib.security.tfa.My2FA;
-import server.middleware.form_checkers.FormChecker;
+import server.middleware.base_mdw.etc.services_mdw.FormCheckerSvcMdw;
 import server.models.backup_code.svc.BkpCodesRepo;
 import server.models.token.etc.TokenT;
 import server.models.token.svc.TokenRepo;
@@ -45,7 +45,7 @@ public class GetUserTestSvc {
   private final MyJwe myJwe;
   private final MyCbcHmac myCbcHmac;
   private final BkpCodesRepo bkpCodesRepo;
-  private final FormChecker formCk;
+  private final FormCheckerSvcMdw formCk;
   private final My2FA tfa;
 
   public Mono<Map<String, Object>> getUserTest(Api api) {

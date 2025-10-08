@@ -1,22 +1,24 @@
 package server.features.job_applications.middleware;
 
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.WebFilterChain;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
+import server.lib.dev.MyLog;
 import server.middleware.base_mdw.BaseMdw;
 
-@SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor @Order(50)
-public class JobApplicationsMdw extends BaseMdw {
+@Component @RequiredArgsConstructor
+public class CreateJobApplMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isProtected(api, chain, "/job-applications", () -> {
-      return checkJwtMandatory(api).then(chain.filter(api));
+    return isTarget(api, chain, "/job-applications", () -> {
+
+      MyLog.log(api.getUser());
+
+      return chain.filter(api);
     });
   }
 }

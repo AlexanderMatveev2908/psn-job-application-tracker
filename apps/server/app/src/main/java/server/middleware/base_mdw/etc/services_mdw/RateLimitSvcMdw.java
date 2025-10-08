@@ -1,4 +1,4 @@
-package server.middleware.security;
+package server.middleware.base_mdw.etc.services_mdw;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -15,11 +15,11 @@ import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 
 @Component @SuppressFBWarnings({ "EI2" })
-public class RateLimit {
+public class RateLimitSvcMdw {
     private final RedisReactiveCommands<String, String> cmd;
     private final EnvKeeper envKeeper;
 
-    public RateLimit(RD rd, EnvKeeper envKeeper) {
+    public RateLimitSvcMdw(RD rd, EnvKeeper envKeeper) {
         this.cmd = rd.getCmd();
         this.envKeeper = envKeeper;
 

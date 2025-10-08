@@ -56,6 +56,13 @@ public interface ApiInfo {
     return getPath().equals(arg.split("\\?", 2)[0]);
   }
 
+  default boolean isProtected(String arg) {
+    if (arg == null)
+      return false;
+
+    return getPath().startsWith(arg.split("\\?", 2)[0]);
+  }
+
   default HttpMethod getMethod() {
     return getExch().getRequest().getMethod();
   }
