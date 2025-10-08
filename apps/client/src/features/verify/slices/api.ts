@@ -12,7 +12,7 @@ const BASE = "/verify";
 export type VerifyCbcHmacReturnT = {
   cbcHmacToken?: string;
   accessToken?: string;
-  strategy_2FA?: boolean;
+  strategy2FA?: boolean;
 };
 
 export type VerifyCbcHmacEndpointT =
