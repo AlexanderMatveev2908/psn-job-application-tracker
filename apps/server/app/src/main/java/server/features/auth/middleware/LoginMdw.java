@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.features.auth.paperwork.LoginForm;
+import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.user.svc.UserSvc;
 
@@ -20,7 +21,7 @@ public class LoginMdw extends BaseMdw {
     public Mono<Void> handle(Api api, WebFilterChain chain) {
         return isTarget(api, chain, "/auth/login", () -> {
             return limitWithRefBody(api).flatMap(bd -> {
-                LoginForm form = LoginForm.fromMap(bd);
+                LoginForm form = Prs.fromMapToT(bd, LoginForm.class);
 
                 return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())
                         .switchIfEmpty(Mono.error(new ErrAPI("user not found", 404))).flatMap(user -> {

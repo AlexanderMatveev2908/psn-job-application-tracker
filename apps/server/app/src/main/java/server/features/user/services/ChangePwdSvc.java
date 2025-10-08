@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.lib.security.hash.MyHashMng;
 import server.models.user.svc.UserRepo;
-import server.paperwork.user_validation.PwdForm;
+import server.paperwork.user_validation.pwd_form.PwdForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class ChangePwdSvc {

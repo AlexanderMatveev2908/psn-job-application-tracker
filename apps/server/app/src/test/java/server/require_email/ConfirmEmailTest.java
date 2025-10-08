@@ -47,7 +47,7 @@ public class ConfirmEmailTest {
 
   static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("user not found", 404), Arguments.of("user already verified", 409),
-        Arguments.of("email invalid", 400));
+        Arguments.of("email required", 422));
   }
 
   @ParameterizedTest @MethodSource("badCases")
@@ -59,7 +59,7 @@ public class ConfirmEmailTest {
       ReqT.withUrl(web, "/verify/confirm-email").method(HttpMethod.GET).addQueryCbcHmac(resTk.getCbcHmac()).send();
 
     var email = status == 404 ? faker.internet().emailAddress() : resTk.getUser().getEmail();
-    mainReq.body(Map.of(status == 400 ? "mail" : "email", email));
+    mainReq.body(Map.of(status == 422 ? "mail" : "email", email));
 
     ResT resRequire = mainReq.send();
 

@@ -4,8 +4,9 @@ import java.util.Map;
 
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
+import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.etc.services_mdw.UserPwdCheckerSvcMdw;
-import server.paperwork.user_validation.PwdForm;
+import server.paperwork.user_validation.pwd_form.PwdForm;
 
 public interface BasePwdMdw {
 
@@ -25,7 +26,7 @@ public interface BasePwdMdw {
 
   default Mono<String> checkPwdReg(Api api) {
     return grabBody(api).flatMap(body -> {
-      var form = PwdForm.fromBody(body);
+      var form = Prs.fromMapToT(body, PwdForm.class);
       return checkForm(api, form).thenReturn(form.getPassword());
     });
   }

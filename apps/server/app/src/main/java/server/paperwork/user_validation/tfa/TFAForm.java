@@ -20,7 +20,6 @@ public class TFAForm {
   private final String backupCode;
 
   public static TFAForm fromMap(Map<String, Object> map) {
-
     try {
       String totpCode = Prs.fromNumToString(map.get("totpCode")).orElse(null);
       String bkpCode = Prs.fromAnyToStr(map.get("backupCode")).orElse(null);
@@ -31,10 +30,8 @@ public class TFAForm {
   }
 
   public Optional<Integer> getTotpInt() {
-
     if (ShapeCheck.isStr(totpCode))
       return Optional.of(Integer.parseInt(totpCode));
-
     return Optional.empty();
   }
 }

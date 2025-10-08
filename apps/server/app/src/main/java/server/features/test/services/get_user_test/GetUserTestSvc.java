@@ -20,6 +20,7 @@ import reactor.util.function.Tuple2;
 import server.decorators.flow.api.Api;
 import server.features.test.paperwork.UserTestForm;
 import server.features.test.services.get_user_test.etc.RecUserTest;
+import server.lib.data_structure.parser.Prs;
 import server.lib.security.hash.MyHashMng;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.MyCbcHmac;
 import server.lib.security.mng_tokens.tokens.cbc_hmac.etc.RecCreateCbcHmacReturnT;
@@ -119,7 +120,7 @@ public class GetUserTestSvc {
     return api.getBd(new TypeReference<Map<String, Object>>() {
     }).map(body -> {
       if (body.get("existingPayload") != null && body.get("existingPayload") instanceof Map userMap) {
-        var form = UserTestForm.fromMap(userMap);
+        var form = Prs.fromMapToT(userMap, UserTestForm.class);
         formCk.checkForm(form);
         return User.fromTestPayload(userMap);
       }

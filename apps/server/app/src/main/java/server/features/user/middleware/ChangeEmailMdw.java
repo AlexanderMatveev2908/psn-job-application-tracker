@@ -7,10 +7,11 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
+import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.token.etc.TokenT;
 import server.models.user.svc.UserSvc;
-import server.paperwork.user_validation.EmailForm;
+import server.paperwork.user_validation.email_form.EmailForm;
 
 @Component @RequiredArgsConstructor
 public class ChangeEmailMdw extends BaseMdw {
@@ -21,7 +22,7 @@ public class ChangeEmailMdw extends BaseMdw {
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/change-email", () -> {
       return limit(api).then(checkBodyCbcHmacLogged(api, TokenT.MANAGE_ACC)).then(grabBody(api).flatMap(body -> {
-        var form = EmailForm.fromBody(body);
+        EmailForm form = Prs.fromMapToT(body, EmailForm.class);
 
         return checkForm(api, form).then(Mono.defer(() -> {
           if (api.getUser().getEmail().equals(form.getEmail()))
