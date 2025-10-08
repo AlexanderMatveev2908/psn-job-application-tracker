@@ -2,6 +2,7 @@ package server._lib_tests;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,6 +23,7 @@ public class ReqT {
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<String, String> query = new HashMap<>();
     private String url;
+    private UUID pathIdParam;
     private HttpMethod method = HttpMethod.GET;
     private Object body;
     private MultipartBodyBuilder multipartBody;
@@ -33,6 +35,11 @@ public class ReqT {
 
     public static ReqT withUrl(WebTestClient web, String url) {
         return new ReqT(web, "/api/v1" + url);
+    }
+
+    public ReqT pathIdParam(UUID pathIdParam) {
+        this.pathIdParam = pathIdParam;
+        return this;
     }
 
     public ReqT method(HttpMethod method) {
@@ -99,6 +106,9 @@ public class ReqT {
 
     public ResT send() {
         String fullUrl = url;
+
+        if (pathIdParam != null)
+            fullUrl += ("/" + pathIdParam.toString());
 
         if (!query.isEmpty()) {
             String joined = query.entrySet().stream().map(pair -> pair.getKey() + "=" + pair.getValue())

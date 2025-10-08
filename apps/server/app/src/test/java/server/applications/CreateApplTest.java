@@ -21,7 +21,9 @@ import server._lib_tests.MyPayloads;
 import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
 
-@SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor
+@SpringBootTest
+@AutoConfigureWebTestClient
+@RequiredArgsConstructor
 public class CreateApplTest {
   private final static String URL = "/job-applications";
 
@@ -44,6 +46,16 @@ public class CreateApplTest {
     MyAssrt.base(res, 201, "application created");
   }
 
+  @Test
+  void notVerifiedUser() {
+    ResT resNotVerified = GrabTk.with(web).send();
+
+    ResT resPost = ReqT.withUrl(web, "/job-applications").jwt(resNotVerified.getJwt()).method(HttpMethod.POST)
+        .multipart(MyPayloads.application()).send();
+
+    MyAssrt.base(resPost, 403, "user not verified");
+  }
+
   static Stream<Arguments> badCases() {
     return Stream.of(Arguments.of("company name required", 422, MyPayloads.applicationPatch("companyName", "")),
         Arguments.of("date invalid", 422, MyPayloads.applicationPatch("appliedAt", "2025-16-35")),
@@ -51,7 +63,8 @@ public class CreateApplTest {
         Arguments.of("jwt_not_provided", 401, MyPayloads.application()));
   }
 
-  @ParameterizedTest @MethodSource("badCases")
+  @ParameterizedTest
+  @MethodSource("badCases")
   void err(String msg, int status, Map<String, Object> payload) {
 
     if (status != 401)
