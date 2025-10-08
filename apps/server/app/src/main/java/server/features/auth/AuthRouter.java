@@ -49,4 +49,9 @@ public class AuthRouter {
     public Mono<ResponseEntity<ResAPI>> recoverPwd(Api api) {
         return patchCtrl.recoverPwd(api);
     }
+
+    @PatchMapping("/recover-pwd-2FA")
+    public Mono<ResponseEntity<ResAPI>> recoverPwd2F(Api api) {
+        return patchCtrl.recoverPwd2FA(api);
+    }
 }

@@ -1,5 +1,6 @@
 package server.features.auth.controllers;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,18 @@ public class PatchAuthCtrl {
 
   public Mono<ResponseEntity<ResAPI>> recoverPwd(Api api) {
 
-    return recoverPwdSvc.mng(api).flatMap(tpl -> new ResAPI(200).msg("password changed").cookie(tpl.getT1())
+    return recoverPwdSvc.simpleFlow(api).flatMap(tpl -> new ResAPI(200).msg("password changed").cookie(tpl.getT1())
         .data(Map.of("accessToken", tpl.getT2())).build());
+  }
+
+  public Mono<ResponseEntity<ResAPI>> recoverPwd2FA(Api api) {
+    return recoverPwdSvc.flow2FA(api).flatMap(tpl -> {
+
+      Map<String, Object> body = new HashMap<>();
+      body.put("accessToken", tpl.getT2());
+      api.putCodesLeftIfPresent(body);
+
+      return new ResAPI(200).msg("password changed").data(body).cookie(tpl.getT1()).build();
+    });
   }
 }
