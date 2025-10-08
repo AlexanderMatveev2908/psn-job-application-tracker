@@ -6,8 +6,9 @@ import org.springframework.web.server.WebFilterChain;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
+import server.lib.data_structure.parser.Prs;
 import server.middleware.base_mdw.BaseMdw;
-import server.paperwork.PwdForm;
+import server.paperwork.user_validation.pwd_form.PwdForm;
 
 @Component @RequiredArgsConstructor
 public class GetAccessMngAccMdw extends BaseMdw {
@@ -15,8 +16,9 @@ public class GetAccessMngAccMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/manage-account", () -> {
-      return limitAndRef(api, 10, 30).flatMap(
-          body -> checkUserLoggedPwdToMatch(api, PwdForm.fromBody(body).getPassword()).then(chain.filter(api)));
+      return limitWithRefBody(api, 10, 30)
+          .flatMap(body -> checkUserLoggedPwdToMatch(api, Prs.fromMapToT(body, PwdForm.class).getPassword())
+              .then(chain.filter(api)));
     });
   }
 }

@@ -34,7 +34,7 @@ const PageCounter = <
 
   const [triggerRTK, res] = hook;
   const {
-    data: { n_hits = 0, pages = 0 } = {},
+    data: { nHits = 0, pages = 0 } = {},
     isLoading,
     isFetching,
     isUninitialized,
@@ -78,7 +78,7 @@ const PageCounter = <
         await handleChangePagination({ key: "limit", val: newLimit });
       }
 
-      // const newTotPages = Math.ceil(n_hits / newLimit);
+      // const newTotPages = Math.ceil(nHits / newLimit);
       const newTotSwaps = Math.ceil(pages / newPagesForSwap);
 
       const lastSwapAllowed = Math.max(0, newTotSwaps - 1);
@@ -100,7 +100,7 @@ const PageCounter = <
     };
   }, [
     setPagination,
-    n_hits,
+    nHits,
     swap,
     page,
     pages,
@@ -109,7 +109,7 @@ const PageCounter = <
     handleChangePagination,
   ]);
 
-  const totPages = useMemo(() => Math.ceil(n_hits / limit), [limit, n_hits]);
+  const totPages = useMemo(() => Math.ceil(nHits / limit), [limit, nHits]);
   // const totSwaps = useMemo(
   //   () => Math.ceil(totPages / pagesForSwap),
   //   [totPages, pagesForSwap]
@@ -130,7 +130,7 @@ const PageCounter = <
 
   // __cg(
   //   "pagination",
-  //   ["n_hits", n_hits],
+  //   ["nHits", nHits],
   //   ["limit", limit],
   //   ["totPages", totPages],
   //   ["pagesForSwap", pagesForSwap],
@@ -148,7 +148,7 @@ const PageCounter = <
     [pagesForSwap, totPages, swap]
   );
 
-  return !isHydrated || isPending || !n_hits ? null : (
+  return !isHydrated || isPending || !nHits ? null : (
     <div className="w-full absolute bottom-0 flex justify-center">
       <div className="w-full grid grid-cols-[75px_1fr_75px] gap-10">
         {swap ? (

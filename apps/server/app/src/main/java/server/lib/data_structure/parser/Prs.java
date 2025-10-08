@@ -45,6 +45,15 @@ public final class Prs {
 
     }
 
+    public static <T> T fromMapToT(Map<String, Object> map, Class<T> cls) {
+        try {
+            return jack.convertValue(map, cls);
+        } catch (Exception err) {
+            err.printStackTrace();
+            throw new ErrAPI("invalid form", 400);
+        }
+    }
+
     // ? hex
     public static String hexToUtf8(String txtHex) {
         byte[] utf8Bytes = HexFormat.of().parseHex(txtHex);

@@ -16,7 +16,7 @@ import server.models.token.svc.TokenCombo;
 import server.models.token.svc.TokenRepo;
 import server.models.user.User;
 import server.models.user.svc.UserRepo;
-import server.paperwork.PwdForm;
+import server.paperwork.user_validation.pwd_form.PwdForm;
 
 @Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
 public class RecoverPwdSvc {

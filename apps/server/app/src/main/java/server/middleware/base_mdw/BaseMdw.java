@@ -13,29 +13,29 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
-import server.middleware.base_mdw.etc.BaseLimitMdw;
-import server.middleware.base_mdw.etc.BasePwdMdw;
-import server.middleware.base_mdw.etc.BaseTokensMdw;
-import server.middleware.form_checkers.FormChecker;
-import server.middleware.security.Check2FAMdw;
-import server.middleware.security.TokenCheckerMdw;
-import server.middleware.security.UserPwdCheckerMdw;
-import server.middleware.security.RateLimit;
+import server.middleware.base_mdw.etc.interfaces.BaseLimitMdw;
+import server.middleware.base_mdw.etc.interfaces.BasePwdMdw;
+import server.middleware.base_mdw.etc.interfaces.BaseTokensMdw;
+import server.middleware.base_mdw.etc.services_mdw.Check2FASvcMdw;
+import server.middleware.base_mdw.etc.services_mdw.FormCheckerSvcMdw;
+import server.middleware.base_mdw.etc.services_mdw.RateLimitSvcMdw;
+import server.middleware.base_mdw.etc.services_mdw.TokenCheckerSvcMdw;
+import server.middleware.base_mdw.etc.services_mdw.UserPwdCheckerSvcMdw;
 import server.models.token.etc.TokenT;
-import server.paperwork.tfa.TFAForm;
+import server.paperwork.user_validation.tfa.TFAForm;
 
 public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, BaseLimitMdw {
 
     @Autowired
-    private RateLimit rl;
+    private RateLimitSvcMdw rl;
     @Autowired
-    private FormChecker formCk;
+    private FormCheckerSvcMdw formCk;
     @Autowired
-    private TokenCheckerMdw tokenCk;
+    private TokenCheckerSvcMdw tokenCk;
     @Autowired
-    private UserPwdCheckerMdw checkUserMdw;
+    private UserPwdCheckerSvcMdw checkUserMdw;
     @Autowired
-    private Check2FAMdw tfaCheck;
+    private Check2FASvcMdw tfaCheck;
 
     protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
 
@@ -46,17 +46,17 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
     }
 
     @Override
-    public TokenCheckerMdw useTokenChecker() {
+    public TokenCheckerSvcMdw useTokenChecker() {
         return tokenCk;
     }
 
     @Override
-    public UserPwdCheckerMdw useUserPwdChecker() {
+    public UserPwdCheckerSvcMdw useUserPwdChecker() {
         return checkUserMdw;
     }
 
     @Override
-    public RateLimit useLimit() {
+    public RateLimitSvcMdw useLimit() {
         return rl;
     }
 
@@ -91,6 +91,10 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
 
     protected Mono<Void> isTarget(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
         return !api.isSamePath("/api/v1" + p) ? chain.filter(api) : cb.get();
+    }
+
+    protected Mono<Void> isProtected(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
+        return !api.isProtected("/api/v1" + p) ? chain.filter(api) : cb.get();
     }
 
 }

@@ -8,25 +8,23 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.models.applications.JobAppl;
-import server.models.applications.etc.JobApplStatusT;
 
 public interface JobApplRepo extends ReactiveCrudRepository<JobAppl, UUID> {
 
-    @Query("""
-            INSERT INTO applications (user_id, company_name, position_name, status, applied_at)
-            VALUES (:userId, :companyName, :positionName, CAST(:status AS application_status_t), :appliedAt)
-            RETURNING *
-                """)
-    public Mono<JobAppl> insert(UUID userId, String companyName, String positionName, JobApplStatusT status,
-            Long appliedAt);
+        @Query("""
+                            INSERT INTO applications (user_id, position_name, company_name, status, applied_at, notes)
+                            VALUES (:#{#job.userId}, :#{#job.positionName}, :#{#job.companyName}, CAST(:#{#job.status} AS application_status_t), :#{#job.appliedAt}, :#{#job.notes})
+                            RETURNING *
+                        """)
+        public Mono<JobAppl> insert(JobAppl job);
 
-    @Query("SELECT * FROM applications WHERE user_id = :userId")
-    public Flux<JobAppl> findByUserId(UUID userId);
+        @Query("SELECT * FROM applications WHERE user_id = :userId")
+        public Flux<JobAppl> findByUserId(UUID userId);
 
-    @Query("""
-            DELETE FROM applications
-            WHERE user_id = :userId
-            RETURNING id
-            """)
-    Flux<String> delByUserId(UUID userid);
+        @Query("""
+                        DELETE FROM applications
+                        WHERE user_id = :userId
+                        RETURNING id
+                        """)
+        Flux<String> delByUserId(UUID userid);
 }

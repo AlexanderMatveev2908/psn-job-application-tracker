@@ -1,50 +1,16 @@
 package server.features.test.paperwork;
 
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.validation.Valid;
 import lombok.Data;
-import server.decorators.flow.ErrAPI;
-import server.paperwork.EmailForm;
-import server.paperwork.NamesForm;
+import server.paperwork.user_validation.NamesSpec;
+import server.paperwork.user_validation.email_form.EmailSpec;
 
-@Data
-public class UserTestForm {
+@Data @JsonIgnoreProperties(ignoreUnknown = true)
+public class UserTestForm implements NamesSpec, EmailSpec {
 
-  @Valid
-  private final EmailForm emailCheck;
-
-  @Valid
-  private final NamesForm namesCheck;
-
-  public UserTestForm(String firstName, String lastName, String email, String password) {
-    this.emailCheck = new EmailForm(email);
-    this.namesCheck = new NamesForm(firstName, lastName);
-  }
-
-  public String getFirstName() {
-    return namesCheck.getFirstName();
-  }
-
-  public String getLastName() {
-    return namesCheck.getLastName();
-  }
-
-  public String getEmail() {
-    return emailCheck.getEmail();
-  }
-
-  public static UserTestForm fromMap(Map<String, Object> bd) {
-
-    var fields = List.of("firstName", "lastName", "email", "password");
-
-    for (String f : fields)
-      if (!(bd.get(f) instanceof String))
-        throw new ErrAPI(String.format("%s invalid", f), 400);
-
-    return new UserTestForm((String) bd.get("firstName"), (String) bd.get("lastName"), (String) bd.get("email"),
-        (String) bd.get("password"));
-  }
-
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String password;
 }
