@@ -8,7 +8,7 @@ import lombok.Data;
 import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
 import server.lib.data_structure.ShapeCheck;
-import server.lib.dev.MyLog;
+import server.lib.data_structure.parser.Prs;
 import server.paperwork.tfa.annotations.TFAFormMatch;
 
 @Data @TFAFormMatch({ "totpCode", "backupCode" })
@@ -22,16 +22,9 @@ public class TFAForm {
   public static TFAForm fromMap(Map<String, Object> map) {
 
     try {
-      Object rawTotp = map.get("totpCode");
-      String totpCode = null;
 
-      if (rawTotp != null)
-        totpCode = rawTotp instanceof Number num ? String.format("%06d", num.intValue()) : (String) rawTotp;
-
-      Object rawBkp = map.get("backupCode");
-      String bkpCode = ShapeCheck.isStr(rawBkp) ? (String) rawBkp : null;
-
-      MyLog.log(totpCode, bkpCode);
+      String totpCode = Prs.fromNumToString(map.get("totpCode")).orElse(null);
+      String bkpCode = Prs.fromAnyToStr(map.get("backupCode")).orElse(null);
 
       return new TFAForm(totpCode, bkpCode);
     } catch (Exception err) {
