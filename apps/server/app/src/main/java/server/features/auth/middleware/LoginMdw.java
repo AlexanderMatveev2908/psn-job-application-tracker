@@ -19,7 +19,7 @@ public class LoginMdw extends BaseMdw {
     @Override
     public Mono<Void> handle(Api api, WebFilterChain chain) {
         return isTarget(api, chain, "/auth/login", () -> {
-            return limitAndRef(api).flatMap(bd -> {
+            return limitWithRefBody(api).flatMap(bd -> {
                 LoginForm form = LoginForm.fromMap(bd);
 
                 return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())

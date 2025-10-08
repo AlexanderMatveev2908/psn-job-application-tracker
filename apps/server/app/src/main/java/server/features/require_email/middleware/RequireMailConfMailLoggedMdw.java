@@ -15,7 +15,7 @@ public class RequireMailConfMailLoggedMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/require-email/confirm-email-logged", () -> {
-      return limitAndRef(api).flatMap(body -> {
+      return limitWithRefBody(api).flatMap(body -> {
         return checkJwtMandatory(api).flatMap(dbUser -> {
           if (!dbUser.getEmail().equals(body.get("email")))
             return Mono.error(new ErrAPI("email sent is different from account one", 409));

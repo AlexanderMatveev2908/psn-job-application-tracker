@@ -19,7 +19,7 @@ public class RequireMailRecoverPwdMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/require-email/recover-pwd", () -> {
-      return limitAndRef(api).flatMap(body -> {
+      return limitWithRefBody(api).flatMap(body -> {
         var form = EmailForm.fromBody(body);
 
         return checkForm(api, form).then(userSvc.findByEmail(form.getEmail())

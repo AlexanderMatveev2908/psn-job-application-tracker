@@ -3,6 +3,7 @@ package server.middleware.base_mdw.etc.interfaces;
 import java.util.Map;
 
 import reactor.core.publisher.Mono;
+import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.etc.services_mdw.RateLimitSvcMdw;
 
@@ -19,11 +20,18 @@ public interface BaseLimitMdw {
     return limit(api, 5, 15);
   }
 
-  default Mono<Map<String, Object>> limitAndRef(Api api, int limit, int minutes) {
+  default Mono<Map<String, Object>> limitWithRefBody(Api api, int limit, int minutes) {
     return limit(api, limit, minutes).then(grabBody(api));
   }
 
-  default Mono<Map<String, Object>> limitAndRef(Api api) {
-    return limitAndRef(api, 5, 15);
+  default Mono<Map<String, Object>> limitWithRefBody(Api api) {
+    return limitWithRefBody(api, 5, 15);
+  }
+
+  default Mono<Map<String, Object>> limitWithFormData(Api api, int limit, int minutes) {
+    return limit(api, limit, minutes).then(Mono.defer(() -> {
+      var body = api.getParsedForm();
+      return !body.isPresent() ? Mono.error(new ErrAPI("data not provided", 400)) : Mono.just(body.get());
+    }));
   }
 }

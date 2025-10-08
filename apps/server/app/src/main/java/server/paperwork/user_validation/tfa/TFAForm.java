@@ -22,10 +22,8 @@ public class TFAForm {
   public static TFAForm fromMap(Map<String, Object> map) {
 
     try {
-
       String totpCode = Prs.fromNumToString(map.get("totpCode")).orElse(null);
       String bkpCode = Prs.fromAnyToStr(map.get("backupCode")).orElse(null);
-
       return new TFAForm(totpCode, bkpCode);
     } catch (Exception err) {
       throw new ErrAPI("invalid 2FA data", 401);
