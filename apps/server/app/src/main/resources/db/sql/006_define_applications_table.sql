@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS applications (
     company_name VARCHAR(255) NOT NULL,
     position_name VARCHAR(255) NOT NULL,
     status application_status_t NOT NULL,
+    notes TEXT,
     applied_at BIGINT DEFAULT (extract(epoch FROM now()) * 1000)::BIGINT
 
 ) INHERITS (root_table);

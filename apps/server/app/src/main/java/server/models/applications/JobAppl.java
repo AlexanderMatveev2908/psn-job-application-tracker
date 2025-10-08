@@ -9,10 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.models.RootTable;
 import server.models.applications.etc.JobApplStatusT;
+import server.paperwork.job_application.JobApplForm;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Table("applications")
+@Data @EqualsAndHashCode(callSuper = true) @Table("applications")
 public class JobAppl extends RootTable {
 
     @Column("user_id")
@@ -28,13 +27,31 @@ public class JobAppl extends RootTable {
     private JobApplStatusT status;
 
     @Column("applied_at")
-    private Long appliedAt;
+    private long appliedAt;
+
+    @Column("notes")
+    private String notes;
 
     public JobAppl() {
+    }
+
+    public JobAppl(UUID userId, String companyName, String positionName, JobApplStatusT status, long appliedAt,
+            String notes) {
+        this.userId = userId;
+        this.companyName = companyName;
+        this.positionName = positionName;
+        this.status = status;
+        this.appliedAt = appliedAt;
+        this.notes = notes;
     }
 
     @Override
     public String toString() {
         return reflectiveToString();
+    }
+
+    public static JobAppl fromUserForm(UUID userId, JobApplForm form) {
+        return new JobAppl(userId, form.getCompanyName(), form.getPositionName(), form.getStatusT(),
+                form.getAppliedAtAsLong(), form.getNotes());
     }
 }

@@ -1,5 +1,8 @@
 package server.paperwork.job_application;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import server.conf.Reg;
+import server.decorators.flow.ErrAPI;
 import server.models.applications.etc.JobApplStatusT;
 import server.paperwork.enum_val.EnumMatch;
 
@@ -26,5 +30,18 @@ public class JobApplForm {
 
   @Pattern(regexp = Reg.DATE_PICKER, message = "date invalid")
   private String appliedAt;
+
+  public JobApplStatusT getStatusT() {
+    return JobApplStatusT.valueOf(status);
+  }
+
+  public long getAppliedAtAsLong() {
+    try {
+      LocalDate date = LocalDate.parse(appliedAt);
+      return date.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    } catch (Exception err) {
+      throw new ErrAPI("invalid applied_at date");
+    }
+  }
 
 }
