@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestBodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.RequestHeadersSpec;
+import org.springframework.web.reactive.function.BodyInserters;
 
 import server.lib.dev.MyLog;
 
@@ -21,6 +24,7 @@ public class ReqT {
     private String url;
     private HttpMethod method = HttpMethod.GET;
     private Object body;
+    private MultipartBodyBuilder multipartBody;
 
     private ReqT(WebTestClient web, String url) {
         this.web = web;
@@ -85,6 +89,14 @@ public class ReqT {
         return this;
     }
 
+    public ReqT multipart(Map<String, Object> parts) {
+        if (this.multipartBody == null) {
+            this.multipartBody = new MultipartBodyBuilder();
+        }
+        parts.forEach((k, v) -> this.multipartBody.part(k, v));
+        return this;
+    }
+
     public ResT send() {
         String fullUrl = url;
 
@@ -99,8 +111,17 @@ public class ReqT {
         if (!headers.isEmpty())
             req = req.headers(existing -> headers.forEach(existing::add));
 
-        if (body != null && req instanceof RequestBodySpec bodySpec)
-            req = bodySpec.bodyValue(body);
+        if (req instanceof RequestBodySpec bodySpec) {
+            if (multipartBody != null) {
+                req = bodySpec.contentType(MediaType.MULTIPART_FORM_DATA);
+
+                req = bodySpec.body(BodyInserters.fromMultipartData(multipartBody.build()));
+            } else if (body != null) {
+                req = bodySpec.contentType(MediaType.APPLICATION_JSON);
+
+                req = bodySpec.bodyValue(body);
+            }
+        }
 
         if (!cookies.isEmpty())
             for (var pair : cookies.entrySet())

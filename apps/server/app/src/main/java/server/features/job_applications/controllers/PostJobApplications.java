@@ -23,7 +23,7 @@ public class PostJobApplications {
 
       Map<String, Object> body = Map.of("application", saved);
 
-      return new ResAPI(200).msg("application created").data(body).build();
+      return new ResAPI(201).msg("application created").data(body).build();
     });
   }
 }
