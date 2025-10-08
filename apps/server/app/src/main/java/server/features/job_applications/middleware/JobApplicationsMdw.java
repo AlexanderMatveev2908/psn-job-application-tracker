@@ -15,7 +15,7 @@ public class JobApplicationsMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isProtected(api, chain, "/job-applications", () -> {
+    return isSubPathOf(api, chain, "/job-applications", () -> {
       return checkJwtMandatory(api).then(chain.filter(api));
     });
   }

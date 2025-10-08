@@ -120,8 +120,13 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
         return !api.isSamePath("/api/v1" + path, method) ? chain.filter(api) : cb.get();
     }
 
-    protected Mono<Void> isProtected(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
-        return !api.isProtected("/api/v1" + p) ? chain.filter(api) : cb.get();
+    protected Mono<Void> isSubPathOf(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
+        return !api.isSubPathOf("/api/v1" + p) ? chain.filter(api) : cb.get();
+    }
+
+    protected Mono<Void> isSubPathOf(Api api, WebFilterChain chain, String p, HttpMethod method,
+            Supplier<Mono<Void>> cb) {
+        return !api.isSubPathOf("/api/v1" + p, method) ? chain.filter(api) : cb.get();
     }
 
 }

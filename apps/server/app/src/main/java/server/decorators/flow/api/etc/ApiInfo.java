@@ -54,6 +54,10 @@ public interface ApiInfo {
     return ShapeCheck.isV4((pathId = parts[lastIdx])) ? Optional.of(UUID.fromString(pathId)) : Optional.empty();
   }
 
+  default boolean hasPathUUID() {
+    return getPathVarId().isPresent();
+  }
+
   // ? query
   default String getQuery() {
     return Optional.ofNullable(getExch().getRequest().getURI().getQuery()).orElse("");
@@ -84,10 +88,6 @@ public interface ApiInfo {
 
     String endpoint = getPath();
 
-    var pathId = getPathVarId();
-    if (pathId.isPresent())
-      endpoint = endpoint.replace("/" + pathId.get().toString(), "");
-
     return endpoint.equals(arg);
   }
 
@@ -95,11 +95,18 @@ public interface ApiInfo {
     return isSamePath(arg) && getMethod().equals(method);
   }
 
-  default boolean isProtected(String arg) {
+  default boolean isSubPathOf(String arg) {
     if (arg == null)
       return false;
 
     return getPath().startsWith(arg);
+  }
+
+  default boolean isSubPathOf(String arg, HttpMethod method) {
+    if (arg == null)
+      return false;
+
+    return getPath().startsWith(arg) && getMethod().equals(method);
   }
 
   default HttpMethod getMethod() {
