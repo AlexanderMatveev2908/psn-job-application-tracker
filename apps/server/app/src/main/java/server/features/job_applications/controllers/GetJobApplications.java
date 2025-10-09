@@ -18,10 +18,12 @@ import server.decorators.flow.res_api.ResAPI;
 public class GetJobApplications {
 
   public Mono<ResponseEntity<ResAPI>> getById(Api api) {
-
     Map<String, Object> body = new HashMap<>();
     body.put("jobApplication", api.getCurrApplication());
-
     return new ResAPI(200).msg("application found").data(body).build();
+  }
+
+  public Mono<ResponseEntity<ResAPI>> readAll(Api api) {
+    return new ResAPI(200).msg("").build();
   }
 }

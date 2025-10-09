@@ -50,4 +50,8 @@ public class JobApplicationsRouter {
     return delCtrl.delById(api);
   }
 
+  @GetMapping
+  public Mono<ResponseEntity<ResAPI>> readAll(Api api) {
+    return getCtrl.readAll(api);
+  }
 }

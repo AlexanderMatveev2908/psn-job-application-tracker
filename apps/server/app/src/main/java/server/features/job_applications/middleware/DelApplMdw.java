@@ -21,7 +21,7 @@ public class DelApplMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isSubPathOf(api, chain, "/job-applications", HttpMethod.DELETE, () -> {
+    return matchPath(api, chain, "/job-applications", HttpMethod.DELETE, () -> {
       return limit(api, 15, 15)
           .then(withPathId(api).flatMap(id -> jobCombo.existsAndBelongs(api, id).then(chain.filter(api))));
     });

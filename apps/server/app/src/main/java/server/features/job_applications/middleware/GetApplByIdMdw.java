@@ -21,8 +21,7 @@ public class GetApplByIdMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isSubPathOf(api, chain, "/job-applications", HttpMethod.GET, () -> {
-
+    return matchPath(api, chain, "/job-applications", HttpMethod.GET, () -> {
       return limit(api, 30, 15)
           .then(withPathId(api).flatMap(jobId -> jobCombo.existsAndBelongs(api, jobId).then(chain.filter(api))));
     });

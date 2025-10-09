@@ -20,7 +20,8 @@ import server.decorators.flow.res_api.ResAPI;
 import server.lib.data_structure.parser.Prs;
 import server.lib.dev.MyLog;
 
-@Component @Order(-1)
+@Component
+@Order(-1)
 public class ErrCatcher implements WebExceptionHandler {
 
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -32,12 +33,18 @@ public class ErrCatcher implements WebExceptionHandler {
 
         String msg = Optional.ofNullable(err.getMessage()).orElse("");
         boolean isRouteNotFound = msg.equals("404 NOT_FOUND");
-        if (isRouteNotFound) {
+        boolean isMethodNotAllowed = msg.contains("405 METHOD_NOT_ALLOWED");
+        if (isRouteNotFound || isMethodNotAllowed) {
             String endpoint = exc.getRequest().getPath().value();
-            msg = String.format("route %s not found 🚦", endpoint);
+            if (isRouteNotFound)
+                msg = String.format("route %s not found 🚦", endpoint);
+            else
+                msg = String.format("route %s does not support %s requests", endpoint,
+                        exc.getRequest().getMethod().toString());
         }
         msg = String.format("%s %s", err instanceof ErrAPI ? "❌" : "💣", msg.replace("❌ ", ""));
-        int status = (err instanceof ErrAPI) ? ((ErrAPI) err).getStatus() : isRouteNotFound ? 404 : 500;
+        int status = (err instanceof ErrAPI errInst) ? errInst.getStatus()
+                : isRouteNotFound ? 404 : isMethodNotAllowed ? 405 : 500;
         Map<String, Object> data = (err instanceof ErrAPI) ? ((ErrAPI) err).getData() : null;
 
         var res = exc.getResponse();

@@ -3,6 +3,7 @@ package server.decorators.flow.api.etc;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -83,9 +84,6 @@ public interface ApiInfo {
   }
 
   default boolean isSamePath(String arg) {
-    if (arg == null)
-      return false;
-
     String endpoint = getPath();
 
     return endpoint.equals(arg);
@@ -96,17 +94,26 @@ public interface ApiInfo {
   }
 
   default boolean isSubPathOf(String arg) {
-    if (arg == null)
-      return false;
-
     return getPath().startsWith(arg);
   }
 
   default boolean isSubPathOf(String arg, HttpMethod method) {
-    if (arg == null)
-      return false;
-
     return getPath().startsWith(arg) && getMethod().equals(method);
+  }
+
+  default boolean matchPath(String arg, HttpMethod method) {
+    String original = getPath();
+    String cut;
+    String[] parts = original.split("\\/", -1);
+    int lastIdx = parts.length - 1;
+    String lastPart = parts[lastIdx];
+
+    if (lastPart.isBlank())
+      cut = original.replaceFirst("\\/+$", "");
+    else
+      cut = original.replaceFirst("/" + Pattern.quote(lastPart) + "$", "");
+
+    return arg.equals(cut) && getMethod().equals(method);
   }
 
   default HttpMethod getMethod() {

@@ -22,8 +22,7 @@ public class PutJobApplMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isSubPathOf(api, chain, "/job-applications", HttpMethod.PUT, () -> {
-
+    return matchPath(api, chain, "/job-applications", HttpMethod.PUT, () -> {
       return limit(api, 15, 15).then(withPathId(api).flatMap(jobId -> checkMultipartForm(api, JobApplForm.class)
           .then(jobCombo.existsAndBelongs(api, jobId).flatMap(dbSaved -> {
             api.setMappedDataAttr(JobAppl.fromAttrApi(api));
