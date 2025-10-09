@@ -20,7 +20,7 @@ public class GetJobApplications {
   public Mono<ResponseEntity<ResAPI>> getById(Api api) {
 
     Map<String, Object> body = new HashMap<>();
-    body.put("jobApplication", api.getMappedData());
+    body.put("jobApplication", api.getCurrApplication());
 
     return new ResAPI(200).msg("application found").data(body).build();
   }

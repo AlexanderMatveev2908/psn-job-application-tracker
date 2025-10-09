@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.web.server.ServerWebExchange;
 
+import server.models.applications.JobAppl;
 import server.models.backup_code.etc.RecInfoBkp;
 import server.models.user.User;
 
@@ -28,6 +29,15 @@ public interface ApiAttr {
 
   default User getUser() {
     return getExch().getAttribute("user");
+  }
+
+  // ? curr job application
+  default void setCurrApplication(JobAppl job) {
+    setAttr("jobApplication", job);
+  }
+
+  default JobAppl getCurrApplication() {
+    return getExch().getAttribute("jobApplication");
   }
 
   // ? bkp codes

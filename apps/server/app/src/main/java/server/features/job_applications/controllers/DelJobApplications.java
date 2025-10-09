@@ -8,13 +8,16 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.decorators.flow.res_api.ResAPI;
+import server.features.job_applications.services.DelJobApplSvc;
 
-@SuppressFBWarnings({ "EI2" }) 
-@Component 
+@SuppressFBWarnings({ "EI2" })
+@Component
 @RequiredArgsConstructor
 public class DelJobApplications {
 
-  public Mono<ResponseEntity<ResAPI>> example(Api api) {
-    return new ResAPI(200).msg("Del JobApplications endpoint").build();
+  private final DelJobApplSvc delSvc;
+
+  public Mono<ResponseEntity<ResAPI>> delById(Api api) {
+    return delSvc.mng(api).then(new ResAPI(200).msg("application deleted").build());
   }
 }

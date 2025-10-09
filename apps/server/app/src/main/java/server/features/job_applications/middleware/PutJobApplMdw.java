@@ -7,11 +7,10 @@ import org.springframework.web.server.WebFilterChain;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.applications.JobAppl;
-import server.models.applications.svc.JobApplRepo;
+import server.models.applications.svc.JobCombo;
 import server.paperwork.job_application.JobApplForm;
 
 @Component
@@ -19,21 +18,17 @@ import server.paperwork.job_application.JobApplForm;
 @SuppressFBWarnings({ "EI2" })
 public class PutJobApplMdw extends BaseMdw {
 
-  private final JobApplRepo jobRepo;
+  private final JobCombo jobCombo;
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isSubPathOf(api, chain, "/job-applications", HttpMethod.PUT, () -> {
 
       return limit(api, 15, 15).then(withPathId(api).flatMap(jobId -> checkMultipartForm(api, JobApplForm.class)
-          .then(jobRepo.findById(jobId)
-              .switchIfEmpty(Mono.error(new ErrAPI("job application not found", 404)))
-              .flatMap(existing -> !existing.getUserId().equals(api.getUser().getId())
-                  ? Mono.error(new ErrAPI("forbidden", 403))
-                  : Mono.defer(() -> {
-                    api.setMappedDataAttr(JobAppl.fromAttrApi(api));
-                    return chain.filter(api);
-                  })))));
+          .then(jobCombo.existsAndBelongs(api, jobId).flatMap(dbSaved -> {
+            api.setMappedDataAttr(JobAppl.fromAttrApi(api));
+            return chain.filter(api);
+          }))));
     });
   }
 }

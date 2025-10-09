@@ -23,7 +23,7 @@ public class ReqT {
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<String, String> query = new HashMap<>();
     private String url;
-    private UUID pathIdParam;
+    private String pathIdParam;
     private HttpMethod method = HttpMethod.GET;
     private Object body;
     private MultipartBodyBuilder multipartBody;
@@ -38,7 +38,12 @@ public class ReqT {
     }
 
     public ReqT pathIdParam(UUID pathIdParam) {
-        this.pathIdParam = pathIdParam;
+        this.pathIdParam = pathIdParam.toString();
+        return this;
+    }
+
+    public ReqT pathIdInvalid() {
+        this.pathIdParam = "invalid_id";
         return this;
     }
 
@@ -108,7 +113,7 @@ public class ReqT {
         String fullUrl = url;
 
         if (pathIdParam != null)
-            fullUrl += ("/" + pathIdParam.toString());
+            fullUrl += ("/" + pathIdParam);
 
         if (!query.isEmpty()) {
             String joined = query.entrySet().stream().map(pair -> pair.getKey() + "=" + pair.getValue())

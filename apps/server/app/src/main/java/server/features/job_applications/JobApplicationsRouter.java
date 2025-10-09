@@ -1,6 +1,7 @@
 package server.features.job_applications;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +43,11 @@ public class JobApplicationsRouter {
   @PutMapping("/{applicationId}")
   public Mono<ResponseEntity<ResAPI>> putApplication(Api api) {
     return putCtrl.putApplication(api);
+  }
+
+  @DeleteMapping("/{applicationId}")
+  public Mono<ResponseEntity<ResAPI>> delById(Api api) {
+    return delCtrl.delById(api);
   }
 
 }
