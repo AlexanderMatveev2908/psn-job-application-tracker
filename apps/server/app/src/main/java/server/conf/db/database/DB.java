@@ -10,43 +10,42 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 
 @Component
 public class DB {
 
-    private final R2dbcEntityTemplate dbHigh;
-    private final DatabaseClient dbLow;
+    private final R2dbcEntityTemplate orm;
+    private final DatabaseClient sqlClient;
     private final TransactionalOperator trxMng;
     private final ConnectionFactory factory;
 
     public DB(ConnectionFactory factory) {
         this.factory = factory;
-        this.dbHigh = new R2dbcEntityTemplate(factory);
-        this.dbLow = dbHigh.getDatabaseClient();
+        this.orm = new R2dbcEntityTemplate(factory);
+        this.sqlClient = orm.getDatabaseClient();
         this.trxMng = TransactionalOperator.create(new R2dbcTransactionManager(factory));
     }
 
     public <T> Mono<T> trxMono(Function<DatabaseClient, Mono<T>> cb) {
-        return cb.apply(dbLow).as(trxMng::transactional).onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
+        return cb.apply(sqlClient).as(trxMng::transactional)
+                .onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
-    public <T> Flux<T> trxFlux(Function<DatabaseClient, Flux<T>> cb) {
-        return cb.apply(dbLow).as(trxMng::transactional).onErrorResume(err -> Flux.error(new ErrAPI(err.getMessage())));
-    }
-
-    public Mono<Void> trxLow(Function<Connection, Mono<Void>> cb) {
-        return Mono.usingWhen(factory.create(),
-                cnt -> Mono.from(cnt.beginTransaction()).then(cb.apply(cnt)).then(Mono.from(cnt.commitTransaction())),
+    public <T> Mono<T> trxLow(Function<Connection, Mono<T>> cb) {
+        return Mono.usingWhen(
+                factory.create(),
+                cnt -> Mono.from(cnt.beginTransaction())
+                        .then(cb.apply(cnt))
+                        .flatMap(result -> Mono.from(cnt.commitTransaction()).thenReturn(result)),
                 cnt -> Mono.from(cnt.close()),
                 (cnt, err) -> Mono.from(cnt.rollbackTransaction()).then(Mono.from(cnt.close())),
                 cnt -> Mono.from(cnt.close()));
     }
 
     public <T> Mono<T> trxHigh(Function<R2dbcEntityTemplate, Mono<T>> cb) {
-        return cb.apply(dbHigh).as(trxMng::transactional)
+        return cb.apply(orm).as(trxMng::transactional)
                 .onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
@@ -59,14 +58,15 @@ public class DB {
                       AND table_name NOT IN ('databasechangelog', 'databasechangeloglock')
                 """;
 
-        return dbLow.sql(sql).map(row -> row.get("table_name", String.class)).all().collectList().flatMap(tables -> {
-            if (tables.isEmpty())
-                return Mono.just(0);
+        return sqlClient.sql(sql).map(row -> row.get("table_name", String.class)).all().collectList()
+                .flatMap(tables -> {
+                    if (tables.isEmpty())
+                        return Mono.just(0);
 
-            String joined = String.join(", ", tables);
-            String truncateSql = "TRUNCATE TABLE " + joined + " RESTART IDENTITY CASCADE";
-            return dbLow.sql(truncateSql).fetch().rowsUpdated().thenReturn(tables.size());
-        }).onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
+                    String joined = String.join(", ", tables);
+                    String truncateSql = "TRUNCATE TABLE " + joined + " RESTART IDENTITY CASCADE";
+                    return sqlClient.sql(truncateSql).fetch().rowsUpdated().thenReturn(tables.size());
+                }).onErrorResume(err -> Mono.error(new ErrAPI(err.getMessage())));
     }
 
 }

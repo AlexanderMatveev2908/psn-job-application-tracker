@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import io.r2dbc.spi.Row;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.decorators.flow.api.Api;
@@ -50,13 +51,17 @@ public class JobAppl extends RootTable {
 
     public JobAppl(UUID id, UUID userId, String companyName, String positionName, JobApplStatusT status, long appliedAt,
             String notes) {
+        this(userId, companyName, positionName, status, appliedAt, notes);
         this.id = id;
-        this.userId = userId;
-        this.companyName = companyName;
-        this.positionName = positionName;
-        this.status = status;
-        this.appliedAt = appliedAt;
-        this.notes = notes;
+    }
+
+    public JobAppl(UUID id, UUID userId, String companyName, String positionName, JobApplStatusT status, long appliedAt,
+            String notes, long createdAt, long updatedAt, Long deletedAt) {
+        this(id, userId, companyName, positionName, status, appliedAt, notes);
+
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
     }
 
     @Override
@@ -70,13 +75,26 @@ public class JobAppl extends RootTable {
     }
 
     public static JobAppl fromAttrApi(Api api) {
-
         JobApplForm form = api.getMappedData();
         UUID userId = api.getUser().getId();
         UUID jobApplId = api.getPathVarId().get();
 
         return new JobAppl(jobApplId, userId, form.getCompanyName(), form.getPositionName(), form.getStatusT(),
                 form.getAppliedAtAsLong(), form.getNotes());
+    }
+
+    public static JobAppl fromRowSql(Row row) {
+        return new JobAppl(
+                row.get("id", UUID.class),
+                row.get("user_id", UUID.class),
+                row.get("company_name", String.class),
+                row.get("position_name", String.class),
+                JobApplStatusT.valueOf(row.get("status", String.class)),
+                row.get("applied_at", Long.class),
+                row.get("notes", String.class),
+                row.get("created_at", Long.class),
+                row.get("updated_at", Long.class),
+                row.get("deleted_at", Long.class));
     }
 
 }

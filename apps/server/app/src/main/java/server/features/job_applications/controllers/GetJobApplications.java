@@ -11,11 +11,14 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.decorators.flow.res_api.ResAPI;
+import server.features.job_applications.services.ReadJobsSvc;
 
 @SuppressFBWarnings({ "EI2" })
 @Component
 @RequiredArgsConstructor
 public class GetJobApplications {
+
+  private final ReadJobsSvc readSvc;
 
   public Mono<ResponseEntity<ResAPI>> getById(Api api) {
     Map<String, Object> body = new HashMap<>();
@@ -24,6 +27,6 @@ public class GetJobApplications {
   }
 
   public Mono<ResponseEntity<ResAPI>> readAll(Api api) {
-    return new ResAPI(200).msg("ok").data(Map.of("parsedQuery", api.getMappedData())).build();
+    return readSvc.mng(api).flatMap(res -> new ResAPI(200).msg("ok").data(res).build());
   }
 }

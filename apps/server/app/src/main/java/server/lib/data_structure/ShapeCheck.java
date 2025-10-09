@@ -1,5 +1,6 @@
 package server.lib.data_structure;
 
+import java.util.List;
 import java.util.UUID;
 
 import server.conf.Reg;
@@ -21,5 +22,12 @@ public final class ShapeCheck {
         } catch (Exception err) {
             return false;
         }
+    }
+
+    public static boolean isList(Object arg) {
+        if (arg instanceof List<?> argList)
+            return !argList.isEmpty();
+
+        return false;
     }
 }
