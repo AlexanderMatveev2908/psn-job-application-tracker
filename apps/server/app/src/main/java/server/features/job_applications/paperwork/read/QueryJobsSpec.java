@@ -16,4 +16,6 @@ public interface QueryJobsSpec {
   String getPositionName();
 
   List<String> getStatus();
+
+  String getAppliedAtSort();
 }

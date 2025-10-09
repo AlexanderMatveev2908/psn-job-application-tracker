@@ -30,7 +30,7 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
       string
     >({
       query: (data) => ({
-        url: `${BASE}/?${data}`,
+        url: `${BASE}?${data}`,
         method: "GET",
       }),
 

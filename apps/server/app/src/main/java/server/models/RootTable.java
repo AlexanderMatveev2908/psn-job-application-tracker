@@ -16,13 +16,16 @@ public class RootTable implements RootCls {
     protected UUID id;
 
     @Column("created_at")
-    protected Long createdAt;
+    protected long createdAt;
 
     @Column("updated_at")
-    protected Long updatedAt;
+    protected long updatedAt;
 
     @Column("deleted_at")
     protected Long deletedAt;
+
+    public RootTable() {
+    }
 
     @Override
     public String toString() {

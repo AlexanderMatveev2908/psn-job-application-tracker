@@ -69,6 +69,8 @@ Together they form a clean, modern **full-stack architecture** 🚀
 - **Namecheap** — Domain provider, configured with DNS records (SPF, DKIM, DMARC) to support both Brevo + Zoho
 - **Zsh** — Custom shell scripts for scaffolding and developer productivity
 
+---
+
 ## 📦 Setup
 
 After cloning the repository, start by installing the dependencies:
