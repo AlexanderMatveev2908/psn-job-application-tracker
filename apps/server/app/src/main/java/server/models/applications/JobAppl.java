@@ -7,11 +7,14 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import server.decorators.flow.api.Api;
 import server.models.RootTable;
 import server.models.applications.etc.JobApplStatusT;
 import server.paperwork.job_application.JobApplForm;
 
-@Data @EqualsAndHashCode(callSuper = true) @Table("applications")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Table("applications")
 public class JobAppl extends RootTable {
 
     @Column("user_id")
@@ -45,6 +48,17 @@ public class JobAppl extends RootTable {
         this.notes = notes;
     }
 
+    public JobAppl(UUID id, UUID userId, String companyName, String positionName, JobApplStatusT status, long appliedAt,
+            String notes) {
+        this.id = id;
+        this.userId = userId;
+        this.companyName = companyName;
+        this.positionName = positionName;
+        this.status = status;
+        this.appliedAt = appliedAt;
+        this.notes = notes;
+    }
+
     @Override
     public String toString() {
         return reflectiveToString();
@@ -54,4 +68,15 @@ public class JobAppl extends RootTable {
         return new JobAppl(userId, form.getCompanyName(), form.getPositionName(), form.getStatusT(),
                 form.getAppliedAtAsLong(), form.getNotes());
     }
+
+    public static JobAppl fromAttrApi(Api api) {
+
+        JobApplForm form = api.getMappedData();
+        UUID userId = api.getUser().getId();
+        UUID jobApplId = api.getPathVarId().get();
+
+        return new JobAppl(jobApplId, userId, form.getCompanyName(), form.getPositionName(), form.getStatusT(),
+                form.getAppliedAtAsLong(), form.getNotes());
+    }
+
 }

@@ -75,7 +75,7 @@ public class PutApplTest {
   }
 
   static Stream<Arguments> badCases() {
-    return Stream.of(Arguments.of("invalid job application id", 400), Arguments.of("application not found", 404));
+    return Stream.of(Arguments.of("invalid id", 400), Arguments.of("application not found", 404));
   }
 
   @ParameterizedTest
@@ -84,7 +84,7 @@ public class PutApplTest {
 
     if (msg.equals("application not found"))
       mainReq.pathIdParam(UUID.randomUUID());
-    else if (!msg.equals("invalid job application id"))
+    else if (!msg.equals("invalid id"))
       mainReq.pathIdParam(pathId);
 
     ResT resPut = mainReq.jwt(resTk.getJwt()).multipart(MyPayloads.application()).send();

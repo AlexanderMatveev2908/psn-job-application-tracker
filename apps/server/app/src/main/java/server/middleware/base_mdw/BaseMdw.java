@@ -2,6 +2,7 @@ package server.middleware.base_mdw;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +110,13 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
 
     protected Mono<Void> checkUserLoggedPwdToMatch(Api api, String plainText) {
         return checkJwtMandatory(api).flatMap(user -> checkUserPwdToMatch(api, plainText));
+    }
+
+    protected Mono<UUID> withPathId(Api api) {
+        if (!api.hasPathUUID())
+            return Mono.error(new ErrAPI("invalid id", 400));
+        return Mono.just(api.getPathVarId().get());
+
     }
 
     protected Mono<Void> isTarget(Api api, WebFilterChain chain, String path, Supplier<Mono<Void>> cb) {

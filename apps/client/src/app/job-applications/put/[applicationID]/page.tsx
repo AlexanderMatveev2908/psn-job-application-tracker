@@ -24,12 +24,12 @@ const Page: FC = () => {
       refetchOnMountOrArgChange: true,
     }
   );
-  const { data: { application } = {}, isLoading } = res ?? {};
+  const { data: { jobApplication } = {}, isLoading } = res ?? {};
   useWrapQuery({ ...res, pushNotice: "*" });
 
   const [mutate] = jobApplicationSliceAPI.usePutJobApplicationMutation();
 
-  const { handleSave, formCtx } = useJobApplForm({ mutate, application });
+  const { handleSave, formCtx } = useJobApplForm({ mutate, jobApplication });
 
   return (
     <FormProvider {...formCtx}>

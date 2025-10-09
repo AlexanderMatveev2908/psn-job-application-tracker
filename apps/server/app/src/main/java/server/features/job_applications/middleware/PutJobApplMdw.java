@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
+import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplRepo;
 import server.paperwork.job_application.JobApplForm;
 
@@ -24,15 +25,15 @@ public class PutJobApplMdw extends BaseMdw {
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isSubPathOf(api, chain, "/job-applications", HttpMethod.PUT, () -> {
 
-      if (!api.hasPathUUID())
-        return Mono.error(new ErrAPI("invalid job application id", 400));
-
-      return checkMultipartForm(api, JobApplForm.class)
-          .then(jobRepo.findById(api.getPathVarId().get())
+      return limit(api, 15, 15).then(withPathId(api).flatMap(jobId -> checkMultipartForm(api, JobApplForm.class)
+          .then(jobRepo.findById(jobId)
               .switchIfEmpty(Mono.error(new ErrAPI("job application not found", 404)))
               .flatMap(existing -> !existing.getUserId().equals(api.getUser().getId())
                   ? Mono.error(new ErrAPI("forbidden", 403))
-                  : chain.filter(api)));
+                  : Mono.defer(() -> {
+                    api.setMappedDataAttr(JobAppl.fromAttrApi(api));
+                    return chain.filter(api);
+                  })))));
     });
   }
 }

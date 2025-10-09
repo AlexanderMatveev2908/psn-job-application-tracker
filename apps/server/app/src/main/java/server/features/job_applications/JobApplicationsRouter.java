@@ -1,6 +1,7 @@
 package server.features.job_applications;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -16,7 +17,10 @@ import server.features.job_applications.controllers.PatchJobApplications;
 import server.features.job_applications.controllers.DelJobApplications;
 import server.router.RouterAPI;
 
-@SuppressFBWarnings({ "EI2" }) @RouterAPI("/api/v1/job-applications") @RequiredArgsConstructor @SuppressWarnings({
+@SuppressFBWarnings({ "EI2" })
+@RouterAPI("/api/v1/job-applications")
+@RequiredArgsConstructor
+@SuppressWarnings({
     "unused", })
 public class JobApplicationsRouter {
   private final GetJobApplications getCtrl;
@@ -28,6 +32,11 @@ public class JobApplicationsRouter {
   @PostMapping
   public Mono<ResponseEntity<ResAPI>> create(Api api) {
     return postCtrl.create(api);
+  }
+
+  @GetMapping("/{applicationId}")
+  public Mono<ResponseEntity<ResAPI>> getById(Api api) {
+    return getCtrl.getById(api);
   }
 
   @PutMapping("/{applicationId}")

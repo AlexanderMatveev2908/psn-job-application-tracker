@@ -29,7 +29,7 @@ public interface JobApplRepo extends ReactiveCrudRepository<JobAppl, UUID> {
                 status = CAST(:#{#job.status} AS application_status_t),
                 applied_at = :#{#job.appliedAt},
                 notes = :#{#job.notes}
-        WHERE user_id = :#{#job.userId} 
+        WHERE id = :#{#job.id} 
         RETURNING *
         """)
         public Mono<JobAppl> put(JobAppl job);

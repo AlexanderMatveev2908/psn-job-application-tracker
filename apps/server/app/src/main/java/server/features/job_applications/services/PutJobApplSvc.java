@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplRepo;
-import server.paperwork.job_application.JobApplForm;
 
 @Service
 @Transactional
@@ -19,10 +18,6 @@ public class PutJobApplSvc {
   private final JobApplRepo jobRepo;
 
   public Mono<JobAppl> mng(Api api) {
-
-    JobApplForm form = api.getMappedData();
-    var application = JobAppl.fromUserForm(api.getUser().getId(), form);
-
-    return jobRepo.put(application);
+    return jobRepo.put(api.getMappedData());
   }
 }
