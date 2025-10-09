@@ -75,22 +75,27 @@ public abstract class BaseMdw implements WebFilter, BaseTokensMdw, BasePwdMdw, B
         return formCk.check(api, form);
     }
 
-    private <T> Mono<T> extractAndCheckForm(Api api, Map<String, Object> arg, Class<T> cls) {
+    private <T> Mono<T> convertAndCheckForm(Api api, Map<String, Object> arg, Class<T> cls) {
         T form = Prs.fromMapToT(arg, cls);
 
         return checkForm(api, form).thenReturn(form);
     }
 
     protected <T> Mono<T> checkBodyForm(Api api, Class<T> cls) {
-        return grabBody(api).flatMap(body -> extractAndCheckForm(api, body, cls));
+        return grabBody(api).flatMap(body -> convertAndCheckForm(api, body, cls));
     }
 
     protected <T> Mono<T> checkMultipartForm(Api api, Class<T> cls) {
         Optional<Map<String, Object>> parsedFormData = api.getParsedForm();
-
         return Mono.defer(() -> parsedFormData.isPresent() ? Mono.just(parsedFormData.get()) : grabBody(api))
-                .flatMap(mapArg -> extractAndCheckForm(api, mapArg, cls));
+                .flatMap(mapArg -> convertAndCheckForm(api, mapArg, cls));
+    }
 
+    protected <T> Mono<T> checkQueryForm(Api api, Class<T> cls) {
+        Optional<Map<String, Object>> parsedQuery = api.getParsedQuery();
+
+        return Mono.defer(() -> !parsedQuery.isPresent() ? Mono.error(new ErrAPI("data not provided", 400))
+                : convertAndCheckForm(api, parsedQuery.get(), cls));
     }
 
     protected Mono<String> checkPwdForm(Api api) {

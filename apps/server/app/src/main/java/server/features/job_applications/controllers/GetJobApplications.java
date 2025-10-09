@@ -24,6 +24,6 @@ public class GetJobApplications {
   }
 
   public Mono<ResponseEntity<ResAPI>> readAll(Api api) {
-    return new ResAPI(200).msg("").build();
+    return new ResAPI(200).msg("ok").data(Map.of("parsedQuery", api.getMappedData())).build();
   }
 }

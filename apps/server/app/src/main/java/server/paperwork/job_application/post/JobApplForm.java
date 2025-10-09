@@ -1,4 +1,4 @@
-package server.paperwork.job_application;
+package server.paperwork.job_application.post;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -12,7 +12,7 @@ import lombok.Data;
 import server.conf.Reg;
 import server.decorators.flow.ErrAPI;
 import server.models.applications.etc.JobApplStatusT;
-import server.paperwork.enum_val.EnumMatch;
+import server.paperwork.enum_val.enum_match.EnumMatch;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

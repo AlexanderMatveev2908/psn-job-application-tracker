@@ -49,6 +49,7 @@ public final class Prs {
         try {
             return jack.convertValue(map, cls);
         } catch (Exception err) {
+            err.printStackTrace();
             throw new ErrAPI("invalid form", 400);
         }
     }

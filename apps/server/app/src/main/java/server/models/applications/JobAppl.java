@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import server.decorators.flow.api.Api;
 import server.models.RootTable;
 import server.models.applications.etc.JobApplStatusT;
-import server.paperwork.job_application.JobApplForm;
+import server.paperwork.job_application.post.JobApplForm;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -1,4 +1,4 @@
-package server.paperwork.enum_val;
+package server.paperwork.enum_val.enum_match;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -16,7 +16,7 @@ public class EnumMatchValidator implements ConstraintValidator<EnumMatch, Object
   }
 
   @Override
-  public boolean isValid(Object value, ConstraintValidatorContext context) {
+  public boolean isValid(Object value, ConstraintValidatorContext ctx) {
     if (value == null)
       return false;
 

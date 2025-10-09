@@ -11,7 +11,7 @@ import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobCombo;
-import server.paperwork.job_application.JobApplForm;
+import server.paperwork.job_application.post.JobApplForm;
 
 @Component
 @RequiredArgsConstructor

@@ -9,9 +9,12 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplRepo;
-import server.paperwork.job_application.JobApplForm;
+import server.paperwork.job_application.post.JobApplForm;
 
-@Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings({ "EI2" })
+@Service
+@Transactional
+@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2" })
 public class CreateApplSvc {
   private final JobApplRepo jobRepo;
 
