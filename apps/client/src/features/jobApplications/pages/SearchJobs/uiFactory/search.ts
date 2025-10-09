@@ -40,16 +40,16 @@ export const filtersSearchJobs: FilterSearchBarT[] = [
 
 export const sortersSearchJobs: SorterSearchBarT[] = [
   {
-    name: "created_at",
+    name: "createdAt",
   },
   {
-    name: "updated_at",
+    name: "updatedAt",
   },
   {
     name: "appliedAt",
   },
 ].map((el) => ({
-  name: el.name + "_sort",
+  name: el.name + "Sort",
   label: parseDevValUsFriendly(el.name, { titleCase: true }),
   Svg: CgSandClock,
 }));

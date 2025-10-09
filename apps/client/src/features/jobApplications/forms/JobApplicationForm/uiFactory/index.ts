@@ -24,5 +24,6 @@ export const statusField = gen.checkField({
 
 export const dateApplicationField = gen.txtField({
   name: "appliedAt",
+  label: "Applied At",
   type: "date",
 });
