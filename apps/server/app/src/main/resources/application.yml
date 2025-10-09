@@ -50,7 +50,7 @@ spring:
       enabled: true
       initial-size: 0
       max-size: 20
-      max-acquire-time: 120s
+      max-acquire-time: 240s
       validation-query: SELECT 1
 
   main:

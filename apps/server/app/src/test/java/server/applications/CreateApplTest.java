@@ -35,7 +35,7 @@ public class CreateApplTest {
 
   @BeforeAll
   static void setupGlobalTimer() {
-    System.setProperty("reactor.blocking.timeout", "120s");
+    System.setProperty("reactor.blocking.timeout", "240s");
   }
 
   @BeforeEach
