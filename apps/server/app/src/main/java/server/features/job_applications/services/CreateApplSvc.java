@@ -7,9 +7,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
+import server.features.job_applications.paperwork.post.JobApplForm;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobApplRepo;
-import server.paperwork.job_application.post.JobApplForm;
 
 @Service
 @Transactional

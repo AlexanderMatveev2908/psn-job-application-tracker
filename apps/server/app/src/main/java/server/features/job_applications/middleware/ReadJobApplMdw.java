@@ -6,8 +6,8 @@ import org.springframework.web.server.WebFilterChain;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
+import server.features.job_applications.paperwork.read.QueryJobsForm;
 import server.middleware.base_mdw.BaseMdw;
-import server.paperwork.job_application.read.QueryJobsForm;
 
 import org.springframework.http.HttpMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

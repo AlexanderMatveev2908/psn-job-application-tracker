@@ -8,10 +8,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
+import server.features.job_applications.paperwork.post.JobApplForm;
 import server.middleware.base_mdw.BaseMdw;
 import server.models.applications.JobAppl;
 import server.models.applications.svc.JobCombo;
-import server.paperwork.job_application.post.JobApplForm;
 
 @Component
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package server.paperwork.job_application.read;
+package server.features.job_applications.paperwork.read;
 
 import java.util.List;
 

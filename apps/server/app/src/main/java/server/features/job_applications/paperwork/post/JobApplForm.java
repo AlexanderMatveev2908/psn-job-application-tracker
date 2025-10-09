@@ -1,4 +1,4 @@
-package server.paperwork.job_application.post;
+package server.features.job_applications.paperwork.post;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;

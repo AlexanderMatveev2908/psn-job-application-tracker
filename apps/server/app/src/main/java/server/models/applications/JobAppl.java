@@ -8,9 +8,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.decorators.flow.api.Api;
+import server.features.job_applications.paperwork.post.JobApplForm;
 import server.models.RootTable;
 import server.models.applications.etc.JobApplStatusT;
-import server.paperwork.job_application.post.JobApplForm;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
