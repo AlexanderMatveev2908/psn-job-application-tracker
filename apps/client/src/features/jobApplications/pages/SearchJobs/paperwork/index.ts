@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { REG_JOB_NAME } from "@/core/constants/regex";
-import { parseDevValUsFriendly } from "@/core/lib/dataStructure/formatters";
 import { MapperArrayFieldsT, txtFieldSchema } from "@/core/paperwork";
 import z from "zod";
 import { searchJobsFieldsTxt } from "../uiFactory/search";
@@ -33,7 +32,7 @@ export const searchJobsSchema = z
 
     while (i < data.txtFields.length) {
       const curr = data.txtFields?.[i];
-      const friendlyName = parseDevValUsFriendly(curr.name, {});
+      const friendlyName = curr.label;
 
       if (curr.val.trim().length)
         if (!mapper[curr.name as keyof typeof mapper].reg.test(curr.val))

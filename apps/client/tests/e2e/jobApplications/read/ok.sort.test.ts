@@ -12,7 +12,7 @@ test("read job appl sort by appliedAt ok", async ({ browser }) => {
 
   const sortBar = await getByID(page, "search_bar__sort_bar");
 
-  await clickByID(sortBar, "sort_bar__appliedAt_sort__ASC");
+  await clickByID(sortBar, "sort_bar__appliedAtSort__ASC");
 
   await clickByID(sortBar, "btn__close_popup");
 

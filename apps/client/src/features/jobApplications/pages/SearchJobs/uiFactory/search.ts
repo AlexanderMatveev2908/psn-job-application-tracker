@@ -9,7 +9,6 @@ import {
 } from "../../../uiFactory";
 import { IoStatsChart } from "react-icons/io5";
 import { CgSandClock } from "react-icons/cg";
-import { parseDevValUsFriendly } from "@/core/lib/dataStructure/formatters";
 
 export const searchJobsFieldsTxt = [companyNameField, positionNameField];
 
@@ -41,15 +40,18 @@ export const filtersSearchJobs: FilterSearchBarT[] = [
 export const sortersSearchJobs: SorterSearchBarT[] = [
   {
     name: "createdAt",
+    label: "Created At",
   },
   {
     name: "updatedAt",
+    label: "Updated At",
   },
   {
     name: "appliedAt",
+    label: "Applied At",
   },
 ].map((el) => ({
+  ...el,
   name: el.name + "Sort",
-  label: parseDevValUsFriendly(el.name, { titleCase: true }),
   Svg: CgSandClock,
 }));

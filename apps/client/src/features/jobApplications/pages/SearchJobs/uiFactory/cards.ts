@@ -3,23 +3,23 @@ import { MdOutlineUpdate, MdWork } from "react-icons/md";
 import { JobApplicationT } from "@/features/jobApplications/types";
 import { FaPenFancy, FaRegTrashAlt } from "react-icons/fa";
 import { IoIosCreate } from "react-icons/io";
-import {
-  formatDate,
-  parseDevValUsFriendly,
-} from "@/core/lib/dataStructure/formatters";
+import { formatDate } from "@/core/lib/dataStructure/formatters";
 
 export const genPairsMainCardInfo = (jobAppl: JobApplicationT) =>
   [
     {
       key: "companyName",
+      label: "Company Name",
       Svg: FaBuilding,
     },
     {
       key: "positionName",
+      label: "Position Name",
       Svg: MdWork,
     },
     {
       key: "appliedAt",
+      label: "Applied At",
       Svg: FaPenFancy,
     },
   ].map((el) => {
@@ -27,7 +27,6 @@ export const genPairsMainCardInfo = (jobAppl: JobApplicationT) =>
 
     return {
       ...el,
-      label: parseDevValUsFriendly(el.key, { titleCase: true }),
       val: el.key !== "appliedAt" ? v : formatDate(v as number),
     };
   });

@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import io.r2dbc.spi.Row;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.decorators.flow.api.Api;
@@ -83,18 +82,18 @@ public class JobAppl extends RootTable {
                 form.getAppliedAtAsLong(), form.getNotes());
     }
 
-    public static JobAppl fromRowSql(Row row) {
-        return new JobAppl(
-                row.get("id", UUID.class),
-                row.get("user_id", UUID.class),
-                row.get("company_name", String.class),
-                row.get("position_name", String.class),
-                JobApplStatusT.valueOf(row.get("status", String.class)),
-                row.get("applied_at", Long.class),
-                row.get("notes", String.class),
-                row.get("created_at", Long.class),
-                row.get("updated_at", Long.class),
-                row.get("deleted_at", Long.class));
-    }
+    // public static JobAppl fromRowSql(Row row) {
+    //     return new JobAppl(
+    //             row.get("id", UUID.class),
+    //             row.get("user_id", UUID.class),
+    //             row.get("company_name", String.class),
+    //             row.get("position_name", String.class),
+    //             JobApplStatusT.valueOf(row.get("status", String.class)),
+    //             row.get("applied_at", Long.class),
+    //             row.get("notes", String.class),
+    //             row.get("created_at", Long.class),
+    //             row.get("updated_at", Long.class),
+    //             row.get("deleted_at", Long.class));
+    // }
 
 }

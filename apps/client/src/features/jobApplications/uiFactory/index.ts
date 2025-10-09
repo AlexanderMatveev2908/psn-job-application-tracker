@@ -1,6 +1,6 @@
-import { parseDevValUsFriendly } from "@/core/lib/dataStructure/formatters";
 import { FormFieldGen } from "@/core/uiFactory/classes";
 import { ApplicationStatusT } from "../types";
+import { parseDevValUsFriendly } from "@/core/lib/dataStructure/formatters";
 
 const gen = new FormFieldGen();
 

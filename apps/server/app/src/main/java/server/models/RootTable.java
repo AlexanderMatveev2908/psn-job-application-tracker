@@ -24,12 +24,12 @@ public class RootTable implements RootCls {
     @Column("deleted_at")
     protected Long deletedAt;
 
+    public RootTable() {
+    }
+
     @Override
     public String toString() {
         return reflectiveToString();
-    }
-
-    public RootTable() {
     }
 
 }
