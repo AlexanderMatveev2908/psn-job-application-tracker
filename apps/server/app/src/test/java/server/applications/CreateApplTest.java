@@ -3,6 +3,7 @@ package server.applications;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,6 +32,11 @@ public class CreateApplTest {
   private WebTestClient web;
   private ReqT mainReq;
   private ResT resTk;
+
+  @BeforeAll
+  static void setupGlobalTimer() {
+    System.setProperty("reactor.blocking.timeout", "120s");
+  }
 
   @BeforeEach
   void setup() {

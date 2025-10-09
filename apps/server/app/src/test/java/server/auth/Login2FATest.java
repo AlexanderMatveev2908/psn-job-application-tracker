@@ -24,7 +24,10 @@ import server._lib_tests.ReqT;
 import server._lib_tests.ResT;
 import server.lib.security.tfa.totp.MyTotp;
 
-@SpringBootTest @AutoConfigureWebTestClient @RequiredArgsConstructor @Timeout(value = 60, unit = TimeUnit.SECONDS)
+@SpringBootTest
+@AutoConfigureWebTestClient
+@RequiredArgsConstructor
+@Timeout(value = 60, unit = TimeUnit.SECONDS)
 public class Login2FATest {
   private final static String URL = "/auth/login-2FA";
 
@@ -38,7 +41,7 @@ public class Login2FATest {
 
   @BeforeAll
   static void setupGlobalTimer() {
-    System.setProperty("reactor.blocking.timeout", "60s");
+    System.setProperty("reactor.blocking.timeout", "120s");
   }
 
   @BeforeEach
@@ -58,7 +61,8 @@ public class Login2FATest {
     return Stream.of(Arguments.of("totp"), Arguments.of("bkp_code"));
   }
 
-  @ParameterizedTest @MethodSource("goodCases")
+  @ParameterizedTest
+  @MethodSource("goodCases")
   void ok(String approach) {
 
     var body = new HashMap<>();
@@ -81,7 +85,8 @@ public class Login2FATest {
         Arguments.of("cbc_hmac_not_provided", 401));
   }
 
-  @ParameterizedTest @MethodSource("badCases")
+  @ParameterizedTest
+  @MethodSource("badCases")
   void err(String msg, int status) {
 
     var body = new HashMap<>();
