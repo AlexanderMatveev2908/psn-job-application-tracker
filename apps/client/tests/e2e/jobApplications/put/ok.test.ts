@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import test, { expect } from "@playwright/test";
 import { clickByID, genPayloadJobAppl, getByID } from "../../lib_tests/idx";
-import { waitTmr, waitURL } from "../../lib_tests/shortcuts/wait";
+import { waitURL } from "../../lib_tests/shortcuts/wait";
 import { preJobAppl } from "../pre";
 
 test("put appl ok", async ({ browser }) => {
