@@ -15,7 +15,7 @@ public class ManageAcc2FAMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/user/manage-account-2FA", () -> {
-      return limit(api).then(checkLogged2FA(api, TokenT.MANAGE_ACC_2FA)).then(chain.filter(api));
+      return limit(api, 10, 15).then(checkLogged2FA(api, TokenT.MANAGE_ACC_2FA)).then(chain.filter(api));
     });
   }
 }

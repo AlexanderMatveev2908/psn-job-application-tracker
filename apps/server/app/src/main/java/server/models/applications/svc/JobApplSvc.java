@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import server.models.applications.JobAppl;
 
-@Service @Transactional @RequiredArgsConstructor @SuppressFBWarnings("EI_EXPOSE_REP2")
+@Service
+@Transactional
+@RequiredArgsConstructor
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 public class JobApplSvc {
 
     private final JobApplRepo repo;

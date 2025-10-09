@@ -83,7 +83,7 @@ export const jobApplicationSliceAPI = apiSlice.injectEndpoints({
     }),
 
     getJobApplicationByID: builder.query<
-      ResApiT<{ application: JobApplicationT }>,
+      ResApiT<{ jobApplication: JobApplicationT }>,
       string
     >({
       query: (applID) => ({

@@ -15,12 +15,12 @@ import { useEffect } from "react";
 
 type Params<T extends Record<string, any>> = {
   mutate: TriggerApiT<T>;
-  application?: JobApplicationT;
+  jobApplication?: JobApplicationT;
 };
 
 export const useJobApplForm = <T extends Record<string, any>>({
   mutate,
-  application,
+  jobApplication,
 }: Params<T>) => {
   const formCtx = useForm({
     mode: "onChange",
@@ -38,16 +38,16 @@ export const useJobApplForm = <T extends Record<string, any>>({
   });
 
   useEffect(() => {
-    if (!application) return;
+    if (!jobApplication) return;
 
     reset({
-      companyName: application.companyName,
-      positionName: application.positionName,
-      status: application.status,
-      notes: application.notes ?? "",
-      appliedAt: new Date(application.appliedAt).toISOString().split("T")[0],
+      companyName: jobApplication.companyName,
+      positionName: jobApplication.positionName,
+      status: jobApplication.status,
+      notes: jobApplication.notes ?? "",
+      appliedAt: new Date(jobApplication.appliedAt).toISOString().split("T")[0],
     });
-  }, [application, reset]);
+  }, [jobApplication, reset]);
 
   const { nav, wrapAPI } = useKitHooks();
 
@@ -56,8 +56,8 @@ export const useJobApplForm = <T extends Record<string, any>>({
 
     const res = await wrapAPI<T>({
       cbAPI: () =>
-        application
-          ? mutate({ data: formData, applicationID: application.id })
+        jobApplication
+          ? mutate({ data: formData, applicationID: jobApplication.id })
           : mutate(data),
     });
 

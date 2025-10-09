@@ -16,7 +16,7 @@ public class ConfirmEmailMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/verify/confirm-email", () -> {
-      return limit(api).then(checkQueryCbcHmac(api, TokenT.CONF_EMAIL).flatMap(user -> {
+      return limit(api, 5, 15).then(checkQueryCbcHmac(api, TokenT.CONF_EMAIL).flatMap(user -> {
         if (user.isVerified())
           return Mono.error(new ErrAPI("user already verified", 409));
 

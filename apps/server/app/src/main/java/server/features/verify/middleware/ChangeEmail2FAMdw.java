@@ -15,7 +15,7 @@ public class ChangeEmail2FAMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/verify/new-email-2FA", () -> {
-      return limit(api).then(check2FA(api, TokenT.CHANGE_EMAIL_2FA)).then(chain.filter(api));
+      return limit(api, 5, 15).then(check2FA(api, TokenT.CHANGE_EMAIL_2FA)).then(chain.filter(api));
     });
   }
 }

@@ -3,7 +3,7 @@ import { genPayloadJobAppl, getByID, getTokensLib } from "../../lib_tests/idx";
 import { goPage } from "../../lib_tests/shortcuts/go";
 
 export const preJobAppl = async (browser: Browser) => {
-  const { page, ...rst } = await getTokensLib(browser, {});
+  const { page, ...rst } = await getTokensLib(browser, { verifyUser: true });
 
   await goPage(page, "/job-applications/post");
 

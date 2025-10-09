@@ -15,7 +15,7 @@ public class VerifyRecoverPwd2FAMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/verify/recover-pwd-2FA", () -> {
-      return limit(api).then(check2FA(api, TokenT.RECOVER_PWD)).then(chain.filter(api));
+      return limit(api, 5, 15).then(check2FA(api, TokenT.RECOVER_PWD)).then(chain.filter(api));
     });
   }
 }

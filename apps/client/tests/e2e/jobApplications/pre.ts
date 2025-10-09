@@ -6,7 +6,9 @@ import { JobApplicationT } from "@/features/jobApplications/types";
 export const relevantKeysJobAppl = ["companyName", "positionName", "status"];
 
 export const preJobAppl = async (browser: Browser) => {
-  const { page, accessToken, ...rst } = await getTokensLib(browser, {});
+  const { page, accessToken, ...rst } = await getTokensLib(browser, {
+    verifyUser: true,
+  });
 
   const originalPayload = genPayloadJobAppl();
 

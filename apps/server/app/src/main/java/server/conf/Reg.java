@@ -19,6 +19,7 @@ public final class Reg {
         public static final String BKP_CODE = "^[A-F0-9]{4}-[A-F0-9]{4}$";
         public static final String BASE_64 = "^[A-Za-z0-9+/]*={0,2}$";
         public static final String DATE_PICKER = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$";
+        public static final String HEX_UUID = "^[a-f0-9\\-]+$";
 
         private Reg() {
                 throw new ErrAPI("Keep Reg class as static helper", 500);
@@ -86,5 +87,9 @@ public final class Reg {
 
         public static boolean isB64(String arg) {
                 return checkReg(arg, BASE_64);
+        }
+
+        public static boolean isIlikeUUID(String arg) {
+                return checkReg(arg, HEX_UUID);
         }
 }

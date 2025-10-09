@@ -10,13 +10,16 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.BaseMdw;
 
-@SuppressFBWarnings({ "EI2" }) @Component @RequiredArgsConstructor @Order(50)
+@SuppressFBWarnings({ "EI2" })
+@Component
+@RequiredArgsConstructor
+@Order(50)
 public class JobApplicationsMdw extends BaseMdw {
 
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
-    return isProtected(api, chain, "/job-applications", () -> {
-      return checkJwtMandatory(api).then(chain.filter(api));
+    return isSubPathOf(api, chain, "/job-applications", () -> {
+      return checkJwtVerified(api).then(chain.filter(api));
     });
   }
 }

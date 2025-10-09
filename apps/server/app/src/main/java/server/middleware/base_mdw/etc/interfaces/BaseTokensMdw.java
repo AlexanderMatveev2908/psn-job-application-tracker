@@ -1,6 +1,7 @@
 package server.middleware.base_mdw.etc.interfaces;
 
 import reactor.core.publisher.Mono;
+import server.decorators.flow.ErrAPI;
 import server.decorators.flow.api.Api;
 import server.middleware.base_mdw.etc.services_mdw.TokenCheckerSvcMdw;
 import server.models.token.etc.TokenT;
@@ -13,6 +14,11 @@ public interface BaseTokensMdw {
   // ? session tokens
   default Mono<User> checkJwtMandatory(Api api) {
     return useTokenChecker().checkJwt(api, true);
+  }
+
+  default Mono<User> checkJwtVerified(Api api) {
+    return checkJwtMandatory(api)
+        .flatMap(user -> user.isVerified() ? Mono.just(user) : Mono.error(new ErrAPI("user not verified", 403)));
   }
 
   default Mono<User> checkJwtOptional(Api api) {

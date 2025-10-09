@@ -15,7 +15,7 @@ public class Login2FAMdw extends BaseMdw {
   @Override
   public Mono<Void> handle(Api api, WebFilterChain chain) {
     return isTarget(api, chain, "/auth/login-2FA", () -> {
-      return limit(api).then(check2FA(api, TokenT.LOGIN_2FA)).then(chain.filter(api));
+      return limit(api, 5, 15).then(check2FA(api, TokenT.LOGIN_2FA)).then(chain.filter(api));
     });
   }
 }

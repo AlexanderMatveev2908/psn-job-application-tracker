@@ -1,5 +1,8 @@
 package server.features.job_applications.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +12,16 @@ import reactor.core.publisher.Mono;
 import server.decorators.flow.api.Api;
 import server.decorators.flow.res_api.ResAPI;
 
-@SuppressFBWarnings({ "EI2" }) 
-@Component 
+@SuppressFBWarnings({ "EI2" })
+@Component
 @RequiredArgsConstructor
 public class GetJobApplications {
 
-  public Mono<ResponseEntity<ResAPI>> example(Api api) {
-    return new ResAPI(200).msg("Get JobApplications endpoint").build();
+  public Mono<ResponseEntity<ResAPI>> getById(Api api) {
+
+    Map<String, Object> body = new HashMap<>();
+    body.put("jobApplication", api.getMappedData());
+
+    return new ResAPI(200).msg("application found").data(body).build();
   }
 }

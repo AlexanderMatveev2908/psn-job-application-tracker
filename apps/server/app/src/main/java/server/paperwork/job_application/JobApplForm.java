@@ -14,18 +14,25 @@ import server.decorators.flow.ErrAPI;
 import server.models.applications.etc.JobApplStatusT;
 import server.paperwork.enum_val.EnumMatch;
 
-@Data @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JobApplForm {
-  @NotBlank(message = "company name required") @Pattern(regexp = Reg.JOB_NAME, message = "company name invalid") @Size(max = 100, message = "max length company name exceeded")
+  @NotBlank(message = "company name required")
+  @Pattern(regexp = Reg.JOB_NAME, message = "company name invalid")
+  @Size(max = 100, message = "max length company name exceeded")
   private String companyName;
 
-  @NotBlank(message = "position name required") @Pattern(regexp = Reg.JOB_NAME, message = "position name invalid") @Size(max = 100, message = "max length position name exceeded")
+  @NotBlank(message = "position name required")
+  @Pattern(regexp = Reg.JOB_NAME, message = "position name invalid")
+  @Size(max = 100, message = "max length position name exceeded")
   private String positionName;
 
-  @NotBlank(message = "status required") @EnumMatch(enumCls = JobApplStatusT.class)
+  @NotBlank(message = "status required")
+  @EnumMatch(enumCls = JobApplStatusT.class)
   private String status;
 
-  @Pattern(regexp = Reg.TXT, message = "notes invalid") @Size(max = 1000, message = "max length notes exceeded")
+  @Pattern(regexp = Reg.TXT, message = "notes invalid")
+  @Size(max = 1000, message = "max length notes exceeded")
   private String notes;
 
   @Pattern(regexp = Reg.DATE_PICKER, message = "date invalid")
@@ -40,7 +47,8 @@ public class JobApplForm {
       LocalDate date = LocalDate.parse(appliedAt);
       return date.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     } catch (Exception err) {
-      throw new ErrAPI("invalid applied_at date");
+      err.printStackTrace();
+      throw new ErrAPI("invalid applied_at date", 400);
     }
   }
 
