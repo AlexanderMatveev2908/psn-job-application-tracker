@@ -4,11 +4,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
 import server.models.applications.etc.JobApplStatusT;
 import server.paperwork.enum_val.enum_list.EnumList;
 import server.paperwork.pagination.PagSpec;
 
+@SuppressFBWarnings({ "EI2", "EI" })
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueryJobsForm implements PagSpec, QueryJobsSpec {
