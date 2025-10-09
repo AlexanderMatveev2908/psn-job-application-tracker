@@ -18,7 +18,7 @@ public class EnumMatchValidator implements ConstraintValidator<EnumMatch, Object
   @Override
   public boolean isValid(Object value, ConstraintValidatorContext ctx) {
     if (value == null)
-      return false;
+      return true;
 
     return whitelist.contains(value.toString());
   }

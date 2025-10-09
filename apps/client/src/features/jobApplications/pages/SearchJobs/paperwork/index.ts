@@ -24,9 +24,9 @@ export const searchJobsSchema = z
 
     status: z.array(z.enum(Object.values(ApplicationStatusT))),
 
-    created_at_sort: z.string(),
-    updated_at_sort: z.string(),
-    appliedAt_sort: z.string(),
+    createdAtSort: z.string(),
+    updatedAtSort: z.string(),
+    appliedAtSort: z.string(),
   })
   .superRefine((data, ctx) => {
     let i = 0;
@@ -72,7 +72,7 @@ export const resetValsSearchJobs: SearchJobsFormT = {
   txtFields: [{ ...searchJobsFieldsTxt[0], val: "" }],
   status: [],
 
-  created_at_sort: "",
-  updated_at_sort: "",
-  appliedAt_sort: "",
+  createdAtSort: "",
+  updatedAtSort: "",
+  appliedAtSort: "",
 };

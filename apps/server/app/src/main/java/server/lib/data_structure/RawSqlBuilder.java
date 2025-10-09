@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.Statement;
+import server.paperwork.pagination.PagSpec;
 
 public class RawSqlBuilder {
   public static void appendILike(StringBuilder sql, List<Object> params, String key, String val) {
@@ -44,12 +45,35 @@ public class RawSqlBuilder {
     sql.append(")");
   }
 
-  public static Statement create(Connection client, StringBuilder sql, List<Object> params) {
+  public static Statement createStmnt(Connection client, String sql, List<Object> params) {
     Statement stmt = client.createStatement(sql.toString());
     for (int i = 0; i < params.size(); i++)
       stmt.bind(i, params.get(i));
 
     return stmt;
+  }
+
+  public static Statement createHitsCounter(Connection client, StringBuilder sql, List<Object> params) {
+    List<Object> cpyParams = List.copyOf(params);
+
+    String txt = sql.toString();
+    String replaced = txt.replaceFirst("(?i)select\\s+\\*", "SELECT COUNT(*)");
+
+    Statement counter = RawSqlBuilder.createStmnt(client, replaced, cpyParams);
+
+    return counter;
+
+  }
+
+  public static int withPagination(StringBuilder sql, List<Object> params, PagSpec form) {
+    sql.append(" LIMIT $").append(params.size() + 1);
+    params.add(form.getLimit());
+
+    sql.append(" OFFSET $").append(params.size() + 1);
+    int offset = form.getPage() * form.getLimit();
+    params.add(offset);
+
+    return offset;
   }
 
 }

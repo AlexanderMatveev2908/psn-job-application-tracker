@@ -1,7 +1,7 @@
 package server.features.job_applications.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,30 +40,63 @@ public class ReadJobsSvc {
       List<Object> params = new ArrayList<>();
       params.add(userId);
 
+      // ? generic query
       if (ShapeCheck.isStr(form.getCompanyName()))
         RawSqlBuilder.appendILike(sql, params, "company_name", form.getCompanyName());
       if (ShapeCheck.isStr(form.getPositionName()))
         RawSqlBuilder.appendILike(sql, params, "position_name", form.getPositionName());
-
       if (ShapeCheck.isList(form.getStatus()))
         RawSqlBuilder.isIn(sql, params, "status", "application_status_t", form.getStatus());
 
-      Statement stmt = RawSqlBuilder.create(client, sql, params);
+      // ? create counter before inserting order or pagination not needed
+      // ? to know n_hits 
+      Statement hitsCounter = RawSqlBuilder.createHitsCounter(client, sql, params);
 
-      return Flux.from(stmt.execute())
-          .flatMap(res -> res.map((row, meta) -> {
-            var mapped = Prs.mapSql(row, meta);
-            return mapped;
+      // ? order logic
+      List<String> orderParts = new ArrayList<>();
+
+      if (ShapeCheck.isStr(form.getCreatedAtSort()))
+        orderParts.add("created_at " + form.getCreatedAtSort());
+      if (ShapeCheck.isStr(form.getUpdatedAtSort()))
+        orderParts.add("updated_at " + form.getUpdatedAtSort());
+      if (ShapeCheck.isStr(form.getAppliedAtSort()))
+        orderParts.add("applied_at " + form.getAppliedAtSort());
+
+      if (!orderParts.isEmpty())
+        sql.append(" ORDER BY ").append(String.join(", ", orderParts));
+
+      // ? manage pagination
+      RawSqlBuilder.withPagination(sql, params, form);
+
+      Statement stmt = RawSqlBuilder.createStmnt(client, sql.toString(), params);
+
+      return Mono.from(hitsCounter.execute()).doOnError(err -> err.printStackTrace())
+          .flatMapMany(resHits -> resHits.map((rowHits, metaHits) -> {
+            Long nHits = rowHits.get(0, Long.class);
+
+            return nHits;
           }))
-          .collectList().flatMap(applications -> {
-            Map<String, Object> data = new HashMap<>();
+          .single(0L)
+          .flatMap(nHits -> Flux.from(stmt.execute())
+              .flatMap(res -> res.map((row, meta) -> {
+                var mapped = Prs.mapSql(row, meta);
 
-            data.put("jobApplications", applications);
-            data.put("nHits", applications.size());
+                return mapped;
+              }))
+              .collectList()
+              .map(applications -> {
+                Map<String, Object> data = new LinkedHashMap<>();
 
-            return Mono.just(data);
-          });
+                int pages = (int) Math.ceil((double) nHits / form.getLimit());
+                data.put("nHits", nHits);
+                data.put("pages", pages);
+                data.put("hasPrevPage", form.getPage() > 0);
+                data.put("hasNextPage", form.getPage() + 1 * form.getLimit() < nHits);
+                data.put("jobApplications", applications);
+                data.put("queryForm", form);
+
+                return data;
+              }));
     });
-
   }
 }
