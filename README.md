@@ -518,10 +518,6 @@ To allow GitHub Actions to deploy the app, you’ll need to configure deployment
 
 ---
 
-Got it buddy 😎 let’s make your **Python CLI section** read smooth, professional, and clear while still keeping it developer-friendly. Here’s a polished version of what you wrote:
-
----
-
 ## ⚙️ Python CLI
 
 ### Working Directory
